@@ -26,6 +26,14 @@ Soporte FITS/PSRFITS/Filterbank; \emph{chunking} con \emph{overlap} parametrizab
 
 El sistema procesa archivos FITS/PSRFITS mediante algoritmos de normalización por canal que compensan variaciones instrumentales y efectos de ganancia. Se implementa enmascarado adaptativo de interferencia de radiofrecuencia (RFI) basado en análisis estadístico de outliers temporales y espectrales. La arquitectura de \emph{chunking} con solapamiento controlado permite procesamiento eficiente de observaciones de larga duración mediante streaming de datos con gestión automática de memoria.
 
+\begin{center}
+\includegraphics[width=0.9\textwidth]{figures/sistema-chunks.png}
+
+\noindent\textbf{Figura \ref{fig:sistema-chunks}:} Esquema de un archivo astronómico dividido en chunks y slices, ilustrando el concepto de procesamiento con solapamiento. Fuente: Elaboración propia.
+\label{fig:sistema-chunks}
+\vspace{0.5cm}
+\end{center}
+
 \subsubsection{Aceleración y Control de Recursos}
 
 Vectorización, uso opcional de GPU, paralelización por bloques, \textit{caches} por canal y reducción de I/O. Métricas por etapa (tiempos, throughput, picos de memoria).
