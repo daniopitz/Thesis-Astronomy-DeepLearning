@@ -1,2 +1,5 @@
 \babel@toc {spanish}{}\relax 
-\contentsline {figure}{\numberline {1}{\ignorespaces Malla Curricular Ingeniería Civil Informática.}}{5}{figure.0.1}%
+\contentsline {figure}{\numberline {1.1}{\ignorespaces \textbf {Sugerencia de figura:} Flujo actual (dedispersión + candidatos + curaduría) versus flujo propuesto (detección DL + clasificación DL + reporte). Señalar puntos de latencia y reducción de falsos positivos.}}{4}{figure.0.1}%
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Modo HF: del perfil SNR a cajas sintéticas, dedispersión local y clasificación binaria. Fuente: Elaboración propia.}}{12}{figure.0.1}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Ejemplo de TWL-map (tiempo vs. ancho con intensidad de $L$). Fuente: Elaboración propia.}}{13}{figure.0.2}%
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Arquitectura unificada: Strategy (propuesta de candidatos) + Validador DM-aware + Visualizador. \textit {Fuente: Elaboración propia}.}}{15}{figure.0.3}%

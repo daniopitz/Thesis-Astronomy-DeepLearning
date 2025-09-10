@@ -10,14 +10,14 @@
 
 % NOTE: Leer nota en el README sobre la font.
 
-\newcommand{\titulo}{Título de la memoria}
+\newcommand{\titulo}{Desarrollo de un pipeline basado en DRAFTS para detección y clasificación de transientes de radio con adaptación y extensión en regímenes de alta frecuencia}
 \newcommand{\ciudad}{Valparaíso} % e.g. Valparaíso
 % TODO: Consultar el formato de los nombres:
 \newcommand{\nombrealumno}{Sebastian Salgado Polanco}
 \newcommand{\nombreprofesor}{Daniela Opitz}
 \newcommand{\nombrecorreferente}{Marylin Cruces}
 % Mes y año del examen
-\newcommand{\mesexamen}{Diciembre}
+\newcommand{\mesexamen}{Enero}
 \newcommand{\anioexamen}{2025}
 % Dedicatoria y agradecimientos
 \newcommand{\dedicatoria}{
@@ -83,6 +83,10 @@ Corresponde a la traducción al idioma inglés de Palabras Clave anteriores.
 \titlespacing*{name=\section}{0pt}{0pt}{0.5cm}
 \titlespacing*{name=\section,numberless}{0pt}{0pt}{0.5cm}
 
+% Formato para subsecciones numeradas
+\titleformat{name=\subsection}[block]{\fontsize{14.4}{18}\selectfont\bfseries}{\arabic{mychapter}.\arabic{subsection}}{0.5em}{#1}
+\titlespacing*{name=\subsection}{0pt}{0pt}{0.3cm}
+
 % Separación entre parrafos
 \setlength{\parskip}{0.4cm}
 
@@ -90,6 +94,12 @@ Corresponde a la traducción al idioma inglés de Palabras Clave anteriores.
 \usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage{float}
+\usepackage{booktabs}  % Para comandos de tablas profesionales (\toprule, \midrule, \bottomrule)
+\usepackage{tikz}       % Para diagramas y gráficos
+\usetikzlibrary{positioning,shapes.geometric,arrows.meta}
+\usepackage{algorithm}  % Para pseudocódigos
+\usepackage{algpseudocode}  % Para pseudocódigos con estilo
+\usepackage{listings}   % Para código con formato
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
 
 % Formato de las tablas de contenido
@@ -126,12 +136,21 @@ Corresponde a la traducción al idioma inglés de Palabras Clave anteriores.
 }
 
 % Comandos para secciones
+\newcounter{mychapter}
+\setcounter{mychapter}{0}
+\setcounter{section}{0}
+\setcounter{figure}{0}
+\setcounter{table}{0}
 \newcommand{\secnumbersection}[1]{
-\addtocounter{section}{1}
+\stepcounter{mychapter}
+\stepcounter{section}
 \phantomsection
-\section*{CAPÍTULO \thesection \texorpdfstring{\\}\ #1}
-\addcontentsline{toc}{section}{CAPÍTULO \thesection : #1}
+\section*{CAPÍTULO \themychapter \texorpdfstring{\\}\ #1}
+\addcontentsline{toc}{section}{CAPÍTULO \themychapter : #1}
 \setcounter{subsection}{0}
+\setcounter{figure}{0}
+\setcounter{table}{0}
+\renewcommand{\thesubsection}{\arabic{mychapter}.\arabic{subsection}}
 }
 \newcommand{\secnumberlesssection}[1]{
 \section*{#1}
@@ -165,6 +184,33 @@ Corresponde a la traducción al idioma inglés de Palabras Clave anteriores.
        {\@latex@warning{Empty `thebibliography' environment}}%
       \endlist}
 \makeatother
+
+% Configuración de numeración de figuras y tablas
+\renewcommand{\thefigure}{\arabic{mychapter}.\arabic{figure}}
+\renewcommand{\thetable}{\arabic{mychapter}.\arabic{table}}
+
+% Configuración para pseudocódigos con estilo profesional
+\algnewcommand\algorithmicinput{\textbf{Entrada:}}
+\algnewcommand\algorithmicoutput{\textbf{Salida:}}
+\algnewcommand\Input{\item[\algorithmicinput]}
+\algnewcommand\Output{\item[\algorithmicoutput]}
+
+% Configuración de listings para código
+\lstset{
+    basicstyle=\ttfamily\small,
+    keywordstyle=\bfseries,
+    commentstyle=\itshape,
+    stringstyle=\itshape,
+    numbers=left,
+    numberstyle=\tiny,
+    stepnumber=1,
+    numbersep=5pt,
+    frame=single,
+    breaklines=true,
+    breakatwhitespace=true,
+    tabsize=2,
+    showstringspaces=false
+}
 
 % Personalizar Tabla de Contenidos
 
