@@ -1,0 +1,46 @@
+# Archivos auxiliares de LaTeX
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+*.lof
+*.lot
+*.nav
+*.snm
+*.vrb
+*.idx
+*.ilg
+*.ind
+*.lol
+
+# Directorios de salida
+out/
+$OutDir/
+build/
+
+# Archivos temporales del sistema
+.DS_Store
+Thumbs.db
+*.tmp
+*.temp
+
+# Archivos de editor
+*~
+*.swp
+*.swo
+.vscode/settings.json
+
+# Archivos de compilación
+*.pdf
+!figures/*.pdf
+
+# Archivos de respaldo
+*.bak
+*.backup
