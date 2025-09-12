@@ -14,8 +14,6 @@ Esta propuesta se estructura en \textbf{dos grandes bloques} que abordan desafí
 
 \textbf{Bloque 2: Extensión a Alta Frecuencia - Cuatro Líneas de Investigación} explora estrategias metodológicas para extender las capacidades de detección hacia regímenes de alta frecuencia (30-100 GHz), donde las firmas dispersivas tradicionales se atenúan significativamente. Este bloque presenta cuatro líneas de investigación complementarias que abordan diferentes aspectos del desafío de detección en el espectro milimétrico.
 
-Los diagramas de arquitectura muestran el flujo E2E y la arquitectura unificada por \emph{Strategy}. \textit{Fuente: Elaboración propia}.
-
 \subsection{Bloque 1: DRAFTS++ - Pipeline Productivo, Robusto y Eficiente}
 
 Este bloque aborda la transformación fundamental del prototipo DRAFTS original hacia un sistema productivo capaz de operar en entornos observacionales reales. La evolución desde un prototipo de investigación hacia sistema productivo requiere una transformación arquitectónica fundamental que aborde las limitaciones inherentes del código base original.
@@ -54,7 +52,7 @@ El sistema procesa archivos FITS/PSRFITS mediante algoritmos de normalización p
 
 La arquitectura de \emph{chunking} con solapamiento controlado permite procesamiento eficiente de observaciones de larga duración mediante streaming de datos con gestión automática de memoria. Esta aproximación elimina las limitaciones de memoria del prototipo original y permite procesar observaciones de cualquier duración.
 
-\begin{figure}[h]
+\begin{figure}[H]
 \centering
 \includegraphics[width=0.9\textwidth]{figures/sistema-chunks.png}
 \caption{Esquema de un archivo astronómico dividido en chunks y slices, ilustrando el concepto de procesamiento con solapamiento. Fuente: Elaboración propia.}
@@ -71,7 +69,7 @@ Sistema de \emph{logging} estructurado que registra todas las operaciones críti
 
 Las salidas incluyen reportes CSV/Parquet estructurados, figuras consistentes (tiempo--DM, dispersado/dedispersado, parches) y \textit{composites} que facilitan el análisis posterior y la validación de resultados.
 
-\begin{table}[h] 
+\begin{table}[H] 
 \centering 
   \caption{\label{tab:mejoras} Resumen de mejoras de ingeniería (DRAFTS++). \textit{Fuente: Elaboración propia}.}
 \begin{tabular}{p{0.28\textwidth} p{0.32\textwidth} p{0.32\textwidth}} 
@@ -127,6 +125,33 @@ Esta línea implementa una aproximación híbrida que combina la detección trad
 
 Esta línea mantiene la eficiencia computacional de la detección por SNR (O(N)) mientras aprovecha la precisión de la red de clasificación entrenada de DRAFTS++. La activación automática del modo HF cuando $\Delta t_{\mathrm{ms}} < \alpha\, t_{\mathrm{samp}}$ garantiza que se use la estrategia más apropiada según las condiciones físicas.
 
+\begin{figure}[H] 
+\centering 
+% \includegraphics[width=0.9\textwidth]{hf_mode_snr_boxes.pdf} 
+\caption{\label{fig:hf} Modo HF: del perfil SNR a cajas sintéticas, dedispersión local y clasificación binaria. Fuente: Elaboración propia.} 
+\end{figure}
+
+\paragraph{Pseudocódigo de Detección SNR}
+
+\begin{algorithm}[H]
+\caption{Detección SNR para Alta Frecuencia}
+\begin{algorithmic}[1]
+\Input{$s(t)$, umbral $T$, separación mínima $\Delta t_{min}$}
+\Output{Lista de picos candidatos $\{t_i\}$}
+\Function{DetectarPicosSNR}{$s$, $T$, $\Delta t_{min}$}
+    \State $s_{norm} \leftarrow (s - median(s)) / MAD(s)$
+    \State $picos \leftarrow maxima\_locales(s_{norm})$
+    \State $candidatos \leftarrow [\ ]$
+    \For{$t$ \textbf{in} $picos$}
+        \If{$s_{norm}[t] \geq T$ \textbf{and} $dist\_minima(t, candidatos) \geq \Delta t_{min}$}
+            \State $candidatos.append(t)$
+        \EndIf
+    \EndFor
+    \State \textbf{return} $candidatos$
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
 \subsubsection{Línea 3: Nuevos Plots Característicos - TWL-maps}
 
 \paragraph{Concepto de TWL-maps}
@@ -152,6 +177,50 @@ El proceso de detección híbrida sigue una secuencia específica que garantiza 
 \item \textbf{Guardado de resultados:} Los candidatos válidos se almacenan con métricas completas y se generan visualizaciones correspondientes.
 \end{enumerate}
 
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    node distance=1.2cm and 1.5cm,
+    box/.style={rectangle, draw, fill=blue!20, text width=2.2cm, text centered, minimum height=0.7cm, font=\small},
+    decision/.style={diamond, draw, fill=yellow!20, text width=1.8cm, text centered, minimum height=0.7cm, font=\small},
+    process/.style={rectangle, draw, fill=green!20, text width=2.2cm, text centered, minimum height=0.7cm, font=\small},
+    arrow/.style={-Stealth, thick}
+]
+
+% Nodos principales
+\node[box] (A) {Pipeline Alta Frecuencia};
+\node[decision, below=of A] (B) {TWL Híbrido?};
+\node[process, below left=of B] (C) {Generar Mapa t-W};
+\node[process, below=of C] (D) {Convertir a Tensor RGB};
+\node[process, below=of D] (E) {Red de Detección};
+\node[decision, below=of E] (F) {Candidatos?};
+\node[process, below left=of F] (G) {Clasificación Binaria};
+\node[process, below right=of B] (H) {Fallback SNR};
+\node[process, below=of H] (I) {Detección SNR Tradicional};
+\node[process, below=of G] (J) {Guardar Candidatos};
+
+% Conexiones
+\draw[arrow] (A) -- (B);
+\draw[arrow] (B) -- node[left] {Sí} (C);
+\draw[arrow] (C) -- (D);
+\draw[arrow] (D) -- (E);
+\draw[arrow] (E) -- (F);
+\draw[arrow] (F) -- node[left] {Sí} (G);
+\draw[arrow] (B) -- node[right] {No} (H);
+\draw[arrow] (H) -- (I);
+\draw[arrow] (I) -- (F);
+\draw[arrow] (G) -- (J);
+
+\end{tikzpicture}
+\caption{\label{fig:hf-pipeline} Flujo del Pipeline de Alta Frecuencia: detección híbrida TWL con fallback automático a SNR tradicional. El diagrama muestra la decisión que determina si usar detección híbrida (mapa t-W + CenterNet) o fallback a SNR tradicional. Fuente: Elaboración propia.}
+\end{figure}
+
+\begin{figure}[H] 
+\centering 
+% \includegraphics[width=0.9\textwidth]{twl_map.pdf} 
+\caption{\label{fig:twl} Ejemplo de TWL-map (tiempo vs. ancho con intensidad de $L$). Fuente: Elaboración propia.} 
+\end{figure}
+
 \subsubsection{Línea 4: Estrategias Alternativas del Autor de DRAFTS}
 
 \paragraph{DM-range Expand \& Step Coarse}
@@ -172,13 +241,7 @@ Esta línea explora estrategias sugeridas por Yong–Kun Zhang \cite{zhang2024dr
 
 Ambas tácticas se exponen como \textbf{estrategias} de propuesta de candidatos (alternativas a SNR/TWL/DM--Time) y se someten al \textbf{mismo} validador DM-aware, clasificación y visualización.
 
-\subsection{Arquitectura Unificada y Diagramas}
-
-\subsubsection{Arquitectura Unificada (Strategy + Validator + Visualizer)}
-
-Se adopta un patrón \textbf{Strategy} para la \textbf{propuesta de candidatos} (intercambiable: DM--Time/CenterNet, TWL-híbrido, SNR, DM-expand, fishing en DM$\approx0$), con un \textbf{validador DM-aware} común y un \textbf{visualizador desacoplado}. La función de proceso se unifica como \texttt{process\_slice(..., strategy)}.
-
-\begin{table}[h] 
+\begin{table}[H] 
 \centering 
 \caption{\label{tab:estrategias} Estrategias de propuesta de candidatos y criterios de uso. Fuente: Elaboración propia.} 
 \begin{tabular}{p{0.24\textwidth} p{0.38\textwidth} p{0.30\textwidth}} 
@@ -193,9 +256,156 @@ DM$\approx 0$ fishing + validar DM$>0$ & Para "pescar" candidatos débiles & + S
 \end{tabular} 
 \end{table}
 
+\begin{table}[H]
+  \centering
+  \caption{\label{tab:param_hf} Parámetros del modo HF (valores iniciales). \textit{Fuente: Elaboración propia}.}
+  \begin{tabular}{p{0.35\textwidth} p{0.55\textwidth}}
+    \toprule
+    \textbf{Parámetro} & \textbf{Descripción} \\
+    \midrule
+    $T$ (umbral SNR) & 5--7; ajustar por FDR y condiciones de ruido \\
+    $\Delta t_{\min}$ & Múltiplo del ancho de pulso esperado \\
+    Rejilla DM local & Centrada en 0; pasos gruesos y posterior refinamiento \\
+    Sub-bandas & 2--4 particiones para coherencia \\
+    Criterio DM & Requerir DM$^\ast>0$ (con error acotado) \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Arquitectura Unificada y Diagramas}
+
+\subsubsection{Arquitectura Unificada (Strategy + Validator + Visualizer)}
+
+Se adopta un patrón \textbf{Strategy} para la \textbf{propuesta de candidatos} (intercambiable: DM--Time/CenterNet, TWL-híbrido, SNR, DM-expand, fishing en DM$\approx0$), con un \textbf{validador DM-aware} común y un \textbf{visualizador desacoplado}. La función de proceso se unifica como \texttt{process\_slice(..., strategy)}.
+
+\begin{figure}[H] 
+\centering 
+% \includegraphics[width=0.96\textwidth]{arquitectura_unificada.pdf} 
+\caption{\label{fig:arquitectura-unificada} Arquitectura unificada: Strategy (propuesta de candidatos) + Validador DM-aware + Visualizador. \textit{Fuente: Elaboración propia}.} 
+\end{figure}
+
+\paragraph{Bucle Unificado (Pseudocódigo)}
+
+\begin{algorithm}[H]
+\caption{Pipeline Unificado con Strategy Pattern}
+\begin{algorithmic}[1]
+\Input{$config$, $obs\_params$, $data\_files$}
+\Output{Candidatos validados y métricas}
+\Function{RunPipeline}{$config$, $obs\_params$}
+    \State $strategy \leftarrow select\_strategy(config, obs\_params)$
+    \For{$chunk$ \textbf{in} $stream\_data(\ldots)$}
+        \State $cands \leftarrow strategy.propose(chunk, meta)$
+        \For{$c$ \textbf{in} $cands$}
+            \State $patch \leftarrow extract\_patch\_and\_dedisperse(chunk, c, local\_dm\_grid)$
+            \State $y \leftarrow classifier.predict(patch)$
+            \If{$y.is\_burst$ \textbf{and} $dm\_validate(patch)$ \textbf{and} $subband\_consistency(patch)$}
+                \State $save\_candidate(patch, y, metrics)$
+            \EndIf
+        \EndFor
+    \EndFor
+    \State $visualize\_and\_summarize(run\_id)$
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
 \subsubsection{Diagrama End-to-End del Pipeline}
 
-El diagrama end-to-end sintetiza el flujo desde \texttt{main.py} hasta los resultados, con ramas clásica (DM--Time/CenterNet) y de alta frecuencia (TWL-híbrido, SNR) y \textit{fallbacks}.
+La Figura \ref{fig:pipeline-end-to-end} sintetiza el flujo desde \texttt{main.py} hasta los resultados, con ramas clásica (DM--Time/CenterNet) y de alta frecuencia (TWL-híbrido, SNR) y \textit{fallbacks}.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    node distance=1.0cm and 1.5cm,
+    box/.style={rectangle, draw, fill=blue!20, text width=2.0cm, text centered, minimum height=0.6cm, font=\tiny},
+    decision/.style={diamond, draw, fill=yellow!20, text width=1.6cm, text centered, minimum height=0.6cm, font=\tiny},
+    process/.style={rectangle, draw, fill=green!20, text width=2.0cm, text centered, minimum height=0.6cm, font=\tiny},
+    output/.style={rectangle, draw, fill=orange!20, text width=2.0cm, text centered, minimum height=0.6cm, font=\tiny},
+    arrow/.style={-Stealth, thick}
+]
+
+% FLUJO SIMPLIFICADO
+\node[box] (A) {main.py};
+\node[box, below=of A] (B) {run\_pipeline};
+\node[box, below=of B] (C) {Cargar Modelos};
+
+% ENTRADA DE DATOS
+\node[box, right=of B] (D) {find\_data\_files};
+\node[decision, below=of D] (E) {Tipo Archivo?};
+\node[box, below left=of E] (F) {fits\_handler};
+\node[box, below right=of E] (G) {filterbank\_handler};
+
+% PROCESAMIENTO
+\node[box, below=of E] (H) {streaming\_orchestrator};
+\node[box, below=of H] (I) {Procesar Chunk};
+\node[decision, below=of I] (J) {Frecuencia ≥ 8GHz?};
+
+% PIPELINES
+\node[box, below left=of J] (K) {Pipeline Alta Frecuencia};
+\node[box, below right=of J] (L) {Pipeline Clásico};
+
+% DETECCIÓN
+\node[decision, below=of K] (M) {TWL\_HYBRID?};
+\node[box, below left=of M] (N) {TWL + CenterNet};
+\node[box, below right=of M] (O) {SNR Tradicional};
+\node[process, below=of L] (P) {CenterNet DM-Time};
+
+% CLASIFICACIÓN
+\node[process, below=of N] (Q) {classify\_patch};
+\node[process, below=of O] (R) {classify\_patch};
+\node[process, below=of P] (S) {classify\_patch};
+
+% RESULTADOS
+\node[output, below=of Q] (T) {Guardar Candidatos};
+\node[output, below=of R] (U) {Guardar Candidatos};
+\node[output, below=of S] (V) {Guardar Candidatos};
+
+% VISUALIZACIÓN
+\node[output, below=of T] (W) {Plots + CSV};
+\node[output, below=of U] (X) {Plots + CSV};
+\node[output, below=of V] (Y) {Plots + CSV};
+
+% Conexiones principales
+\draw[arrow] (A) -- (B);
+\draw[arrow] (B) -- (C);
+\draw[arrow] (B) -- (D);
+\draw[arrow] (D) -- (E);
+\draw[arrow] (E) -- node[left] {FITS} (F);
+\draw[arrow] (E) -- node[right] {Filterbank} (G);
+\draw[arrow] (F) -- (H);
+\draw[arrow] (G) -- (H);
+\draw[arrow] (H) -- (I);
+\draw[arrow] (I) -- (J);
+\draw[arrow] (J) -- node[left] {Sí} (K);
+\draw[arrow] (J) -- node[right] {No} (L);
+
+% Detección
+\draw[arrow] (K) -- (M);
+\draw[arrow] (M) -- node[left] {Sí} (N);
+\draw[arrow] (M) -- node[right] {No} (O);
+\draw[arrow] (L) -- (P);
+
+% Clasificación
+\draw[arrow] (N) -- (Q);
+\draw[arrow] (O) -- (R);
+\draw[arrow] (P) -- (S);
+
+% Resultados
+\draw[arrow] (Q) -- (T);
+\draw[arrow] (R) -- (U);
+\draw[arrow] (S) -- (V);
+
+% Visualización
+\draw[arrow] (T) -- (W);
+\draw[arrow] (U) -- (X);
+\draw[arrow] (V) -- (Y);
+
+\end{tikzpicture}
+\caption{\label{fig:pipeline-end-to-end} Diagrama end-to-end (ingesta $\to$ \emph{streaming}/\emph{chunking} $\to$ estrategia de candidatos $\to$ clasificación/validación $\to$ visualización y salida). \textit{Fuente: Elaboración propia}.}
+\end{figure}
+
+\subsection{Evaluación y Métricas}
+
+Conjuntos ya analizados (control de \emph{recall}) y datos mm-wave piloto. Métricas: \emph{recall}, \emph{precision}, tasa de FP, latencia por GB, throughput, coherencia sub-bandas y \emph{chunks}. \emph{Ablation}: sin validación DM-aware, sin coherencia por sub-bandas, sin TWL.
 
 \subsection{Síntesis de Contribuciones}
 
@@ -218,4 +428,4 @@ Esta investigación establece las bases para la próxima generación de sistemas
 \item \textbf{Aplicación a programas observacionales de gran escala:} Implementación en observatorios reales para validación operacional completa.
 \end{itemize}
 
-Los diagramas de arquitectura documentan la evolución arquitectónica completa, desde la conceptualización inicial hasta la implementación productiva. Juntos, demuestran no solo la transformación técnica del sistema, sino la creación de una plataforma extensible que puede adaptarse a futuros desarrollos en radioastronomía de transientes (Fuente: Elaboración propia).
+Las figuras \ref{fig:pipeline-end-to-end}, \ref{fig:hf-pipeline}, \ref{fig:hf}, \ref{fig:twl} y \ref{fig:arquitectura-unificada} documentan la evolución arquitectónica completa, desde la conceptualización inicial hasta la implementación productiva. Juntas, demuestran no solo la transformación técnica del sistema, sino la creación de una plataforma extensible que puede adaptarse a futuros desarrollos en radioastronomía de transientes (Fuente: Elaboración propia).
