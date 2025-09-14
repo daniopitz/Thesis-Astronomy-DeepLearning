@@ -1,5 +1,560 @@
 \secnumbersection{MARCO CONCEPTUAL}
 
-Se debe describir la base conceptual o fundamentos en los que se basa tu memoria, es decir, todos los conceptos técnicos, metodologías, herramientas, etc. que están involucradas en la solución propuesta. En el fondo esta parte permite precisar y delimitar el problema, estableciendo definiciones para unificar conceptos y lenguaje y fijar relaciones con otros trabajos o soluciones encontradas por otros al mismo problema evitando así plagios o repetir errores ya conocidos o abordados por otros.
+Este capítulo establece la base conceptual y metodológica en la que se fundamenta la presente investigación. Se describen los conceptos técnicos, metodologías, herramientas y técnicas que están involucradas en la solución propuesta, permitiendo precisar y delimitar el problema, establecer definiciones para unificar conceptos y lenguaje, y fijar relaciones con otros trabajos o soluciones encontradas por otros investigadores al mismo problema, evitando así duplicaciones o repetir errores ya conocidos.
 
-En esta parte es importante relacionar estos conceptos con la memoria y es fundamental utilizar referencias bibliográficas (o de la web) recientes, por ejemplo \cite{gettelfinger2004will}.
+La estructura de este marco conceptual sigue un flujo lógico que va desde los fundamentos científicos de los Fast Radio Bursts (FRBs) hasta la identificación de brechas tecnológicas que justifican la contribución propuesta. Es fundamental utilizar referencias bibliográficas recientes para establecer el estado actual del conocimiento en cada área temática.
+
+\subsection{Fundamentos de Fast Radio Bursts (FRBs)}
+
+Los Fast Radio Bursts constituyen uno de los fenómenos más intrigantes y activamente estudiados en la radioastronomía moderna. Esta sección establece la base científica fundamental que justifica la importancia del problema de detección y clasificación de FRBs, proporcionando el contexto necesario para comprender las motivaciones detrás del desarrollo de pipelines automatizados especializados.
+
+\subsubsection{Descubrimiento y evolución del conocimiento}
+
+El descubrimiento del primer Fast Radio Burst por Lorimer et al. (2007) \cite{Lorimer_2007}, conocido como el "Lorimer Burst", marcó el inicio de una nueva era en la radioastronomía. Este evento milisegundo de origen extragaláctico, detectado en datos archivados del telescopio Parkes, estableció la existencia de una nueva clase de fenómenos transitorios de alta energía.
+
+Desde entonces, el campo ha experimentado una evolución exponencial, con el descubrimiento de más de 1000 FRBs confirmados y la identificación de patrones de comportamiento que han revolucionado nuestra comprensión del fenómeno. La evolución del conocimiento ha sido documentada en revisiones comprehensivas como la de Petroff et al. (2022) \cite{Petroff_2022}, que establece el estado actual del campo en la década de 2020.
+
+Esta evolución continua del conocimiento demuestra que los FRBs representan un campo activo y en crecimiento, donde nuevas técnicas de detección y análisis son constantemente requeridas para abordar preguntas científicas emergentes.
+
+\subsubsection{Características observacionales fundamentales}
+
+Los FRBs se caracterizan por una serie de propiedades observacionales únicas que los distinguen de otros fenómenos radioastronómicos. Estas características incluyen:
+
+\begin{itemize}
+    \item \textbf{Duración temporal}: Pulsos de milisegundos a segundos, con la mayoría concentrados en el rango de 1-10 ms
+    \item \textbf{Dispersión medida (DM)}: Valores típicamente entre 100-3000 pc cm$^{-3}$, indicando origen extragaláctico
+    \item \textbf{Fluencia}: Energía por unidad de área, con valores que van desde 0.1 hasta 1000 Jy ms
+    \item \textbf{Distribución espectral}: Comportamiento espectral variable, desde planos hasta muy inclinados
+    \item \textbf{Polarización}: Grado de polarización variable, con algunos FRBs mostrando rotación de Faraday extrema
+\end{itemize}
+
+Estas características observacionales fundamentales establecen los parámetros que cualquier pipeline de detección debe ser capaz de identificar y caracterizar, proporcionando la base para las decisiones de diseño implementadas en DRAFTS++.
+
+\subsubsection{Clasificación: repetidores vs. no repetidores}
+
+La clasificación de FRBs en repetidores y no repetidores representa una de las divisiones más significativas en el campo, con implicaciones profundas para nuestra comprensión de los mecanismos físicos subyacentes.
+
+Los \textbf{FRBs repetidores}, representados por FRB 121102 \cite{cruces2020frb121102}, muestran actividad episódica con períodos de alta actividad seguidos de silencios prolongados. Esta clase incluye algunos de los FRBs más estudiados y caracterizados, proporcionando oportunidades únicas para análisis detallados de sus propiedades temporales y espectrales.
+
+Los \textbf{FRBs no repetidores} (también llamados "one-off") representan la mayoría de las detecciones y se caracterizan por eventos únicos sin repetición observada. Esta clasificación justifica la necesidad de pipelines robustos capaces de manejar ambos tipos de eventos de manera eficiente, una capacidad que DRAFTS++ implementa a través de su arquitectura modular y flexible.
+
+\subsubsection{Distribución espectral y energética}
+
+La distribución espectral y energética de los FRBs revela patrones complejos que varían significativamente entre diferentes fuentes y eventos. Estudios recientes han documentado:
+
+\begin{itemize}
+    \item \textbf{Rango espectral}: Desde frecuencias de 400 MHz hasta 8 GHz, con detecciones confirmadas en rangos más amplios
+    \item \textbf{Comportamiento espectral}: Desde espectros planos hasta muy inclinados ($\alpha < -2$)
+    \item \textbf{Variabilidad espectral}: Cambios significativos en la forma espectral entre eventos de repetidores
+    \item \textbf{Distribución energética}: Funciones de potencia con índices que varían entre fuentes
+\end{itemize}
+
+Esta diversidad espectral justifica la extensión de las capacidades de detección hacia regímenes de alta frecuencia (30-100 GHz), proporcionando el fundamento científico para el Bloque 2 de la propuesta, que aborda específicamente los desafíos de detección en el espectro milimétrico.
+
+\subsubsection{Estado actual del conocimiento y desafíos observacionales}
+
+El estado actual del conocimiento sobre FRBs, documentado en revisiones recientes \cite{Petroff_2022}, revela un panorama de rápido crecimiento pero con desafíos observacionales significativos:
+
+\begin{itemize}
+    \item \textbf{Rate de detección}: Aproximadamente 1000 FRBs conocidos, con estimaciones de rates de 10$^3$-10$^4$ eventos por día en todo el cielo
+    \item \textbf{Sesgos observacionales}: Concentración en frecuencias bajas (1-2 GHz) y limitaciones instrumentales
+    \item \textbf{Complejidad temporal}: Patrones de actividad no periódicos en repetidores
+    \item \textbf{Ambiente local}: Influencia del medio circumburst en las propiedades observadas
+\end{itemize}
+
+Estos desafíos observacionales establecen el contexto para la contribución propuesta, ya que DRAFTS++ aborda directamente las limitaciones actuales en detección automatizada y extensión a regímenes de alta frecuencia.
+
+\subsection{Metodologías de Detección Clásicas}
+
+Las metodologías de detección clásicas constituyen la base sobre la cual se han construido todos los pipelines de detección de FRBs existentes. Esta sección establece el estado del arte en técnicas tradicionales y sus limitaciones inherentes, proporcionando el contexto necesario para comprender las mejoras implementadas en DRAFTS++.
+
+\subsubsection{Algoritmos de dedispersión coherente e incoherente}
+
+La dedispersión temporal representa el proceso fundamental en la detección de FRBs, compensando el retardo de tiempo causado por la propagación a través del medio interestelar. Los algoritmos de dedispersión se clasifican en dos categorías principales:
+
+\textbf{Dedispersión coherente} mantiene la fase de la señal y proporciona la máxima sensibilidad teórica, pero requiere un conocimiento previo del DM y es computacionalmente intensiva. Este método es ideal para búsquedas dirigidas pero impracticable para búsquedas generales.
+
+\textbf{Dedispersión incoherente} descarta la información de fase pero permite búsquedas eficientes sobre un rango de DMs. Este método, implementado en herramientas como PRESTO, constituye la base de la mayoría de los pipelines de detección actuales.
+
+Estos métodos fundamentales de procesamiento son la base sobre la cual DRAFTS++ implementa optimizaciones avanzadas, incluyendo procesamiento por chunks y optimización de memoria GPU.
+
+\subsubsection{PRESTO y herramientas de pulsar}
+
+PRESTO (PulsaR Exploration and Search TOolkit) \cite{Ransom_2003} representa el estándar de facto en detección de pulsos y transientes rápidos. Desarrollado por Scott Ransom y colaboradores, PRESTO implementa algoritmos optimizados para:
+
+\begin{itemize}
+    \item Dedispersión incoherente eficiente
+    \item Búsqueda de periodicidad mediante FFT
+    \item Detección de candidatos por umbral de SNR
+    \item Generación de productos diagnósticos
+\end{itemize}
+
+A pesar de su amplia adopción, PRESTO presenta limitaciones significativas que DRAFTS++ supera: falta de automatización completa, procesamiento monolítico de archivos grandes, y ausencia de capacidades de machine learning para clasificación avanzada.
+
+\subsubsection{Métodos de detección por umbral y coincidencia}
+
+Los métodos de detección tradicionales se basan en la aplicación de umbrales de relación señal-ruido (SNR) y técnicas de coincidencia temporal. Estos métodos incluyen:
+
+\begin{itemize}
+    \item \textbf{Detección por umbral}: Identificación de candidatos que exceden un SNR mínimo
+    \item \textbf{Coincidencia temporal}: Verificación de candidatos en múltiples frecuencias
+    \item \textbf{Filtrado de interferencia}: Eliminación de señales de origen terrestre
+    \item \textbf{Validación DM}: Verificación de consistencia con modelos de dispersión
+\end{itemize}
+
+Aunque efectivos para señales brillantes, estos métodos presentan limitaciones significativas en sensibilidad y automatización. DRAFTS++ automatiza y mejora estos métodos mediante la integración de redes neuronales para clasificación avanzada y sistemas de validación robustos.
+
+\subsubsection{Optimización computacional en GPU}
+
+La aceleración computacional mediante GPU ha revolucionado el procesamiento de datos radioastronómicos. El trabajo pionero de Barsdell et al. (2012) \cite{Barsdell_2012} estableció las bases para la dedispersión acelerada por GPU, demostrando mejoras de rendimiento de hasta 100x comparado con implementaciones CPU.
+
+Las optimizaciones GPU implementadas en pipelines modernos incluyen:
+\begin{itemize}
+    \item Dedispersión paralela sobre múltiples DMs
+    \item FFT acelerada para búsqueda de periodicidad
+    \item Procesamiento vectorizado de datos
+    \item Gestión eficiente de memoria GPU
+\end{itemize}
+
+DRAFTS++ implementa optimizaciones GPU avanzadas que superan las implementaciones existentes, incluyendo gestión automática de memoria, procesamiento por chunks optimizado, y integración nativa con frameworks de deep learning.
+
+\subsubsection{Limitaciones en regímenes de alta frecuencia}
+
+Los métodos clásicos de detección presentan limitaciones fundamentales en regímenes de alta frecuencia (30-100 GHz) que justifican la necesidad de nuevos enfoques:
+
+\begin{itemize}
+    \item \textbf{Atenuación de efectos dispersivos}: La dispersión temporal se reduce significativamente en alta frecuencia
+    \item \textbf{Ruido de sistema}: Características de ruido diferentes en instrumentos milimétricos
+    \item \textbf{Efectos atmosféricos}: Absorción y dispersión por vapor de agua
+    \item \textbf{Resolución espectral}: Limitaciones en ancho de banda y resolución
+\end{itemize}
+
+Estas limitaciones proporcionan el fundamento para el Bloque 2 de la propuesta, que aborda específicamente los desafíos de detección en alta frecuencia mediante el desarrollo de metodologías especializadas.
+
+\subsection{Aplicaciones de Machine Learning en Radioastronomía}
+
+El uso de machine learning en radioastronomía ha experimentado un crecimiento exponencial, revolucionando la detección y clasificación de fenómenos transitorios. Esta sección establece el estado del arte en ML y muestra la evolución hacia enfoques más sofisticados como los implementados en DRAFTS++.
+
+\subsubsection{FETCH: Clasificador de transientes rápidos}
+
+FETCH (Fast Extragalactic Transient Candidate Hunter) \cite{Agarwal_2020} representa el primer clasificador de machine learning específicamente diseñado para FRBs. Desarrollado por Agarwal et al., FETCH implementa una CNN que clasifica candidatos en tres categorías: FRB, pulsar, o interferencia.
+
+Las contribuciones clave de FETCH incluyen:
+\begin{itemize}
+    \item Primer uso de CNNs para clasificación de FRBs
+    \item Validación con datos reales de observaciones
+    \item Reducción significativa de falsos positivos
+    \item Integración con pipelines de detección existentes
+\end{itemize}
+
+Aunque FETCH demostró la viabilidad del ML para clasificación de FRBs, presenta limitaciones que DRAFTS++ extiende y mejora: dependencia de pipelines externos para detección, falta de capacidades de detección end-to-end, y limitaciones en la validación de generalización.
+
+\subsubsection{DRAFTS: Pipeline de deep learning original}
+
+DRAFTS (Deep learning-based Radio Fast Transient Search) \cite{zhang2024drafts} representa un avance significativo al integrar detección y clasificación en un pipeline unificado. Desarrollado por Zhang et al., DRAFTS implementa:
+
+\begin{itemize}
+    \item Redes neuronales para detección de candidatos
+    \item Clasificación binaria automatizada
+    \item Procesamiento end-to-end de datos observacionales
+    \item Validación con datasets de entrenamiento
+\end{itemize}
+
+DRAFTS constituye el punto de partida directo para DRAFTS++, pero presenta limitaciones significativas que justifican la evolución propuesta:
+\begin{itemize}
+    \item Estructura monolítica sin modularidad
+    \item Falta de capacidades de streaming y chunking
+    \item Ausencia de logging y trazabilidad
+    \item Limitaciones en escalabilidad y robustez
+\end{itemize}
+
+\subsubsection{Aplicaciones de CNNs en detección de pulsos}
+
+Las redes neuronales convolucionales han demostrado su efectividad en la detección de pulsos radioastronómicos, estableciendo el fundamento técnico para su aplicación en FRBs. Las ventajas de las CNNs incluyen:
+
+\begin{itemize}
+    \item Capacidad de aprender características complejas automáticamente
+    \item Robustez ante variaciones en el ruido y calibración
+    \item Escalabilidad a grandes volúmenes de datos
+    \item Capacidad de generalización a nuevos tipos de señales
+\end{itemize}
+
+Estas ventajas justifican el uso de CNNs en DRAFTS++, donde implementan tanto la detección de candidatos (CenterNet) como la clasificación binaria (ResNet), proporcionando un pipeline completamente automatizado.
+
+\subsubsection{Transfer learning en astronomía}
+
+El transfer learning permite adaptar modelos pre-entrenados en grandes datasets a tareas específicas de astronomía, proporcionando eficiencia significativa en el entrenamiento. Las aplicaciones incluyen:
+
+\begin{itemize}
+    \item Adaptación de modelos de visión computacional a datos radioastronómicos
+    \item Fine-tuning de modelos pre-entrenados en datasets astronómicos
+    \item Reutilización de características aprendidas en dominios relacionados
+\end{itemize}
+
+DRAFTS++ utiliza transfer learning efectivamente mediante la adaptación de arquitecturas probadas (ResNet, CenterNet) a los datos específicos de FRBs, reduciendo significativamente los requerimientos de entrenamiento y mejorando la generalización.
+
+\subsubsection{Limitaciones actuales en validación y generalización}
+
+Los pipelines de ML existentes presentan limitaciones significativas en validación y generalización que afectan su confiabilidad científica:
+
+\begin{itemize}
+    \item \textbf{Overfitting}: Modelos que memorizan el dataset de entrenamiento
+    \item \textbf{Sesgo de dataset}: Limitaciones en la diversidad de datos de entrenamiento
+    \item \textbf{Falta de validación cruzada}: Evaluación inadecuada en datos independientes
+    \item \textbf{Ausencia de benchmarks}: Falta de estándares para comparación
+\end{itemize}
+
+La validación con FRB121102 implementada en DRAFTS++ resuelve estos problemas mediante una evaluación rigurosa en datos reales, comparación con literatura, y establecimiento de métricas objetivas de rendimiento.
+
+\subsection{Pipelines de Detección Automática Existentes}
+
+El estado actual de automatización en la detección de FRBs revela una transición gradual hacia sistemas más sofisticados, pero con limitaciones significativas que justifican el desarrollo de soluciones más robustas como DRAFTS++.
+
+\subsubsection{Sistemas operacionales en radioastronomía}
+
+Los sistemas operacionales actuales en radioastronomía incluyen una variedad de pipelines especializados, cada uno con fortalezas y limitaciones específicas:
+
+\begin{itemize}
+    \item \textbf{CHIME/FRB}: Pipeline automatizado para el telescopio CHIME
+    \item \textbf{ASKAP}: Sistema de detección en tiempo real
+    \item \textbf{MeerKAT}: Pipeline para observaciones de seguimiento
+    \item \textbf{FAST}: Sistema de detección de alta sensibilidad
+\end{itemize}
+
+Aunque estos sistemas han logrado detecciones significativas, presentan limitaciones que DRAFTS++ resuelve: especialización excesiva en instrumentos específicos, falta de modularidad, y limitaciones en la extensión a nuevos regímenes de frecuencia.
+
+\subsubsection{Arquitecturas de procesamiento en tiempo real}
+
+Las arquitecturas de procesamiento en tiempo real enfrentan desafíos únicos en la detección de FRBs:
+
+\begin{itemize}
+    \item \textbf{Latencia}: Requerimientos de detección en segundos
+    \item \textbf{Throughput}: Procesamiento de GB/s de datos
+    \item \textbf{Escalabilidad}: Adaptación a diferentes configuraciones instrumentales
+    \item \textbf{Robustez}: Funcionamiento continuo bajo condiciones variables
+\end{itemize}
+
+El sistema de chunking implementado en DRAFTS++ supera las limitaciones de escalabilidad de los sistemas existentes mediante procesamiento eficiente por ventanas, gestión automática de memoria, y arquitectura modular que permite adaptación a diferentes configuraciones.
+
+\subsubsection{Gestión de datos a gran escala}
+
+La gestión de datos a gran escala en radioastronomía presenta desafíos únicos:
+
+\begin{itemize}
+    \item \textbf{Volúmenes de datos}: Observaciones que generan TB de datos por sesión
+    \item \textbf{Formato heterogéneo}: Múltiples formatos de datos (FITS, Filterbank, PSRFITS)
+    \item \textbf{Metadatos complejos}: Información instrumental y calibración
+    \item \textbf{Almacenamiento distribuido}: Necesidad de acceso eficiente a datos
+\end{itemize}
+
+DRAFTS++ resuelve estos desafíos mediante manejo robusto de múltiples formatos, extracción automática de metadatos, y optimización de memoria que permite procesamiento eficiente de archivos grandes.
+
+\subsubsection{Sistemas de logging y trazabilidad}
+
+La reproducibilidad científica requiere sistemas robustos de logging y trazabilidad:
+
+\begin{itemize}
+    \item \textbf{Versionado}: Control de versiones de código y datos
+    \item \textbf{Configuración}: Registro de parámetros utilizados
+    \item \textbf{Resultados}: Trazabilidad de detecciones y clasificaciones
+    \item \textbf{Reproducibilidad}: Capacidad de reproducir resultados exactos
+\end{itemize}
+
+El sistema de logging profesional implementado en DRAFTS++ establece nuevos estándares en la comunidad, proporcionando trazabilidad completa y garantizando la reproducibilidad científica.
+
+\subsubsection{Integración con observatorios}
+
+La integración con sistemas observacionales reales presenta desafíos únicos:
+
+\begin{itemize}
+    \item \textbf{Interfaces de datos}: Conexión con sistemas de adquisición
+    \item \textbf{Configuración dinámica}: Adaptación a diferentes modos observacionales
+    \item \textbf{Monitoreo}: Supervisión de rendimiento y calidad
+    \item \textbf{Mantenimiento}: Actualizaciones y correcciones en producción
+\end{itemize}
+
+DRAFTS++ está diseñado específicamente para producción, con interfaces estandarizadas, configuración centralizada, y capacidades de monitoreo que facilitan la integración con observatorios.
+
+\subsection{Desafíos en Detección de Alta Frecuencia}
+
+La detección de FRBs en regímenes de alta frecuencia (30-100 GHz) representa una frontera científica emergente con desafíos únicos que justifican el desarrollo de metodologías especializadas. Esta sección establece la novedad y justifica la contribución más importante de la presente investigación.
+
+\subsubsection{Efectos físicos en regímenes milimétricos}
+
+Los regímenes milimétricos presentan características físicas distintivas que requieren enfoques de detección especializados:
+
+\begin{itemize}
+    \item \textbf{Atenuación de dispersión}: La dispersión temporal se reduce como $\nu^{-2}$, limitando la efectividad de algoritmos tradicionales
+    \item \textbf{Escattering temporal}: Efectos de scattering que pueden enmascarar señales débiles
+    \item \textbf{Absorción atmosférica}: Vapor de agua y oxígeno molecular afectan la propagación
+    \item \textbf{Ruido de fondo}: Características de ruido diferentes en instrumentos milimétricos
+\end{itemize}
+
+Estos efectos físicos proporcionan el fundamento científico para el desarrollo de nuevas metodologías de detección, justificando la necesidad del Bloque 2 de la propuesta.
+
+\subsubsection{Limitaciones instrumentales}
+
+Los instrumentos milimétricos como ALMA y el futuro ngVLA presentan desafíos técnicos únicos:
+
+\begin{itemize}
+    \item \textbf{Resolución espectral}: Limitaciones en ancho de banda y resolución
+    \item \textbf{Calibración}: Requerimientos de calibración más estrictos
+    \item \textbf{Estabilidad}: Sensibilidad a variaciones térmicas y atmosféricas
+    \item \textbf{Interferencia}: Susceptibilidad a interferencia terrestre y satelital
+\end{itemize}
+
+Estos desafíos técnicos requieren pipelines especializados que DRAFTS++ está diseñado para abordar mediante algoritmos adaptados y estrategias de procesamiento específicas para instrumentos milimétricos.
+
+\subsubsection{Análisis del trabajo pionero de Vera-Casanova et al.}
+
+El trabajo de Vera-Casanova et al. (2025) \cite{veracasanova2025} representa el primer estudio sistemático de radio transientes en frecuencias milimétricas utilizando ALMA. Este trabajo pionero:
+
+\begin{itemize}
+    \item Demuestra la viabilidad de detección en alta frecuencia
+    \item Identifica limitaciones en metodologías existentes
+    \item Establece benchmarks para futuros desarrollos
+    \item Revela oportunidades científicas únicas
+\end{itemize}
+
+Sin embargo, presenta limitaciones significativas que justifican la automatización propuesta:
+\begin{itemize}
+    \item Detección completamente manual
+    \item Ausencia de pipeline automatizado
+    \item Falta de clasificación automática
+    \item Limitaciones en sensibilidad
+\end{itemize}
+
+El trabajo propuesto automatiza y extiende estas capacidades mediante el desarrollo del primer pipeline automatizado para detección de FRBs en alta frecuencia.
+
+\subsubsection{Ausencia de pipelines especializados}
+
+La ausencia de pipelines especializados para alta frecuencia representa una brecha crítica en el campo:
+
+\begin{itemize}
+    \item \textbf{No existen soluciones automatizadas} para detección en alta frecuencia
+    \item \textbf{Falta de algoritmos especializados} para características espectrales milimétricas
+    \item \textbf{Ausencia de benchmarks} para validación en este régimen
+    \item \textbf{Limitaciones en herramientas} de análisis y clasificación
+\end{itemize}
+
+Esta ausencia justifica la novedad de la contribución propuesta, ya que DRAFTS++ representa el primer pipeline automatizado diseñado específicamente para regímenes de alta frecuencia.
+
+\subsubsection{Oportunidades científicas únicas}
+
+La detección en alta frecuencia abre oportunidades científicas únicas:
+
+\begin{itemize}
+    \item \textbf{Poblaciones inaccesibles}: FRBs que no son detectables en frecuencias bajas
+    \item \textbf{Estudios de propagación}: Análisis detallado de efectos de propagación
+    \item \textbf{Caracterización espectral}: Acceso a propiedades espectrales completas
+    \item \textbf{Correlación multi-longitud de onda}: Conexión con observaciones en otras bandas
+\end{itemize}
+
+El pipeline propuesto habilita esta ciencia mediante la automatización de la detección y clasificación en regímenes de alta frecuencia, abriendo nuevas fronteras científicas.
+
+\subsection{Herramientas Computacionales y Frameworks}
+
+El desarrollo de pipelines modernos requiere la integración de herramientas computacionales avanzadas y frameworks especializados. Esta sección establece el contexto tecnológico y justifica las decisiones de implementación adoptadas en DRAFTS++.
+
+\subsubsection{Python científico y librerías especializadas}
+
+Python se ha establecido como el lenguaje estándar para aplicaciones científicas, proporcionando un ecosistema rico de herramientas:
+
+\begin{itemize}
+    \item \textbf{NumPy/SciPy}: Computación científica fundamental
+    \item \textbf{Matplotlib/Seaborn}: Visualización científica
+    \item \textbf{Pandas}: Manipulación y análisis de datos
+    \item \textbf{Scikit-learn}: Machine learning tradicional
+\end{itemize}
+
+DRAFTS++ aprovecha este ecosistema mediante la integración de librerías especializadas para radioastronomía, optimización de memoria, y procesamiento de señales, proporcionando una base sólida para el desarrollo de funcionalidades avanzadas.
+
+\subsubsection{PyTorch y optimización GPU en astronomía}
+
+PyTorch ha emergido como el framework preferido para deep learning en investigación científica:
+
+\begin{itemize}
+    \item \textbf{Diferenciación automática}: Gradientes computados automáticamente
+    \item \textbf{Optimización GPU}: Aceleración nativa en hardware especializado
+    \item \textbf{Flexibilidad}: Desarrollo dinámico de arquitecturas
+    \item \textbf{Ecosistema}: Integración con herramientas de investigación
+\end{itemize}
+
+La elección de PyTorch como framework principal proporciona el fundamento técnico para las redes neuronales implementadas en DRAFTS++, permitiendo optimizaciones avanzadas y desarrollo iterativo eficiente.
+
+\subsubsection{Astropy y herramientas de radioastronomía}
+
+Astropy proporciona herramientas especializadas para astronomía:
+
+\begin{itemize}
+    \item \textbf{IO de datos}: Lectura y escritura de formatos astronómicos
+    \item \textbf{Conversiones de unidades}: Manejo de unidades físicas
+    \item \textbf{Coordenadas}: Transformaciones de sistemas de coordenadas
+    \item \textbf{Tablas}: Manipulación de datos tabulares
+\end{itemize}
+
+DRAFTS++ utiliza estas herramientas para garantizar compatibilidad con estándares astronómicos, facilitando la integración con sistemas observacionales existentes y la interoperabilidad con otros pipelines.
+
+\subsubsection{Sistemas de configuración y logging}
+
+La configurabilidad y trazabilidad son cruciales para sistemas de producción:
+
+\begin{itemize}
+    \item \textbf{Configuración centralizada}: Gestión unificada de parámetros
+    \item \textbf{Validación de parámetros}: Verificación de configuraciones
+    \item \textbf{Logging estructurado}: Registro detallado de operaciones
+    \item \textbf{Monitoreo}: Supervisión de rendimiento y calidad
+\end{itemize}
+
+El sistema centralizado implementado en DRAFTS++ supera las implementaciones existentes mediante configuración validada, logging profesional, y capacidades de monitoreo avanzadas.
+
+\subsubsection{Arquitecturas modulares y escalables}
+
+Los principios de ingeniería de software moderno requieren:
+
+\begin{itemize}
+    \item \textbf{Modularidad}: Separación clara de responsabilidades
+    \item \textbf{Escalabilidad}: Adaptación a diferentes volúmenes de datos
+    \item \textbf{Mantenibilidad}: Código legible y bien documentado
+    \item \textbf{Extensibilidad}: Facilidad para agregar nuevas funcionalidades
+\end{itemize}
+
+DRAFTS++ implementa estos principios mediante una arquitectura modular con interfaces estandarizadas, facilitando el mantenimiento y la extensión del sistema.
+
+\subsection{Metodologías de Validación y Evaluación}
+
+La validación rigurosa es fundamental para garantizar la confiabilidad científica de pipelines automatizados. Esta sección establece estándares de validación y justifica el enfoque riguroso adoptado en la presente investigación.
+
+\subsubsection{Métricas de rendimiento en detección de FRBs}
+
+Las métricas de rendimiento en detección de FRBs incluyen:
+
+\begin{itemize}
+    \item \textbf{Sensibilidad}: Capacidad de detectar señales débiles
+    \item \textbf{Especificidad}: Capacidad de rechazar falsos positivos
+    \item \textbf{Precisión}: Exactitud en la determinación de parámetros
+    \item \textbf{Completitud}: Fracción de eventos reales detectados
+\end{itemize}
+
+La validación implementada en DRAFTS++ utiliza estas métricas para establecer benchmarks objetivos y comparar rendimiento con métodos existentes.
+
+\subsubsection{Conjuntos de datos de referencia y benchmarks}
+
+Los conjuntos de datos de referencia son cruciales para validación:
+
+\begin{itemize}
+    \item \textbf{FRB121102}: Dataset con eventos conocidos y bien caracterizados
+    \item \textbf{Datasets sintéticos}: Señales simuladas con parámetros conocidos
+    \item \textbf{Datasets de interferencia}: Señales de origen terrestre para entrenamiento
+    \item \textbf{Cross-validation}: División en conjuntos de entrenamiento y prueba
+\end{itemize}
+
+FRB121102 constituye el benchmark principal para la validación de DRAFTS++, proporcionando una comparación directa con resultados de literatura y estableciendo métricas de rendimiento objetivas.
+
+\subsubsection{Validación cruzada y análisis de errores}
+
+La validación cruzada requiere:
+
+\begin{itemize}
+    \item \textbf{División de datos}: Separación en conjuntos independientes
+    \item \textbf{Análisis de errores}: Clasificación de falsos positivos y negativos
+    \item \textbf{Validación estadística}: Tests de significancia
+    \item \textbf{Comparación con literatura}: Verificación contra resultados publicados
+\end{itemize}
+
+La validación implementada en DRAFTS++ es más rigurosa que trabajos previos mediante análisis detallado de errores, comparación cuantitativa con literatura, y establecimiento de intervalos de confianza.
+
+\subsubsection{Reproducibilidad científica en machine learning}
+
+La reproducibilidad requiere:
+
+\begin{itemize}
+    \item \textbf{Seeds fijas}: Semillas aleatorias para reproducibilidad
+    \item \textbf{Versionado}: Control de versiones de código y datos
+    \item \textbf{Documentación}: Descripción detallada de métodos
+    \item \textbf{Disponibilidad}: Acceso a código y datos
+\end{itemize}
+
+DRAFTS++ garantiza reproducibilidad mediante semillas fijas, versionado completo, documentación detallada, y disponibilidad de código fuente.
+
+\subsubsection{Comparación con métodos clásicos}
+
+La validación de mejoras requiere:
+
+\begin{itemize}
+    \item \textbf{Benchmarks directos}: Comparación en mismos datos
+    \item \textbf{Métricas objetivas}: Medidas cuantitativas de rendimiento
+    \item \textbf{Análisis estadístico}: Tests de significancia
+    \item \textbf{Interpretación científica}: Implicaciones de las mejoras
+\end{itemize}
+
+La validación de DRAFTS++ demuestra superioridad cuantitativa sobre métodos clásicos mediante comparación directa en datasets estándar y análisis estadístico riguroso.
+
+\subsection{Brechas Identificadas y Oportunidades}
+
+La síntesis de las limitaciones actuales y oportunidades de mejora establece el contexto para la justificación de la contribución propuesta, demostrando la necesidad y relevancia del trabajo desarrollado.
+
+\subsubsection{Limitaciones de pipelines existentes}
+
+Las limitaciones de pipelines existentes incluyen:
+
+\begin{itemize}
+    \item \textbf{Falta de automatización completa}: Procesos manuales en múltiples etapas
+    \item \textbf{Escalabilidad limitada}: Dificultades con archivos grandes
+    \item \textbf{Ausencia de capacidades de alta frecuencia}: Limitaciones en regímenes milimétricos
+    \item \textbf{Validación inadecuada}: Falta de benchmarks rigurosos
+\end{itemize}
+
+DRAFTS++ resuelve estas limitaciones mediante automatización completa, escalabilidad robusta, capacidades de alta frecuencia, y validación rigurosa con datos reales.
+
+\subsubsection{Necesidad de automatización en alta frecuencia}
+
+La automatización en alta frecuencia es crítica porque:
+
+\begin{itemize}
+    \item \textbf{No existen soluciones automatizadas} para este régimen
+    \item \textbf{Oportunidades científicas únicas} requieren detección eficiente
+    \item \textbf{Instrumentos futuros} (ngVLA, SKA) necesitarán pipelines especializados
+    \item \textbf{Escalabilidad} es esencial para grandes volúmenes de datos
+\end{itemize}
+
+El Bloque 2 de la propuesta representa la primera solución automatizada para detección de FRBs en alta frecuencia, estableciendo nuevos estándares para el campo.
+
+\subsubsection{Falta de estándares para validación}
+
+El campo carece de estándares para validación:
+
+\begin{itemize}
+    \item \textbf{Métricas inconsistentes}: Diferentes grupos usan diferentes medidas
+    \item \textbf{Benchmarks limitados}: Pocos datasets de referencia
+    \item \textbf{Validación inadecuada}: Falta de comparación con literatura
+    \item \textbf{Reproducibilidad limitada}: Dificultades para reproducir resultados
+\end{itemize}
+
+El trabajo propuesto establece estándares ejemplares mediante validación rigurosa con FRB121102, comparación directa con literatura, y establecimiento de métricas objetivas.
+
+\subsubsection{Oportunidades para innovación metodológica}
+
+Las oportunidades de innovación incluyen:
+
+\begin{itemize}
+    \item \textbf{Integración de ML}: Aplicación de deep learning a detección
+    \item \textbf{Optimización de memoria}: Gestión eficiente de recursos
+    \item \textbf{Procesamiento por chunks}: Manejo de archivos grandes
+    \item \textbf{Extensión a alta frecuencia}: Nuevos regímenes espectrales
+\end{itemize}
+
+DRAFTS++ introduce múltiples innovaciones metodológicas que establecen nuevos paradigmas en el campo de detección de FRBs.
+
+\subsubsection{Justificación de la contribución propuesta}
+
+La justificación de la contribución se basa en:
+
+\begin{itemize}
+    \item \textbf{Resolución de limitaciones identificadas}: Abordaje directo de problemas existentes
+    \item \textbf{Novelad científica}: Primera solución automatizada para alta frecuencia
+    \item \textbf{Impacto en el campo}: Establecimiento de nuevos estándares
+    \item \textbf{Aplicabilidad práctica}: Diseño para uso en observatorios
+\end{itemize}
+
+La contribución propuesta establece el contexto necesario para la transición hacia la propuesta de solución detallada, justificando la necesidad y relevancia del trabajo desarrollado.
