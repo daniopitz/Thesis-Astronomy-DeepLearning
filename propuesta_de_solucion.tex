@@ -444,7 +444,7 @@ La Figura \ref{fig:pipeline-end-to-end} sintetiza el flujo desde \texttt{main.py
 % PROCESAMIENTO
 \node[box, below=of E] (H) {streaming\_orchestrator};
 \node[box, below=of H] (I) {Procesar Chunk};
-\node[decision, below=of I] (J) {Frecuencia ≥ 8GHz?};
+\node[decision, below=of I] (J) {Frecuencia $\geq$ 8GHz?};
 
 % PIPELINES
 \node[box, below left=of J] (K) {Pipeline Alta Frecuencia};
@@ -532,7 +532,7 @@ Las observaciones ALMA en modo phased array presentan características técnicas
 
 \textbf{Parámetros Temporales Configurables:}
 \begin{itemize}
-\item \textbf{Resolución temporal:} 64 μs - 1 ms (configurable por proyecto)
+\item \textbf{Resolución temporal:} 64 $\mu$s - 1 ms (configurable por proyecto)
 \item \textbf{Integración temporal:} 1-10 ms para detección FRB
 \item \textbf{Duración observación:} 1-8 horas por sesión
 \end{itemize}
@@ -550,9 +550,9 @@ El dataset de validación se estructura en tres categorías de fuentes conocidas
 
 \textbf{Púlsares de Referencia:}
 \begin{itemize}
-\item \textbf{B0355+54:} DM = 57.14 pc cm⁻³, período = 156.4 ms, ideal para validación temporal
-\item \textbf{B1919+21:} DM = 12.43 pc cm⁻³, período = 1.337 s, referencia clásica
-\item \textbf{B0329+54:} DM = 26.77 pc cm⁻³, período = 714.5 ms, alta dispersión
+\item \textbf{B0355+54:} DM = 57.14 pc cm$^{-3}$, período = 156.4 ms, ideal para validación temporal
+\item \textbf{B1919+21:} DM = 12.43 pc cm$^{-3}$, período = 1.337 s, referencia clásica
+\item \textbf{B0329+54:} DM = 26.77 pc cm$^{-3}$, período = 714.5 ms, alta dispersión
 \end{itemize}
 
 \textbf{Observaciones Multi-banda Simultáneas:}
@@ -607,7 +607,7 @@ La selección automática de estrategias de detección se basa en criterios fís
 
 Donde:
 \begin{itemize}
-\item $\text{DM}$ = Medida de dispersión en pc cm⁻³
+\item $\text{DM}$ = Medida de dispersión en pc cm$^{-3}$
 \item $\nu_{\text{low}}, \nu_{\text{high}}$ = Frecuencias límite en MHz
 \item $\Delta t_{\text{disp}}$ = Retardo temporal máximo en ms
 \end{itemize}
@@ -651,7 +651,7 @@ Donde $\alpha = 1.5-2.0$ (factor de seguridad) y $t_{\text{samp}}$ = resolución
     \ElsIf{SNR $< 8$ OR bow\_tie\_no\_resoluble}
         \State \textbf{return} "SNR Tradicional"
     \Else
-        \State \textbf{return} "Fishing DM≈0"
+        \State \textbf{return} "Fishing DM$\approx$0"
     \EndIf
 \EndFunction
 \end{algorithmic}
@@ -666,7 +666,7 @@ Cada línea de investigación requiere benchmarks específicos y mensurables que
 \textbf{Métricas de Completitud:}
 \begin{itemize}
 \item \textbf{Completitud vs Frecuencia:} $\geq 95\%$ en Band 3, $\geq 85\%$ en Band 6, $\geq 70\%$ en Band 7
-\item \textbf{Límites de Detectabilidad:} SNR mínimo 5σ en Band 3, 7σ en Band 6, 10σ en Band 7
+\item \textbf{Límites de Detectabilidad:} SNR mínimo 5$\sigma$ en Band 3, 7$\sigma$ en Band 6, 10$\sigma$ en Band 7
 \item \textbf{Tiempo de Procesamiento:} 2-3 min/hora de datos (8 GB RAM, RTX 3080+)
 \end{itemize}
 
@@ -689,7 +689,7 @@ Cada línea de investigación requiere benchmarks específicos y mensurables que
 \textbf{Métricas de Rendimiento:}
 \begin{itemize}
 \item \textbf{Tiempo Procesamiento:} 1-2 min/hora (4 GB RAM, CPU-only)
-\item \textbf{Umbral SNR:} Adaptativo 5-7σ según condiciones
+\item \textbf{Umbral SNR:} Adaptativo 5-7$\sigma$ según condiciones
 \item \textbf{Validación DM:} 100\% candidatos con DM > 0 significativo
 \end{itemize}
 
@@ -713,7 +713,7 @@ Cada línea de investigación requiere benchmarks específicos y mensurables que
 
 \textbf{Métricas de Recuperación:}
 \begin{itemize}
-\item \textbf{Recuperación Eventos Débiles:} 40-60\% eventos SNR < 5σ
+\item \textbf{Recuperación Eventos Débiles:} 40-60\% eventos SNR < 5$\sigma$
 \item \textbf{Tasa Éxito Validación:} 80-90\% candidatos validados correctamente
 \item \textbf{Robustez Estadística:} Consistencia entre chunks $\geq 95\%$
 \end{itemize}
@@ -735,7 +735,7 @@ La generación de TWL-maps constituye una innovación metodológica específica 
 \begin{itemize}
 \item \textbf{Stokes I:} Intensidad total (requerida)
 \item \textbf{Stokes Q,U:} Componentes de polarización lineal (requeridas)
-\item \textbf{Resolución temporal:} 64 μs - 1 ms (configurable)
+\item \textbf{Resolución temporal:} 64 $\mu$s - 1 ms (configurable)
 \end{itemize}
 
 \textbf{Pseudocódigo de Generación:}
@@ -786,7 +786,7 @@ Donde $G(w_i, \sigma_w)$ son kernels gaussianos con anchos $w_i = [1,2,4,8]$ ms.
 \textbf{Parámetros Temporales:}
 \begin{itemize}
 \item \textbf{Ventana temporal:} 1-10 segundos (configurable)
-\item \textbf{Resolución temporal:} 64 μs - 1 ms
+\item \textbf{Resolución temporal:} 64 $\mu$s - 1 ms
 \item \textbf{Anchos gaussianos:} [1, 2, 4, 8] ms
 \end{itemize}
 
@@ -810,7 +810,7 @@ La detección de FRBs en regímenes milimétricos está significativamente afect
 
 \paragraph{Efectos Físicos Específicos}
 
-\textbf{Absorción por Vapor de Agua (H₂O):}
+\textbf{Absorción por Vapor de Agua (H$_2$O):}
 \[
 \tau_{\text{H2O}}(\nu, \text{PWV}) = \tau_0(\nu) \times \text{PWV}^{\alpha(\nu)}
 \]
@@ -861,7 +861,7 @@ G_{\text{corr}}(t) = G_{\text{raw}}(t) \times \exp(-\tau_{\text{WVR}}(t))
 \begin{itemize}
 \item \textbf{Degradación SNR:} 10-30\% sin correcciones WVR
 \item \textbf{Falsos positivos:} Aumento 20-50\% por variaciones ganancia
-\item \textbf{Límite detectabilidad:} Incremento 2-3σ en condiciones pobres
+\item \textbf{Límite detectabilidad:} Incremento 2-3$\sigma$ en condiciones pobres
 \end{itemize}
 
 \paragraph{Estrategias de Mitigación}
@@ -888,9 +888,9 @@ El análisis de escalabilidad determina los requisitos computacionales específi
 
 \textbf{Phased Array por Banda:}
 \begin{itemize}
-\item \textbf{Band 3:} 2-4 GB/hora (resolución temporal 64 μs)
-\item \textbf{Band 6:} 4-6 GB/hora (resolución temporal 64 μs)
-\item \textbf{Band 7:} 6-8 GB/hora (resolución temporal 64 μs)
+\item \textbf{Band 3:} 2-4 GB/hora (resolución temporal 64 $\mu$s)
+\item \textbf{Band 6:} 4-6 GB/hora (resolución temporal 64 $\mu$s)
+\item \textbf{Band 7:} 6-8 GB/hora (resolución temporal 64 $\mu$s)
 \end{itemize}
 
 \textbf{Configuración Multi-banda:}

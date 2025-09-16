@@ -1,7 +1,7 @@
-\RequirePackage{iftex}
-\ifPDFTeX
-  \errmessage{This document requires XeLaTeX or LuaLaTeX. Please change your compiler.}
-\fi
+% \RequirePackage{iftex}
+% \ifPDFTeX
+%   \errmessage{This document requires XeLaTeX or LuaLaTeX. Please change your compiler.}
+% \fi
 \documentclass[12pt]{report}
 
 % @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@>
@@ -48,20 +48,7 @@ Corresponde a la traducción al idioma inglés de Palabras Clave anteriores.
 % Idioma y fuentes
 \usepackage[spanish,es-tabla]{babel}
 \usepackage[T1]{fontenc}
-
-\usepackage{fontspec}
-% Selección robusta de fuente principal con respaldo en Windows
-\newcommand{\MainFontName}{Carlito}
-\IfFontExistsTF{Carlito}{
-  \renewcommand{\MainFontName}{Carlito}
-}{
-  \IfFontExistsTF{Calibri}{
-    \renewcommand{\MainFontName}{Calibri}
-  }{
-    \renewcommand{\MainFontName}{Latin Modern Roman}
-  }
-}
-\setmainfont{\MainFontName}[BoldFont={* Bold}, ItalicFont={* Italic}]
+\usepackage{lmodern} % Latin Modern fonts para pdfLaTeX
 
 % Paquete para definir cualquier tamaño de font
 \usepackage{anyfontsize}
@@ -121,6 +108,7 @@ Corresponde a la traducción al idioma inglés de Palabras Clave anteriores.
 
 % Header y footer
 \usepackage{fancyhdr}
+\setlength{\headheight}{25pt}
 \fancypagestyle{portada}{
     \lhead{}
     \chead{}
@@ -225,11 +213,11 @@ Corresponde a la traducción al idioma inglés de Palabras Clave anteriores.
 % Personalizar Tabla de Contenidos
 
 \usepackage{tocloft}
-\renewcommand{\cftsecfont}{\fontsize{12}{14}\selectfont\fontspec{\MainFontName}}
-\renewcommand{\cftsubsecfont}{\fontsize{12}{14}\selectfont\fontspec{\MainFontName}}
-\renewcommand{\cftsubsubsecfont}{\fontsize{12}{14}\selectfont\fontspec{\MainFontName}}
+\renewcommand{\cftsecfont}{\fontsize{12}{14}\selectfont}
+\renewcommand{\cftsubsecfont}{\fontsize{12}{14}\selectfont}
+\renewcommand{\cftsubsubsecfont}{\fontsize{12}{14}\selectfont}
 
-\renewcommand\cftfigfont{\fontsize{12}{14}\selectfont\fontspec{\MainFontName}}
+\renewcommand\cftfigfont{\fontsize{12}{14}\selectfont}
 
 % Links sin color
 \usepackage{hyperref}

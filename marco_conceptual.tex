@@ -89,7 +89,7 @@ CHIME/FRB lidera con >4000 detecciones catalogadas \cite{shin2025chimefrbdiscove
 
 Las arquitecturas de procesamiento en tiempo real enfrentan desafíos únicos: requerimientos de detección en segundos, procesamiento de GB/s de datos, adaptación a diferentes configuraciones instrumentales, y funcionamiento continuo bajo condiciones variables. El sistema de chunking implementado en DRAFTS++ supera las limitaciones de escalabilidad de los sistemas existentes mediante procesamiento eficiente por ventanas, gestión automática de memoria, y arquitectura modular que permite adaptación a diferentes configuraciones.
 
-Pipelines modernos como FREDDA alcanzan sensibilidades del orden de 0.3 km s⁻¹ Mpc⁻¹ en determinación de H₀ \cite{freda2025}, mientras que sistemas basados en CNN como el pipeline DDSS logran >99.6\% de precisión \cite{ddss2025}.
+Pipelines modernos como FREDDA alcanzan sensibilidades del orden de 0.3 km s$^{-1}$ Mpc$^{-1}$ en determinación de H$_0$ \cite{freda2025}, mientras que sistemas basados en CNN como el pipeline DDSS logran >99.6\% de precisión \cite{ddss2025}.
 
 \subsection{Desafíos en Detección de Alta Frecuencia}
 
@@ -112,7 +112,7 @@ Los instrumentos milimétricos como ALMA y el futuro ngVLA presentan desafíos t
 
 El trabajo de Vera-Casanova et al. (2025) \cite{veracasanova2025} representa el primer estudio sistemático de radio transientes en frecuencias milimétricas utilizando ALMA. Este trabajo pionero demuestra la viabilidad de detección en alta frecuencia, identifica limitaciones en metodologías existentes, establece benchmarks para futuros desarrollos, y revela oportunidades científicas únicas.
 
-Las observaciones con Phased ALMA \cite{veracasanova2025} han caracterizado la detectabilidad de púlsares hasta 295 GHz, estableciendo distribuciones espectrales γ=-2.4±0.1 y demostrando viabilidad técnica para FRBs en regímenes milimétricos.
+Las observaciones con Phased ALMA \cite{veracasanova2025} han caracterizado la detectabilidad de púlsares hasta 295 GHz, estableciendo distribuciones espectrales $\gamma=-2.4\pm0.1$ y demostrando viabilidad técnica para FRBs en regímenes milimétricos.
 
 Sin embargo, presenta limitaciones significativas que justifican la automatización propuesta: detección completamente manual, ausencia de pipeline automatizado, falta de clasificación automática, y limitaciones en sensibilidad. El trabajo propuesto automatiza y extiende estas capacidades mediante el desarrollo del primer pipeline automatizado para detección de FRBs en alta frecuencia.
 
@@ -156,7 +156,7 @@ La validación rigurosa es fundamental para garantizar la confiabilidad científ
 
 Las métricas de rendimiento en detección de FRBs incluyen sensibilidad (capacidad de detectar señales débiles), especificidad (capacidad de rechazar falsos positivos), precisión (exactitud en la determinación de parámetros), y completitud (fracción de eventos reales detectados).
 
-Estudios recientes establecen umbrales de detección con precision/recall >95\% para SNR >8 \cite{metrics2025}, mientras que análisis de sensibilidad demuestran dependencia fuerte del ancho de pulso broadened pero independencia del DM \cite{sensitivity2025}. Técnicas VLBI con EVN alcanzan precisión 2.7 mas (1-σ) \cite{vlbi2025}, mejorando localizaciones previas por factores >1000.
+Estudios recientes establecen umbrales de detección con precision/recall >95\% para SNR >8 \cite{metrics2025}, mientras que análisis de sensibilidad demuestran dependencia fuerte del ancho de pulso broadened pero independencia del DM \cite{sensitivity2025}. Técnicas VLBI con EVN alcanzan precisión 2.7 mas (1-$\sigma$) \cite{vlbi2025}, mejorando localizaciones previas por factores >1000.
 
 Los conjuntos de datos de referencia son cruciales para validación: FRB121102 como dataset con eventos conocidos y bien caracterizados, datasets sintéticos con señales simuladas y parámetros conocidos, datasets de interferencia para entrenamiento, y cross-validation mediante división en conjuntos de entrenamiento y prueba.
 
