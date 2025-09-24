@@ -1,18 +1,19 @@
 \secnumbersection{PROPUESTA DE SOLUCIÓN}
 
-% Se debe desarrollar la solución propuesta. Los subcapítulos por poner aquí son propios del autor. Se sugiere mencionar metodología usada. Es conveniente incorporar figuras y tablas para aclarar la solución, que deben indicar el número de la figura, su nombre y su autor o fuente (si las diseñas tú, la fuente es ``Elaboración propia''). Ver ejemplos en esta página y en la siguiente.
-
-% Cabe mencionar que aquí está la esencia del trabajo en lo que se refiere al aporte creativo del memorista, es el momento de demostrar que usted es un destacado profesional que creó, diseñó y/o llevó a cabo la solución propuesta.
-
-Esta propuesta presenta la evolución de \textbf{DRAFTS} \cite{zhang2024drafts} desde un prototipo de investigación hacia un \textit{pipeline} \textbf{productivo, robusto y eficiente} diseñado para operaciones observacionales a gran escala. La transformación arquitectónica no se limita a mejoras incrementales, sino que establece una \textbf{extensión fundamental para regímenes de alta frecuencia} que expande significativamente las capacidades de detección en el espectro milimétrico.
+Esta propuesta presenta la evolución de \textbf{DRAFTS} \cite{zhang2024drafts} desde un prototipo de investigación hacia un \textit{pipeline} 
+\textbf{productivo, robusto y eficiente} diseñado para operaciones observacionales a gran escala. La transformación arquitectónica no se limita a 
+mejoras incrementales, sino que establece una \textbf{extensión fundamental para regímenes de alta frecuencia} que expande significativamente las capacidades de 
+detección en el espectro milimétrico.
 
 \subsection{Vista General: Dos Grandes Bloques de Contribución}
 
 Esta propuesta se estructura en \textbf{dos grandes bloques} que abordan desafíos complementarios en la detección de FRBs:
 
-\textbf{Bloque 1: DRAFTS++ - Pipeline Productivo, Robusto y Eficiente} aborda la transformación del prototipo DRAFTS original hacia un sistema productivo capaz de operar en entornos observacionales reales. Este bloque incluye la refactorización arquitectónica completa, implementación de procesamiento eficiente por chunks, trazabilidad completa y artefactos de salida estandarizados.
+\textbf{Bloque 1: DRAFTS++ - Pipeline Productivo, Robusto y Eficiente} aborda la transformación del prototipo DRAFTS original hacia un sistema productivo capaz de operar en entornos observacionales reales.
+ Este bloque incluye la refactorización arquitectónica completa, implementación de procesamiento eficiente por chunks, trazabilidad completa y artefactos de salida estandarizados.
 
-\textbf{Bloque 2: Extensión a Alta Frecuencia - Cuatro Líneas de Investigación} explora estrategias metodológicas para extender las capacidades de detección hacia regímenes de alta frecuencia (30-100 GHz), donde las firmas dispersivas tradicionales se atenúan significativamente. Este bloque presenta cuatro líneas de investigación complementarias que abordan diferentes aspectos del desafío de detección en el espectro milimétrico.
+\textbf{Bloque 2: Extensión a Alta Frecuencia - Cuatro Líneas de Investigación} explora estrategias metodológicas para extender las capacidades de detección hacia regímenes de alta frecuencia (30-100 GHz), 
+donde las firmas dispersivas tradicionales se atenúan significativamente. Este bloque presenta cuatro líneas de investigación complementarias que abordan diferentes aspectos del desafío de detección en el espectro milimétrico.
 
 \subsection{Bloque 1: DRAFTS++ - Pipeline Productivo, Robusto y Eficiente}
 
@@ -20,7 +21,7 @@ Este bloque aborda la transformación fundamental del prototipo DRAFTS original 
 
 \subsubsection{Desafíos del Prototipo Original}
 
-El prototipo inicial presenta una estructura monolítica con scripts independientes (\texttt{d-center-main.py}, \texttt{d-resnet-main.py}) optimizados para condiciones de laboratorio controladas pero incapaces de manejar la variabilidad operacional de entornos observacionales reales. Las limitaciones principales incluyen:
+El prostotipo inicial presenta una estructura monolítica con scripts independientes (\texttt{d-center-main.py}, \texttt{d-resnet-main.py}) optimizados para condiciones de laboratorio controladas pero incapaces de manejar la variabilidad operacional de entornos observacionales reales. Las limitaciones principales incluyen:
 
 \begin{itemize}
 \item \textbf{Estructura monolítica:} Scripts independientes sin integración coherente
@@ -97,7 +98,7 @@ donde $\text{dt\_ds}$ es la resolución temporal decimada, garantizando que cada
 \label{fig:sistema-chunks}
 \end{figure}
 
-\subsubsection{Sistema de Análisis Multi-Banda}
+\subsubsection{Extensión multi-banda}
 
 \noindent\textbf{Procesamiento simultáneo de bandas de frecuencia para detección mejorada.} La capacidad de procesar múltiples bandas de frecuencia simultáneamente constituye una mejora fundamental que permite explotar las diferencias espectrales en la detección de FRBs. Este sistema implementa procesamiento independiente de bandas de frecuencia (banda completa, banda baja, banda alta) con detección independiente por banda.
 
@@ -105,7 +106,7 @@ El análisis multi-banda aprovecha las características espectrales únicas de c
 
 La implementación permite la configuración dinámica de bandas según las características observacionales, adaptándose automáticamente a diferentes configuraciones instrumentales y maximizando la eficiencia de detección en cada régimen espectral.
 
-\subsubsection{Sistema de Manejo de Polarización Avanzado}
+\subsubsection{Manejo de polarización}
 
 \noindent\textbf{Explotación de información polarimétrica para detección mejorada.} La capacidad de procesar datos polarizados (Stokes I, Q, U, V) constituye una mejora fundamental que permite explotar información polarimétrica para mejorar la detección y caracterización de FRBs. Este sistema implementa selección automática de polarización y calibración de datos polarizados.
 
@@ -113,15 +114,15 @@ El procesamiento de datos de Stokes completo permite el cálculo de parámetros 
 
 La implementación de algoritmos de calibración automática garantiza la correcta interpretación de los datos polarizados, estableciendo las bases para análisis polarimétricos avanzados que pueden proporcionar insights únicos sobre los mecanismos físicos responsables de la emisión de FRBs.
 
-\subsubsection{Extracción de Candidatos Precisos}
+\subsubsection{Detección y extracción de candidatos (DM--tiempo)}
 
 \noindent\textbf{Dedispersión GPU optimizada para detección de alta calidad.} La mejora en la calidad de extracción de candidatos mediante dedispersión GPU optimizada constituye una contribución fundamental que mejora significativamente la sensibilidad y especificidad del sistema. Esta implementación incluye normalización por exposición y validación de bordes para garantizar la calidad de los datos procesados.
 
 El sistema implementa algoritmos de dedispersión que incluyen cálculo de fondo dinámico y reducción de ruido sistemático, mejorando la relación señal-ruido de los candidatos detectados. La normalización por exposición compensa variaciones instrumentales y efectos de ganancia, garantizando coherencia en la detección.
 
-La optimización GPU de los algoritmos de dedispersión permite el procesamiento eficiente de grandes volúmenes de datos mientras mantiene la precisión requerida para la detección de eventos débiles, estableciendo las bases para el análisis de observaciones de larga duración.
+La optimización GPU de los algoritmos de dedispersión permite el procesamiento eficiente de grandes volúmenes de datos mientras mantiene la precisión requerida para la detección de eventos débiles, estableciendo las bases para el análisis de observaciones de larga duración. Cuando el contraste dispersivo lo permite, la etapa de detección opera sobre mapas DM--tiempo con detectores \emph{anchor-free} (p.ej., CenterNet) para proponer candidatos de forma directa.
 
-\subsubsection{Sistema de Optimización de Memoria GPU Avanzada}
+\subsubsection{Optimización de memoria GPU y rendimiento}
 
 \noindent\textbf{Gestión inteligente de recursos computacionales especializados.} La gestión avanzada de memoria GPU constituye una mejora fundamental que optimiza el rendimiento del sistema y previene fallos por agotamiento de memoria. Este sistema implementa limpieza automática de memoria CUDA, sincronización de operaciones y manejo robusto de errores GPU.
 
@@ -129,7 +130,7 @@ El sistema calcula dinámicamente los requisitos de memoria GPU y implementa est
 
 La implementación de manejo de errores GPU robusto incluye detección automática de fallos de memoria, recuperación automática y fallback a procesamiento CPU cuando es necesario, garantizando la continuidad del procesamiento incluso en condiciones de recursos limitados.
 
-\subsubsection{Cálculo de SNR Robusto}
+\subsubsection{Preprocesamiento y cálculo de SNR robusto}
 
 \noindent\textbf{Estimación de calidad de señal resistente a outliers.} La implementación de algoritmos de cálculo de SNR robustos constituye una mejora fundamental que mejora la confiabilidad de la clasificación de candidatos. Este sistema utiliza métodos estadísticos robustos, incluyendo el método del Rango Intercuartílico (IQR) para estimación de ruido resistente a outliers.
 
@@ -141,11 +142,11 @@ La implementación incluye validación automática de perfiles SNR y detección 
 
 Vectorización de operaciones matemáticas críticas, integración opcional de procesamiento GPU para algoritmos intensivos en cómputo, y paralelización de bloques de procesamiento para maximizar la utilización de recursos computacionales disponibles. Se implementan \textit{caches} por canal y reducción de I/O para optimizar el rendimiento.
 
-\subsubsection{Registro, Auditoría y Salidas Estandarizadas}
+\subsubsection{Registro, auditoría y salidas estandarizadas}
 
 Sistema de \emph{logging} estructurado que registra todas las operaciones críticas, implementación de semillas fijas para algoritmos estocásticos, generación de firmas criptográficas para datos y modelos, y producción de resúmenes de métricas por ejecución para garantizar auditoría completa.
 
-\subsubsection{Sistema de Visualización Unificado y Rangos Dinámicos}
+\subsubsection{Visualización y productos diagnósticos}
 
 \noindent\textbf{Generación automática de productos diagnósticos con rangos optimizados.} La implementación de un sistema de visualización unificado constituye una mejora fundamental que facilita el análisis posterior y la validación de resultados mediante la generación automática de productos diagnósticos consistentes.
 
@@ -153,7 +154,7 @@ El sistema implementa algoritmos de cálculo de rangos dinámicos que optimizan 
 
 La generación automática incluye reportes estructurados (CSV/Parquet), figuras consistentes (tiempo-DM, dispersado/dedispersado, parches) y composites que facilitan el análisis posterior y la validación de resultados. El sistema mantiene coherencia visual entre diferentes productos diagnósticos, estableciendo estándares de presentación que facilitan la interpretación y comparación de resultados.
 
-\paragraph{Impacto de la Precisión Temporal en la Detección}
+\subsubsection{Impacto de la precisión temporal en la detección}
 
 La implementación de precisión temporal quirúrgica tiene un impacto directo y medible en la efectividad del sistema. En la validación con el pulsar B0355+54\_FB\_20220918, el sistema demostró una eficiencia de detección del 97.3\% (732 de 752 pulsos esperados), donde cada pulso fue localizado con precisión temporal exacta. Esta precisión temporal permite:
 

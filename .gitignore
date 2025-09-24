@@ -1,3 +1,99 @@
+############################################################
+# Ignorar archivos generados (LaTeX)
+############################################################
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.dvi
+*.fdb_latexmk
+*.fls
+*.idx
+*.ilg
+*.ind
+*.lof
+*.log
+*.lot
+*.out
+*.toc
+*.synctex.gz
+*.nav
+*.snm
+*.vrb
+*.xdv
+*.run.xml
+*.lol
+*.acn
+*.acr
+*.alg
+*.glg
+*.glo
+*.gls
+*.ist
+*.auxlock
+missfont.log
+
+# Caches de paquetes LaTeX comunes
+_minted*/
+
+# PDFs generados (mantener PDFs dentro de figures/)
+*.pdf
+!figures/**/*.pdf
+
+############################################################
+# Python
+############################################################
+__pycache__/
+*.py[cod]
+*.pyo
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+*.egg-info/
+dist/
+build/
+
+# Entornos virtuales
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+############################################################
+# IDEs y editores
+############################################################
+.vscode/
+.idea/
+*.code-workspace
+.history/
+
+############################################################
+# OS
+############################################################
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~
+
+############################################################
+# Otros
+############################################################
+*.orig
+*.bak
+*.tmp
+~$*
 # Archivos auxiliares de LaTeX
 *.aux
 *.bbl
