@@ -10,26 +10,26 @@
 
 
 
-Esta propuesta presenta abarca desde la evolución de \textbf{DRAFTS} \cite{zhang2024drafts} desde un prototipo de investigación para la deteccion y clasificacion de FRBs, hacia un \textit{pipeline} 
-\textbf{productivo, robusto y eficiente} diseñado para detectar y clasificar transientes de radio y FRBs de forma sencilla y facil para el astronomo . Esta transformación arquitectónica no se limita a 
-mejoras incrementales, sino que ademas establece una \textbf{extensión fundamental para regímenes de alta frecuencia} que expande significativamente las capacidades de 
+Esta propuesta abarca la evolución de \textbf{DRAFTS} \cite{zhang2024drafts} desde un prototipo de investigación para la detección y clasificación de FRBs, hacia un \textit{pipeline} 
+\textbf{productivo, robusto y eficiente} diseñado para detectar y clasificar transientes de radio y FRBs de forma sencilla y fácil para el astrónomo. Esta transformación arquitectónica no se limita a 
+mejoras incrementales, sino que además establece una \textbf{extensión fundamental para regímenes de alta frecuencia} que expande significativamente las capacidades de 
 detección en el espectro milimétrico.
 
-Desde ahora hacia adelante a esta nueva version de DRAFTS le llamare DRAFTS++, que es basicamente toda esta memoria.
+De ahora en adelante, a esta nueva versión de DRAFTS le llamaré DRAFTS++, que es básicamente toda esta memoria.
 
-\subsection{Vista General: Dos Grandes Bloques de Contribución a los pipelines astronomicos de FRBs}
+\subsection{Vista General: Dos Grandes Bloques de Contribución a los pipelines astronómicos de FRBs}
 
 Esta propuesta se estructura en \textbf{dos grandes bloques} que abordan desafíos complementarios en la detección de FRBs:
 
-\textbf{Bloque 1: Creacion de DRAFTS++ como un Pipeline Productivo, Robusto y Eficiente}: Este bloque aborda la transformación del prototipo DRAFTS hacia un sistema productivo capaz de operar en entornos observacionales reales.
- Este bloque incluye la refactorización arquitectónica completa, implementación de procesamiento eficiente por chunks, gestion de memoria y recursos eficientes, trazabilidad completa y artefactos de salida estandarizados.
+\textbf{Bloque 1: Creación de DRAFTS++ como un Pipeline Productivo, Robusto y Eficiente}: Este bloque aborda la transformación del prototipo DRAFTS hacia un sistema productivo capaz de operar en entornos observacionales reales.
+ Este bloque incluye la refactorización arquitectónica completa; la implementación de procesamiento eficiente por \emph{chunks}; la gestión eficiente de memoria y recursos; la trazabilidad completa; y artefactos de salida estandarizados.
 
 \textbf{Bloque 2: Extensión a Alta Frecuencia - Cuatro Líneas de Investigación:} Este bloque explora estrategias metodológicas para extender las capacidades de detección hacia regímenes de alta frecuencia (30-100 GHz), 
 donde las firmas dispersivas tradicionales se atenúan significativamente. Este bloque presenta cuatro líneas de investigación complementarias que abordan diferentes aspectos del desafío de detección en el espectro milimétrico.
 
-\subsection{Bloque 1: DRAFTS++: Pipeline astronomico E2E, Productivo, Robusto y Eficiente}
+\subsection{Bloque 1: DRAFTS++: Pipeline astronómico E2E, Productivo, Robusto y Eficiente}
 
-Como ya se menciono anteriormente, aqui se contempla la transformación fundamental del prototipo DRAFTS hacia un sistema productivo capaz de operar en entornos observacionales reales. La evolución desde un prototipo de investigación hacia sistema productivo requiere una transformación arquitectónica fundamental que aborde las limitaciones inherentes del código base original.
+Como ya se mencionó anteriormente, aquí se contempla la transformación fundamental del prototipo DRAFTS hacia un sistema productivo capaz de operar en entornos observacionales reales. La evolución desde un prototipo de investigación hacia un sistema productivo requiere una transformación arquitectónica fundamental que aborde las limitaciones inherentes del código base original.
 
 \subsubsection{Desafíos y limitaciones de DRAFTS}
 
@@ -45,7 +45,7 @@ En operación y extensibilidad, los modelos se cargan desde rutas relativas y su
 
 \subsubsection{Construccion de un Pipeline End-to-End Modular y Escalable: DRAFTS++}
 
-A continuacion, se procede a explicar y narrar la transformación arquitectónica fundamental que sufrio DRAFTS para ser DRAFTS++. La evolución desde los scripts monolíticos hacia un sistema modular escalable constituye una contribución arquitectónica fundamental que establece las bases para operaciones productivas a gran escala. Esta transformación implementa una arquitectura modular con componentes especializados que establecen separación clara de responsabilidades y interfaces estandarizadas.
+A continuación, se procede a explicar y narrar la transformación arquitectónica fundamental que sufrió DRAFTS para ser DRAFTS++. La evolución desde los scripts monolíticos hacia un sistema modular escalable constituye una contribución arquitectónica fundamental que establece las bases para operaciones productivas a gran escala. Esta transformación implementa una arquitectura modular con componentes especializados que establecen separación clara de responsabilidades y interfaces estandarizadas.
 
 La reestructuración arquitectónica elimina las limitaciones inherentes del prototipo original, caracterizado por scripts independientes sin integración coherente, y establece un flujo de datos unidireccional que garantiza consistencia operacional y facilita mantenimiento y extensibilidad del sistema.
 
