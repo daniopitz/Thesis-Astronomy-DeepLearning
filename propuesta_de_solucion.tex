@@ -261,6 +261,90 @@ donde:
 
 Esta aproximación garantiza que cada \emph{slice} mantenga una duración temporal consistente mientras respeta las restricciones de muestreo del sistema.
 
+\paragraph{Algoritmo de Planificación de Recursos y Gestión de Memoria Dinámica}
+
+El sistema implementa un \textbf{algoritmo de planificación de recursos} que calcula dinámicamente el tamaño óptimo de \emph{chunks} basándose en la memoria disponible del sistema y las características de los datos. Este algoritmo es fundamental para garantizar que el pipeline pueda procesar observaciones de cualquier tamaño sin desbordamientos de memoria.
+
+El algoritmo de planificación de recursos opera mediante los siguientes pasos:
+
+\begin{enumerate}
+    \item \textbf{Cálculo de memoria disponible:} Se determina la memoria RAM disponible del sistema usando \texttt{psutil.virtual\_memory().available}.
+    \item \textbf{Estimación de bytes por muestra:} Se calcula el tamaño en bytes que ocupará cada muestra después de la decimación espectral.
+    \item \textbf{Aplicación de presupuesto de memoria:} Se reserva un porcentaje de la memoria disponible (típicamente 25\%) para operaciones de \emph{overhead} y estabilidad del sistema.
+    \item \textbf{Cálculo de tamaño máximo de chunk:} Se determina el número máximo de muestras que pueden procesarse en un solo \emph{chunk} sin exceder el presupuesto de memoria.
+    \item \textbf{Alineación con longitud de slice:} Se ajusta el tamaño del \emph{chunk} para que sea múltiplo exacto de la longitud de \emph{slice}, garantizando contigüidad perfecta.
+\end{enumerate}
+
+La formulación matemática del algoritmo se basa en las siguientes ecuaciones:
+
+\[
+\text{bytes\_por\_muestra} = 4 \times \left\lfloor \frac{\text{FREQ\_RESO}}{\text{DOWN\_FREQ\_RATE}} \right\rfloor
+\]
+
+donde:
+\begin{itemize}
+    \item $\text{FREQ\_RESO}$: Número total de canales de frecuencia originales
+    \item $\text{DOWN\_FREQ\_RATE}$: Factor de decimación espectral aplicado
+    \item El factor $4$: Representa el tamaño en bytes de un valor de punto flotante (32-bit)
+\end{itemize}
+
+El cálculo de memoria utilizable se realiza mediante:
+
+\[
+\text{memoria\_utilizable} = \frac{\text{memoria\_disponible} \times \text{FRACCION\_MAX\_RAM}}{\text{FACTOR\_OVERHEAD}}
+\]
+
+donde:
+\begin{itemize}
+    \item $\text{memoria\_disponible}$: Memoria RAM disponible del sistema en bytes
+    \item $\text{FRACCION\_MAX\_RAM}$: Fracción máxima de memoria a utilizar (típicamente 0.25 = 25\%)
+    \item $\text{FACTOR\_OVERHEAD}$: Factor de seguridad para operaciones adicionales (típicamente 1.3)
+\end{itemize}
+
+El número máximo de muestras por \emph{chunk} se calcula como:
+
+\[
+\text{muestras\_max} = \left\lfloor \frac{\text{memoria\_utilizable}}{\text{bytes\_por\_muestra}} \right\rfloor
+\]
+
+Finalmente, el tamaño final del \emph{chunk} se alinea con la longitud de \emph{slice}:
+
+\[
+\text{chunk\_samples} = \left\lfloor \frac{\text{muestras\_max}}{\text{slice\_len}} \right\rfloor \times \text{slice\_len}
+\]
+
+Este algoritmo garantiza que cada \emph{chunk} sea procesable con la memoria disponible mientras mantiene la eficiencia computacional y la contigüidad temporal de los datos.
+
+\begin{algorithm}[H]
+\caption{Planificación de Recursos y Gestión de Memoria Dinámica}
+\label{alg:resource-planning}
+\begin{algorithmic}[1]
+\Require Metadatos del archivo (FREQ\_RESO, DOWN\_FREQ\_RATE, FILE\_LENG)
+\Ensure Tamaño óptimo de chunk en muestras
+
+\State \textbf{INICIO}
+\State Obtener memoria disponible: $\text{mem\_available} = \text{psutil.virtual\_memory().available}$
+\State Calcular canales decimados: $\text{channels\_ds} = \lfloor \frac{\text{FREQ\_RESO}}{\text{DOWN\_FREQ\_RATE}} \rfloor$
+\State Calcular bytes por muestra: $\text{bytes\_per\_sample} = 4 \times \text{channels\_ds}$
+
+\If{archivo completo cabe en memoria}
+    \State $\text{chunk\_samples} = \text{total\_samples\_decimated}$
+    \State \textbf{RETORNAR} $\text{chunk\_samples}$
+\Else
+    \State Calcular memoria utilizable: $\text{usable\_mem} = \frac{\text{mem\_available} \times 0.25}{1.3}$
+    \State Calcular muestras máximas: $\text{max\_samples} = \lfloor \frac{\text{usable\_mem}}{\text{bytes\_per\_sample}} \rfloor$
+    \State Alinear con slice\_len: $\text{chunk\_samples} = \lfloor \frac{\text{max\_samples}}{\text{slice\_len}} \rfloor \times \text{slice\_len}$
+    \If{$\text{chunk\_samples} = 0$}
+        \State $\text{chunk\_samples} = \text{slice\_len}$ \Comment{Chunk mínimo}
+    \EndIf
+\EndIf
+
+\State Validar parámetros calculados
+\State \textbf{RETORNAR} $\text{chunk\_samples}$
+\State \textbf{FIN}
+\end{algorithmic}
+\end{algorithm}
+
 \paragraph{Sistema integrado de streaming y continuidad temporal}
 
 La limitación fundamental del prototipo original era su incapacidad para procesar observaciones de larga duración debido a restricciones de memoria y la falta de un mecanismo robusto para asegurar la continuidad temporal. DRAFTS++ resuelve esto con un \textbf{Sistema Integrado de Streaming y Continuidad Temporal}.
