@@ -13,14 +13,14 @@ El proceso de validación inició con el dataset FAST-FREX (FAST dataset for Fas
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{figures/FRB20180301_0001_slice003.png}
-    \caption{Detección de un Fast Radio Burst (FRB) del dataset de entrenamiento FAST-FREX. El panel superior muestra el mapa de dispersión (DM vs. Tiempo) con el evento resaltado. Los paneles inferiores presentan el SNR en cascada crudo, el SNR dedispersado y el SNR del parche candidato, confirmando una detección robusta con un SNR de 5.9$\sigma$.}
+    \caption[Detección FRB (FAST-FREX)]{Detección de un Fast Radio Burst (FRB) del dataset de entrenamiento FAST-FREX. El panel superior muestra el mapa de dispersión (DM vs. Tiempo) con el evento resaltado. Los paneles inferiores presentan el SNR en cascada crudo, el SNR dedispersado y el SNR del parche candidato, confirmando una detección robusta con un SNR de 5.9$\sigma$.}
     \label{fig:frb20180301_0001_slice003}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{figures/FRB20201124_0009_slice004.png}
-    \caption{Detección de un segundo Fast Radio Burst (FRB) del dataset de entrenamiento FAST-FREX. Se observa una detección robusta con SNR de 16.5$\sigma$ después de la dedispersión, confirmando la efectividad del sistema en el dataset de entrenamiento.}
+    \caption[Detección FRB adicional (FAST-FREX)]{Detección de un segundo Fast Radio Burst (FRB) del dataset de entrenamiento FAST-FREX. Se observa una detección robusta con SNR de 16.5$\sigma$ después de la dedispersión, confirmando la efectividad del sistema en el dataset de entrenamiento.}
     \label{fig:frb20201124_0009_slice004}
 \end{figure}
 
@@ -44,7 +44,7 @@ Los resultados obtenidos fueron altamente satisfactorios:
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{figures/B0355+54_FB_20220918_slice000.png}
-    \caption{Validación de continuidad temporal - Slice 000: Se observan 7 pulsos detectados en el primer segundo de observación, demostrando la capacidad del sistema para detectar eventos periódicos con alta precisión temporal. Todos los pulsos fueron clasificados como BURSTS con scores de clasificación superiores a 0.99.}
+    \caption[Validación continuidad temporal: Slice 000]{Validación de continuidad temporal - Slice 000: Se observan 7 pulsos detectados en el primer segundo de observación, demostrando la capacidad del sistema para detectar eventos periódicos con alta precisión temporal. Todos los pulsos fueron clasificados como BURSTS con scores de clasificación superiores a 0.99.}
     \label{fig:b0355_slice000}
 \end{figure}
 
@@ -52,7 +52,7 @@ Los resultados obtenidos fueron altamente satisfactorios:
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{figures/B0355+54_FB_20220918_slice001.png}
-    \caption{Validación de continuidad temporal - Slice 001: Continuidad perfecta en el segundo slice, mostrando 5 pulsos clasificados como BURSTS y 1 como NO BURST. La consistencia en la detección temporal confirma la robustez del sistema de procesamiento por ventanas.}
+    \caption[Validación continuidad temporal: Slice 001]{Validación de continuidad temporal - Slice 001: Continuidad perfecta en el segundo slice, mostrando 5 pulsos clasificados como BURSTS y 1 como ``NO BURST''. La consistencia en la detección temporal confirma la robustez del sistema de procesamiento por ventanas.}
     \label{fig:b0355_slice001}
 \end{figure}
 
@@ -61,7 +61,7 @@ Este resultado confirmó la capacidad del sistema para mantener la continuidad t
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{figures/B0355+54_FB_20220918_slice013.png}
-    \caption{Caso de estudio: Pulso dudoso en la clasificación. El evento \#6 (DM: 55.5, Time: 13.93s) muestra un score de detección alto (0.73) pero un score de clasificación bajo (0.27), resultando en clasificación "NO BURST". El evento \#4 (DM: 54.6, Time: 14.08s) presenta un score de detección muy alto (0.81) pero clasificación muy baja (0.09). Esto demuestra la capacidad del sistema para detectar señales ambiguas que requieren revisión manual.}
+    \caption[Pulso dudoso en la clasificación]{Caso de estudio: Pulso dudoso en la clasificación. El evento \#6 (DM: 55.5, Time: 13.93s) muestra un score de detección alto (0.73) pero un score de clasificación bajo (0.27), resultando en clasificación ``NO BURST''. El evento \#4 (DM: 54.6, Time: 14.08s) presenta un score de detección muy alto (0.81) pero clasificación muy baja (0.09). Esto demuestra la capacidad del sistema para detectar señales ambiguas que requieren revisión manual.}
     \label{fig:b0355_slice013}
 \end{figure}
 
@@ -100,14 +100,14 @@ Estos dos nuevos eventos representan descubrimientos científicos genuinos reali
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{figures/3096_0001_00_8bit_slice039.png}
-    \caption{Primer nuevo evento confirmado de FRB121102 detectado por DRAFTS++ en el archivo 3096\_0001\_00\_8bit, slice 039. El evento muestra DM=563.6 pc cm$^{-3}$ y Time=2421.559296s, con un SNR de 6.3$\sigma$ después de la dedispersión. La detección fue 100\% confirmada por el grupo de astrónomos colaboradores. \textit{Fuente: Elaboración propia}.}
+    \caption[FRB121102: nuevo evento confirmado (3096\_...\_slice039)]{Primer nuevo evento confirmado de FRB121102 detectado por DRAFTS++ en el archivo 3096\_0001\_00\_8bit, slice 039. El evento muestra DM=563.6 pc cm$^{-3}$ y Time=2421.559296s, con un SNR de 6.3$\sigma$ después de la dedispersión. La detección fue 100\% confirmada por el grupo de astrónomos colaboradores. \textit{Fuente: Elaboración propia}.}
     \label{fig:new_event_3096}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{figures/3102_0001_00_8bit_slice040.png}
-    \caption{Segundo nuevo evento confirmado de FRB121102 detectado por DRAFTS++ en el archivo 3102\_0001\_00\_8bit, slice 040. El evento muestra DM=564.88 pc cm$^{-3}$ y Time=723.455399s, con un SNR de 12.0$\sigma$ después de la dedispersión. Este evento representa uno de los bursts más brillantes detectados en el dataset y fue 100\% confirmado por el grupo de astrónomos colaboradores. \textit{Fuente: Elaboración propia}.}
+    \caption[FRB121102: nuevo evento confirmado (3102\_...\_slice040)]{Segundo nuevo evento confirmado de FRB121102 detectado por DRAFTS++ en el archivo 3102\_0001\_00\_8bit, slice 040. El evento muestra DM=564.88 pc cm$^{-3}$ y Time=723.455399s, con un SNR de 12.0$\sigma$ después de la dedispersión. Este evento representa uno de los bursts más brillantes detectados en el dataset y fue 100\% confirmado por el grupo de astrónomos colaboradores. \textit{Fuente: Elaboración propia}.}
     \label{fig:new_event_3102}
 \end{figure}
 
@@ -118,7 +118,7 @@ Para visualizar la distribución temporal de los diferentes tipos de detecciones
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\textwidth]{figures/frb121102_detection_histogram.png}
-    \caption{Histograma de distribución de detecciones de FRB121102 por archivo de observación. Las barras muestran: \textcolor{purple}{\textbf{Morado}} = bursts confirmados por literatura, \textcolor{cyan}{\textbf{Celeste}} = nuevos candidatos sin confirmar, \textcolor{green}{\textbf{Verde}} = nuevos eventos confirmados. \textit{Fuente: Elaboración propia}.}
+    \caption[Histograma de detecciones FRB121102]{Histograma de distribución de detecciones de FRB121102 por archivo de observación. Las barras muestran: \textcolor{purple}{\textbf{Morado}} = bursts confirmados por literatura, \textcolor{cyan}{\textbf{Celeste}} = nuevos candidatos sin confirmar, \textcolor{green}{\textbf{Verde}} = nuevos eventos confirmados. \textit{Fuente: Elaboración propia}.}
     \label{fig:frb121102_histogram}
 \end{figure}
 
@@ -239,28 +239,28 @@ Este caso ilustra las limitaciones del pipeline clásico adaptado, donde incluso
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{figures/2017-04-03-08-16-13_142_0003_t39.977_slice133.png}
-    \caption{Validación del pipeline clásico adaptado con DET\_PROB = 0.3 para el archivo 142\_0003, slice 133. El mapa de detección muestra la ausencia total de candidatos detectados por la red, confirmando que el umbral estándar es demasiado restrictivo para el dominio de altas frecuencias. \textit{Fuente: Elaboración propia}.}
+    \caption[ALMA 142\_0003: DET\_PROB 0.3]{Validación del pipeline clásico adaptado con DET\_PROB = 0.3 para el archivo 142\_0003, slice 133. El mapa de detección muestra la ausencia total de candidatos detectados por la red, confirmando que el umbral estándar es demasiado restrictivo para el dominio de altas frecuencias. \textit{Fuente: Elaboración propia}.}
     \label{fig:142_0003_slice133_highProb}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{figures/2017-04-03-08-16-13_142_0003_t39.977_slice133-lowProb.png}
-    \caption{Validación del pipeline clásico adaptado con DET\_PROB = 0.05 para el archivo 142\_0003, slice 133. El mapa de detección muestra la detección exitosa del pulso principal en el tiempo 39.976s con una probabilidad de detección del 9\%, junto con candidatos adicionales producto de la confusión de la red en umbrales bajos. \textit{Fuente: Elaboración propia}.}
+    \caption[ALMA 142\_0003: DET\_PROB 0.05]{Validación del pipeline clásico adaptado con DET\_PROB = 0.05 para el archivo 142\_0003, slice 133. El mapa de detección muestra la detección exitosa del pulso principal en el tiempo 39.976s con una probabilidad de detección del 9\%, junto con candidatos adicionales producto de la confusión de la red en umbrales bajos. \textit{Fuente: Elaboración propia}.}
     \label{fig:142_0003_slice133_lowProb}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{figures/2017-04-03-13_38_31_242_0005_t44.169_slice149.png}
-    \caption{Validación del pipeline clásico adaptado con DET\_PROB = 0.3 para el archivo 242\_0005, slice 149. El mapa de detección muestra la ausencia de detecciones, ilustrando las limitaciones del pipeline clásico incluso con el umbral estándar. \textit{Fuente: Elaboración propia}.}
+    \caption[ALMA 242\_0005: DET\_PROB 0.3]{Validación del pipeline clásico adaptado con DET\_PROB = 0.3 para el archivo 242\_0005, slice 149. El mapa de detección muestra la ausencia de detecciones, ilustrando las limitaciones del pipeline clásico incluso con el umbral estándar. \textit{Fuente: Elaboración propia}.}
     \label{fig:242_0005_slice149_highProb}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{figures/2017-04-03-13_38_31_242_0005_t44.169_slice149-lowProb.png}
-    \caption{Validación del pipeline clásico adaptado con DET\_PROB = 0.05 para el archivo 242\_0005, slice 149. A pesar del umbral muy permisivo, el sistema no logró detectar el pulso confirmado, demostrando las limitaciones inherentes del pipeline clásico para ciertas características de señales de alta frecuencia. \textit{Fuente: Elaboración propia}.}
+    \caption[ALMA 242\_0005: DET\_PROB 0.05]{Validación del pipeline clásico adaptado con DET\_PROB = 0.05 para el archivo 242\_0005, slice 149. A pesar del umbral muy permisivo, el sistema no logró detectar el pulso confirmado, demostrando las limitaciones inherentes del pipeline clásico para ciertas características de señales de alta frecuencia. \textit{Fuente: Elaboración propia}.}
     \label{fig:242_0005_slice149_lowProb}
 \end{figure}
 
