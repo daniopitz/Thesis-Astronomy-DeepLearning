@@ -1,6 +1,8 @@
-\secnumbersection{ESTADO DEL ARTE}
+\secnumbersection{MARCO CONCEPTUAL}
 
-\subsection{Fenómenos transitorios de radio en astronomía}
+\subsection{Fenomenología de FRBs y propagación en plasmas}
+
+\subsubsection{Contexto físico-observacional de FRBs}
 
 En radioastronomía, además de las fuentes permanentes o de 
 emisión continua, existe una variedad de fenómenos transitorios 
@@ -15,8 +17,6 @@ implica mecanismos energéticos violentos y propagación a través de medios pla
 y atenúan la señal. En particular, los FRBs se han convertido en uno de los focos de investigación 
 más activos en la última década debido a su lejanía y potencia inusual \citep{Petroff_2022}.
 
-\subsection{Las FRBs: descubrimiento, características e implicancias}
-
 Las FRBs son pulsos de radio de duración típicamente del orden de milisegundos, 
 que destacan por su intensa luminosidad y alta medida de dispersión (Dispersion Measure, DM), lo que 
 indica un origen extragaláctico. El descubrimiento inicial de un FRB en 2007, conocido como la ráfaga 
@@ -28,7 +28,9 @@ este evento excepcional en la banda de 1.4\,GHz, con un DM de 375\,pc\,cm$^{-3}$
  búsquedas ciegas han descubierto centenares de FRBs; catálogos recientes han consolidado 
  varios miles de eventos y fuentes \citep{CHIME2021,CHIMEFRB_2021_Catalog1,Petroff2019}.
 
-\subsubsection{Características físicas} Las FRBs típicamente muestran un espectro de frecuencia amplio 
+\subsubsection{La ley de dispersión y el "bow-tie" en tiempo--DM}
+
+Las FRBs típicamente muestran un espectro de frecuencia amplio 
 (decenas a cientos de MHz de ancho de banda) y una alta brillantitud, emitiendo una energía del orden 
 de $10^{38}$--$10^{40}$\,erg en pocos milisegundos. Presentan una marcada dispersión temporal: las 
 frecuencias más bajas del pulso llegan más tarde que las altas, siguiendo la ley de dispersión en 
@@ -40,12 +42,61 @@ Vía Láctea. Muchas muestran altos grados de polarización lineal, e índices e
 Un subconjunto (p.ej., FRB\,121102, FRB\,180916, FRB\,20190520B) presenta actividad repetitiva y 
 entornos densos.
 
-\subsubsection{Implicancias científicas} Las FRBs son poderosas herramientas cosmológicas y 
-laboratorios de física extrema. Su DM permite estimar bariones difusos en el medio intergaláctico 
-y sondear la \textit{cosmic web}; además, dispersión y rotación de Faraday informan sobre densidad, 
-turbulencia y magnetización del medio \citep{Petroff_2022,Masui2015,Shirasaki2021}. También se han propuesto pruebas de física fundamental usando su brevedad y lejanía. En cuanto al motor central, la hipótesis de magnetares ha ganado evidencia tras un estallido tipo FRB desde el magnetar galáctico SGR\,1935+2154 en 2020 \citep{Bochenek2020,CHIME_SGR2020}, aunque puede existir diversidad de mecanismos \citep{Zhang_2020}.
+\subsubsection{Medida de dispersión (DM), retrasos de llegada y su estimación}
 
-\subsection{Métodos clásicos de detección de FRBs}
+\subsubsection{Ensanchamiento por dispersión/escattering y consecuencias en S/N}
+
+\subsubsection{Implicancias para estrategias de búsqueda}
+
+\subsection{Polarización y medio magneto-iónico (RM)}
+
+\subsubsection{Fundamentos de Stokes I,Q,U,V y Rotación Faraday (RM)}
+
+\subsubsection{Definición de Stokes y PA($\lambda^2$); extracción de RM y su interpretación}
+
+\subsubsection{Casos de RM extremos en FRBs; cuándo/por qué se reduce la depolarización}
+
+\subsubsection{Valor diagnóstico de la polarización para distinguir orígenes/medios}
+
+\subsubsection{Representaciones polarimétricas en detección de FRBs: potencial para discriminación en mm-wave}
+
+\subsection{Régimen milimétrico (30--100 GHz): ``compresión dispersiva''}
+
+\subsubsection{Escalamiento del retraso ($\propto\nu^{-2}$) y pérdida de contraste en tiempo--DM}
+
+A frecuencias de decenas a centenas de GHz, $\Delta t\propto \nu^{-2}$ reduce el 
+contraste dispersivo en banda; la señal aparece casi simultánea en frecuencia, 
+dificultando discriminación frente a ruido/RFI \citep{LorimerKramer2004,CordesChatterjee2019}. 
+La sensibilidad instrumental y la tasa de datos exigen procesamiento de baja latencia.
+
+\subsubsection{Requisitos instrumentales: resolución temporal y ancho de banda}
+
+\subsubsection{Consecuencias para S/N y selección del plan DM (pasos/alcance)}
+
+\subsubsection{Evidencias de pulsos/magnetar en mm que motivan el régimen}
+
+Se han detectado pulsos de un magnetar en el Centro Galáctico con ALMA en modo 
+\textit{phased}, demostrando viabilidad de detectar transientes a $\sim$100\,GHz y 
+resaltando el valor de la polarización en la discriminación de señales 
+\citep{Matthews2018,veracasanova2025}. Esto abre la puerta a búsquedas de FRBs repetidoras en mm 
+\citep{veracasanova2025}.
+
+
+\subsection{Representaciones y operaciones núcleo (conceptuales)}
+
+\subsubsection{Waterfall crudo vs dedispersado; artefactos frecuentes}
+
+\subsubsection{Mapas tiempo--DM: geometría del bow-tie, centro (t,DM), contrastes}
+
+\subsubsection{Plan de dedispersión (rango/paso); costo vs fidelidad}
+
+\subsubsection{Métricas físicas básicas: SNR, anchura de pulso, boxcar y plausibilidad}
+
+\secnumbersection{ESTADO DEL ARTE}
+
+\subsection{Pipelines clásicos de búsqueda de pulsos}
+
+\subsubsection{PRESTO: rfifind, DDplan, prepsubband, single\_pulse\_search.py; flujo estándar}
 
 Detectar FRBs en voluminosos datos de radiotelescopios es un reto significativo. 
 Los métodos clásicos se basan en identificar pulsos dispersos mediante de\-dispersión 
@@ -56,7 +107,11 @@ anchos de pulso, (iv) agrupado de candidatos y reglas de descarte, y (v) clasifi
 automática. Herramientas como PRESTO y Heimdall implementan variantes optimizadas de este procedimiento
 \citep{Ransom_2003,Barsdell_2012,Heimdall_Use}.
 
-\subsubsection{Limitaciones} 
+\subsubsection{Heimdall: dedispersión (direct/tree/sub-band) acelerada en GPU}
+
+\subsubsection{Fortalezas: madurez, comunidad amplia, integración con formatos}
+
+\subsubsection{Limitaciones: falsos positivos, tuning manual, escalabilidad en grandes DM-planes y datos largos; contraste reducido a mm}
 
 La eficacia depende de la calidad del enmascaramiento de RFI y de la elección de parámetros 
 (umbral SNR, tamaños de filtros, paso de DM). La de\-dispersión exhaustiva tiene alto costo 
@@ -65,7 +120,9 @@ escalado a encuestas masivas es complejo \citep{Zackay_2014_FDMT,Barsdell_2012}.
 pulso puede generar duplicados a DMs cercanas. En la práctica, proyectos como CHIME/FRB producen 
 grandes volúmenes de candidatos diarios, de los que solo una fracción es real \citep{CHIME2021}.
 
-\subsection{Búsqueda con aprendizaje profundo: el pipeline DRAFTS}
+\subsection{Pipelines con deep learning específicos para FRBs}
+
+\subsubsection{DRAFTS: integra CenterNet (detección anchor-free sobre tiempo--DM) + ResNet (clasificación binaria)}
 
 Inicialmente, redes neuronales se aplicaron a la \textit{clasificación} de candidatos 
 generados por métodos clásicos (p.ej., FETCH) reduciendo la inspección manual 
@@ -78,21 +135,15 @@ El estado del arte lo representa \textbf{DRAFTS} (\textit{Deep-learning RAdio Fa
 clasificación de forma unificada. Su objetivo es mejorar eficiencia, completitud y velocidad, 
 reduciendo falsos positivos frente a enfoques clásicos.
 
-\subsubsection{Detección como \textit{object detection} en DM--tiempo} 
-
 DRAFTS genera una representación 2D (tiempo en $x$, DM en $y$) donde un FRB aparece como región 
 compacta con firma de \textit{bow-tie}. Emplea un detector \textit{anchor-free} (\textbf{CenterNet}) 
 para localizar centros y tamaños de objetos \citep{Zhou_2019_CenterNet}, con un backbone tipo 
 \textbf{ResNet} \citep{He_2015_ResNet}. La red infiere directamente el tiempo de llegada y la 
 DM del pulso \citep{zhang2024drafts}.
 
-\subsubsection{Clasificación binaria} 
-
 Cada detección se recorta, se de\-dispersa a su DM y se clasifica (FRB vs no-FRB) mediante una 
 CNN (p.ej., ResNet), entrenada con bursts reales y casos negativos de RFI/ruido 
 \citep{Agarwal_2020,zhang2024drafts}.
-
-\subsubsection{Desempeño} 
 
 En datos reales (FAST), DRAFTS detectó sustancialmente más ráfagas que pipelines clásicos 
 (p.ej., Heimdall) manteniendo bajo falso positivo, con altas tasas de recuperación y precisión, 
@@ -100,55 +151,37 @@ y tiempo de proceso cercano al tiempo real en GPU \citep{zhang2024drafts,Heimdal
 Entre las mejoras: evita cómputos redundantes sobre DMs similares, minimiza duplicados y 
 aprende variabilidad morfológica relevante.
 
-\subsection{Limitaciones y desafíos hacia altas frecuencias (cm--mm)}
+\subsubsection{CenterNet / Objects as Points: calorímetros de centros + regresión de tamaño/desplazamiento}
 
-\subsubsection{Escalabilidad computacional} 
+\subsubsection{ResNet: aprendizaje residual, backbone ampliamente adoptado}
+
+\subsubsection{Consideraciones para mm-wave: menor bow-tie $\rightarrow$ ajustes de entrada/plan DM/umbrales}
 
 Aumentar cobertura (DM/anchos/sub-bandas) incrementa fuertemente el costo; se requieren estrategias 
 focalizadas y aceleración eficiente \citep{zhang2024drafts,Zackay_2014_FDMT}.
-
-\subsubsection{Mitigación de RFI y generalización} 
 
 La RFI y su variabilidad entre instrumentos exigen estrategias dinámicas 
 (p.ej., IQRM, morfología TF, SK) y robustez de dominio 
 \citep{Morello_2021_IQRM,Offringa2010,Offringa2012}.
 
-\subsubsection{Sesgo de banda}
-
 Modelos entrenados en L-banda pueden degradar su rendimiento en mm; 
 se requiere reentrenamiento/adaptación de dominio \citep{zhang2024drafts}.
 
-\subsubsection{Física en mm} 
+\subsection{Resultados recientes relevantes en mm-wave / ALMA}
 
-A frecuencias de decenas a centenas de GHz, $\Delta t\propto \nu^{-2}$ reduce el 
-contraste dispersivo en banda; la señal aparece casi simultánea en frecuencia, 
-dificultando discriminación frente a ruido/RFI \citep{LorimerKramer2004,CordesChatterjee2019}. 
-La sensibilidad instrumental y la tasa de datos exigen procesamiento de baja latencia.
+\subsubsection{Pulsos del magnetar del GC con ALMA (phased): detecciones y polarización; potencial para FRBs repetidores}
 
-\subsubsection{Evidencia en mm y ALMA faseado} 
+\subsubsection{Detecciones de magnetar hasta 225--291 GHz (IRAM/APEX/others): precedentes a alta frecuencia}
 
-Se han detectado pulsos de un magnetar en el Centro Galáctico con ALMA en modo 
-\textit{phased}, demostrando viabilidad de detectar transientes a $\sim$100\,GHz y 
-resaltando el valor de la polarización en la discriminación de señales 
-\citep{Matthews2018,veracasanova2025}. Esto abre la puerta a búsquedas de FRBs repetidoras en mm 
-\citep{veracasanova2025}.
+\subsubsection{Primeros sondeos/sensibilidades y lecciones de campañas GMVA+ALMA}
 
-\subsection{Hacia DRAFTS++ en ondas milimétricas}
+\subsection{Estándares de datos y metadatos para pipelines de FRBs}
 
-Se propone \textbf{DRAFTS++}, una extensión de DRAFTS para el dominio mm (ALMA faseado):
-\begin{itemize}
-  \item Validación de CenterNet en DM--tiempo con criterio físico de resolubilidad del 
-  \textit{bow-tie} y consistencia de DM entre sub-bandas \citep{zhang2024drafts}.
-  \item Flujo híbrido detección por SNR + clasificación profunda como red de 
-  seguridad y para señales atípicas \citep{Agarwal_2020,zhang2024drafts}.
-  \item Mapas TWL (tiempo--ancho--polarización lineal) para aumentar contraste frente a RFI en mm, 
-  explotando Stokes Q,U \citep{hamaker1996understanding,veracasanova2025}.
-  \item Estrategias alternativas: expansión de rango/\textit{step} de DM, \textit{fishing} en DM 
-  $\approx 0$ con validaciones DM-aware y por sub-bandas, y mayor resolución temporal 
-  \citep{LorimerKramer2004,zhang2024drafts}.
-\end{itemize}
+\subsubsection{FITS: HDUs, tablas, convenciones de encabezado y WCS}
 
-En conjunto, estas líneas buscan un pipeline eficaz para ráfagas en mm, cerrando el 
-vacío metodológico y habilitando ciencia nueva en entornos extremos 
-\citep{Zhang_2020,Matthews2018,veracasanova2025}.
+\subsubsection{PSRFITS: modos SEARCH vs FOLD, polarización y compatibilidad PSRCHIVE}
+
+\subsubsection{SIGPROC Filterbank: espectros dinámicos binarios y compatibilidad}
+
+\subsubsection{MJD y tiempos absolutos; campos de cabecera críticos para pipelines}
 
