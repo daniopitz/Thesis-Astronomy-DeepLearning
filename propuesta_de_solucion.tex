@@ -405,45 +405,66 @@ El algoritmo de planificación de recursos opera mediante los siguientes pasos:
     \item \textbf{Alineación con longitud de slice:} Se ajusta el tamaño del \emph{chunk} para que sea múltiplo exacto de la longitud de \emph{slice}, garantizando contigüidad perfecta.
 \end{enumerate}
 
-La formulación matemática del algoritmo se basa en las siguientes ecuaciones:
+La formulación matemática del algoritmo se basa en las siguientes ecuaciones, siempre en el dominio temporal ya decimado:
 
 \[
-\text{bytes\_por\_muestra} = 4 \times \left\lfloor \frac{\text{FREQ\_RESO}}{\text{DOWN\_FREQ\_RATE}} \right\rfloor
+\text{total\_samples}_{\mathrm{ds}} = \left\lfloor \frac{\text{FILE\_LENG}}{\max(1,\text{DOWN\_TIME\_RATE})} \right\rfloor
 \]
 
 donde:
 \begin{itemize}
-    \item $\text{FREQ\_RESO}$: Número total de canales de frecuencia originales
-    \item $\text{DOWN\_FREQ\_RATE}$: Factor de decimación espectral aplicado
-    \item El factor $4$: Representa el tamaño en bytes de un valor de punto flotante (32-bit)
+    \item $\text{FILE\_LENG}$: Número de muestras crudas del archivo original.
+    \item $\text{DOWN\_TIME\_RATE}$: Factor de decimación temporal aplicado.
+    \item $\text{total\_samples}_{\mathrm{ds}}$: Muestras resultantes tras la decimación temporal (dominio operativo del pipeline).
 \end{itemize}
 
-El cálculo de memoria utilizable se realiza mediante:
+El peso por muestra decimada depende del número de canales que sobreviven al downsampling en frecuencia:
+
+\[
+\text{bytes\_por\_muestra} = 4 \times \left\lfloor \frac{\text{FREQ\_RESO}}{\max(1,\text{DOWN\_FREQ\_RATE})} \right\rfloor
+\]
+
+donde:
+\begin{itemize}
+    \item $\text{FREQ\_RESO}$: Número total de canales de frecuencia originales.
+    \item $\text{DOWN\_FREQ\_RATE}$: Factor de decimación espectral aplicado.
+    \item El factor $4$: Representa el tamaño en bytes de un valor de punto flotante (32-bit).
+\end{itemize}
+
+La fracción de memoria utilizable para chunking queda acotada por la política de presupuesto. Denotando por $\text{memoria\_disponible}$ la memoria RAM libre y por $\text{FRACCION\_MAX\_RAM}$ y $\text{FACTOR\_OVERHEAD}$ los parámetros de configuración (por defecto 0.25 y 1.3 respectivamente), se obtiene:
 
 \[
 \text{memoria\_utilizable} = \frac{\text{memoria\_disponible} \times \text{FRACCION\_MAX\_RAM}}{\text{FACTOR\_OVERHEAD}}
 \]
 
-donde:
+Si el archivo ya decimado cabe íntegramente en memoria (condición $\text{total\_samples}_{\mathrm{ds}} \times \text{bytes\_por\_muestra} \le 0.8\,\text{memoria\_disponible}$), se procesa de una sola vez:
+
+\[
+\text{chunk\_samples} = \text{total\_samples}_{\mathrm{ds}}
+\]
+
+En caso contrario, la política de memoria fija un límite de muestras candidatas
+
+\[
+m_{\text{cand}} = \max\!\left(\text{slice\_len},\; \min\!\left(\left\lfloor \frac{\text{memoria\_utilizable}}{\text{bytes\_por\_muestra}} \right\rfloor,\; \text{total\_samples}_{\mathrm{ds}}\right)\right)
+\]
+
+y el tamaño final del chunk se alinea a un múltiplo exacto de $\text{slice\_len}$ para preservar la geometría calculada:
+
+\[
+\text{chunk\_samples} = \max\!\left(\text{slice\_len},\; \left\lfloor \frac{m_{\text{cand}}}{\text{slice\_len}} \right\rfloor \times \text{slice\_len} \right)
+\]
+
+\noindent donde:
 \begin{itemize}
-    \item $\text{memoria\_disponible}$: Memoria RAM disponible del sistema en bytes
-    \item $\text{FRACCION\_MAX\_RAM}$: Fracción máxima de memoria a utilizar (típicamente 0.25 = 25\%)
-    \item $\text{FACTOR\_OVERHEAD}$: Factor de seguridad para operaciones adicionales (típicamente 1.3)
+    \item $\text{slice\_len}$: Longitud de cada \emph{slice} en muestras decimadas (geometría objetivo calculada en la Sección \ref{sec:chunk-slice-planning}).
+    \item $m_{\text{cand}}$: Límite provisional de muestras derivado del presupuesto de memoria y acotado por $\text{total\_samples}_{\mathrm{ds}}$.
+    \item $\text{memoria\_utilizable}$: Presupuesto de RAM disponible para un chunk, luego de aplicar los factores $\text{FRACCION\_MAX\_RAM}$ y $\text{FACTOR\_OVERHEAD}$.
+    \item $\text{bytes\_por\_muestra}$: Consumo en bytes de una muestra decimada (incluye canales retenidos tras $\text{DOWN\_FREQ\_RATE}$).
+    \item $\text{total\_samples}_{\mathrm{ds}}$: Total de muestras temporales disponibles en el dominio decimado del archivo.
 \end{itemize}
 
-El número máximo de muestras por \emph{chunk} se calcula como:
-
-\[
-\text{muestras\_max} = \left\lfloor \frac{\text{memoria\_utilizable}}{\text{bytes\_por\_muestra}} \right\rfloor
-\]
-
-Finalmente, el tamaño final del \emph{chunk} se alinea con la longitud de \emph{slice}:
-
-\[
-\text{chunk\_samples} = \left\lfloor \frac{\text{muestras\_max}}{\text{slice\_len}} \right\rfloor \times \text{slice\_len}
-\]
-
-Este algoritmo garantiza que cada \emph{chunk} sea procesable con la memoria disponible mientras mantiene la eficiencia computacional y la contigüidad temporal de los datos.
+Este algoritmo garantiza que cada \emph{chunk} sea procesable con la memoria disponible mientras mantiene la eficiencia computacional, preserva la contigüidad temporal y respeta la planificación de \emph{slices}.
 
 \begin{algorithm}[H]
 \caption{Planificación de Recursos y Gestión de Memoria Dinámica}
@@ -454,19 +475,16 @@ Este algoritmo garantiza que cada \emph{chunk} sea procesable con la memoria dis
 
 \State \textbf{INICIO}
 \State Obtener memoria disponible: $\text{mem\_available} = \text{psutil.virtual\_memory().available}$
-\State Calcular canales decimados: $\text{channels\_ds} = \lfloor \frac{\text{FREQ\_RESO}}{\text{DOWN\_FREQ\_RATE}} \rfloor$
+\State Calcular canales decimados: $\text{channels\_ds} = \max\!\left(1, \left\lfloor \frac{\text{FREQ\_RESO}}{\max(1,\text{DOWN\_FREQ\_RATE})} \right\rfloor\right)$
 \State Calcular bytes por muestra: $\text{bytes\_per\_sample} = 4 \times \text{channels\_ds}$
 
 \If{archivo completo cabe en memoria}
-    \State $\text{chunk\_samples} = \text{total\_samples\_decimated}$
+    \State $\text{chunk\_samples} = \text{total\_samples}_{\mathrm{ds}}$
     \State \textbf{RETORNAR} $\text{chunk\_samples}$
 \Else
-    \State Calcular memoria utilizable: $\text{usable\_mem} = \frac{\text{mem\_available} \times 0.25}{1.3}$
-    \State Calcular muestras máximas: $\text{max\_samples} = \lfloor \frac{\text{usable\_mem}}{\text{bytes\_per\_sample}} \rfloor$
-    \State Alinear con slice\_len: $\text{chunk\_samples} = \lfloor \frac{\text{max\_samples}}{\text{slice\_len}} \rfloor \times \text{slice\_len}$
-    \If{$\text{chunk\_samples} = 0$}
-        \State $\text{chunk\_samples} = \text{slice\_len}$ \Comment{Chunk mínimo}
-        \EndIf
+    \State Calcular memoria utilizable: $\text{usable\_mem} = \frac{\text{mem\_available} \times \text{FRACCION\_MAX\_RAM}}{\text{FACTOR\_OVERHEAD}}$
+    \State Calcular muestras candidatas: $m_{\text{cand}} = \max\!\left(\text{slice\_len},\; \min\!\left(\left\lfloor \frac{\text{usable\_mem}}{\text{bytes\_per\_sample}} \right\rfloor,\; \text{total\_samples}_{\mathrm{ds}}\right)\right)$
+    \State Alinear con slice\_len: $\text{chunk\_samples} = \max\!\left(\text{slice\_len},\; \left\lfloor \frac{m_{\text{cand}}}{\text{slice\_len}} \right\rfloor \times \text{slice\_len} \right)$
 \EndIf
 
 \State Validar parámetros calculados
@@ -474,35 +492,6 @@ Este algoritmo garantiza que cada \emph{chunk} sea procesable con la memoria dis
 \State \textbf{FIN}
 \end{algorithmic}
 \end{algorithm}
-
-\paragraph{Gestión Inteligente de Memoria GPU}
-
-El sistema implementa estrategias avanzadas para la gestión de memoria GPU (VRAM) que optimizan el uso de recursos CUDA y previenen desbordamientos de memoria durante el procesamiento intensivo de dedispersión y detección. A diferencia del prototipo original que carecía de gestión de memoria GPU, DRAFTS++ incluye mecanismos de monitoreo, limpieza automática y fallback a CPU cuando es necesario.
-
-La gestión de memoria GPU opera mediante los siguientes componentes:
-
-\begin{enumerate}
-    \item \textbf{Monitoreo de VRAM:} Se implementa telemetría en tiempo real del uso de memoria GPU para detectar situaciones de memoria insuficiente antes de que causen fallos.
-    \item \textbf{Limpieza Automática:} Se ejecuta limpieza determinística de tensores y buffers GPU después de cada operación para liberar memoria no utilizada.
-    \item \textbf{Fallback a CPU:} Se implementa un mecanismo de fallback automático que transfiere operaciones a CPU cuando la memoria GPU es insuficiente.
-    \item \textbf{Contexto de GPU:} Se utiliza un contexto manager que suprime mensajes técnicos de CUDA y maneja errores de manera elegante.
-\end{enumerate}
-
-Esta implementación garantiza que el pipeline sea robusto ante diferentes configuraciones de hardware y pueda adaptarse dinámicamente a las limitaciones de memoria disponibles.
-
-\paragraph{Optimización de Recursos Computacionales}
-
-El sistema incluye algoritmos de optimización que ajustan dinámicamente el uso de recursos en función de las características de los datos y la disponibilidad del sistema. Esta optimización incluye:
-
-\begin{enumerate}
-    \item \textbf{Balanceado de carga:} Distribución inteligente de operaciones entre CPU y GPU según la disponibilidad de recursos.
-    \item \textbf{Gestión de garbage collection:} Liberación proactiva de memoria no utilizada para mantener un uso eficiente de recursos.
-    \item \textbf{Telemetría de rendimiento:} Monitoreo continuo del uso de recursos para optimización dinámica.
-    \item \textbf{Configuración adaptativa:} Ajuste automático de parámetros de procesamiento basado en las capacidades del sistema.
-\end{enumerate}
-
-Esta aproximación integral a la gestión de recursos representa una mejora fundamental que establece las bases para un sistema productivo capaz de operar eficientemente en diferentes entornos computacionales y escalar a observaciones de gran tamaño.
-
 
 \subsubsection{Integración y Automatización del Workflow de Modelos de DRAFTS}
 
@@ -651,28 +640,27 @@ El algoritmo de orquestación y ejecución de ResNet18 en DRAFTS++ opera mediant
     \item \textbf{Decisión automatizada:} Se aplica un umbral de confianza configurable para clasificar automáticamente el candidato como "BURST" o "NO BURST".
 \end{enumerate}
 
-La formulación matemática del proceso de clasificación se basa en:
-
-El preprocesamiento del patch se realiza mediante:
+La formulación matemática del proceso de clasificación se basa en las transformaciones exactas implementadas en el módulo 	exttt{model	extunderscore interface}. El preprocesamiento del patch sigue cuatro pasos determinísticos:
 
 \[
-P_{norm} = \frac{P - \mu_P}{\sigma_P} \cdot \frac{1}{\text{mean}(P)} + 1
+P^{(1)} = P + \mathbf{1}, \qquad
+P^{(2)}_{i,j} = \frac{P^{(1)}_{i,j}}{\mu_j}, \qquad
+P^{(3)} = \operatorname{clip}\big(P^{(2)}, q_{5}, q_{95}\big),
+\]
+
+\[
+P_{\text{final}} = \frac{P^{(3)} - \min P^{(3)}}{\max P^{(3)} - \min P^{(3)}}
 \]
 
 donde:
 \begin{itemize}
-    \item $P$: Patch original extraído
-    \item $\mu_P, \sigma_P$: Media y desviación estándar del patch
-    \item $P_{norm}$: Patch normalizado
+    \item $P$: Patch dedispersado original (tiempo \texttimes{} frecuencia).
+    \item $\mathbf{1}$: Matriz de unos con la misma forma que $P$, que desplaza la señal para evitar valores nulos.
+    \item $\mu_j = \frac{1}{N_t} \sum_i P^{(1)}_{i,j}$: Media de la columna $j$ (normalización por canal de frecuencia).
+    \item $q_{5}$ y $q_{95}$: Percentiles 5$^{\circ}$ y 95$^{\circ}$ calculados sobre todos los elementos de $P^{(2)}$.
+    \item $\operatorname{clip}(\cdot)$: Operador que limita cada valor al rango $[q_{5}, q_{95}]$ para mitigar outliers.
+    \item $\min P^{(3)}$ y $\max P^{(3)}$: Valores mínimo y máximo globales de $P^{(3)}$, usados para el escalado min--max final.
 \end{itemize}
-
-La normalización final se aplica mediante:
-
-\[
-P_{final} = \frac{\text{clip}(P_{norm}, v_{min}, v_{max}) - v_{min}}{v_{max} - v_{min}}
-\]
-
-donde $v_{min}$ y $v_{max}$ son los percentiles 5\% y 95\% del patch, respectivamente.
 
 La probabilidad de clasificación se calcula mediante:
 
