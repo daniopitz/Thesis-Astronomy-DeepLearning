@@ -28,9 +28,9 @@
 % \subsubsection{OTRA SUBSUBSECCIÓN DE PRUEBA}
 % 
 % Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet.
-\subsection{Descripción}
+\subsection{Contexto y caracterización del problema de detección}
 
-Los \textit{Fast Radio Bursts} (FRBs) son  eventos transitorios  de milisegundos de origen extragaláctico. Su estudio se ha consolidado como una línea de investigación en radioastronomia y ciencia de datos, en la cual convergen desarrollos de instrumentación, procesamiento de señales y aprendizaje automático. En la actualidad, se han desarrollado métodos y modelos capaces de detectar y clasificar FRBs en distintos contextos, junto con marcos de trabajo que incorporan técnicas de aprendizaje profundo. Sin embargo, estas aproximaciones suelen estar limitadas a implementaciones específicas, de difícil reproducción y con escasa portabilidad. En particular, no se dispone de un flujo de procesamiento consolidado que pueda adaptarse a distintos entornos y extenderse a regímenes de alta frecuencia (mm-wave) sin necesidad de reentrenar los modelos. En este capítulo se describe los detalles de problema y se expone el enfoque que guiará el desarrollo de la memoria.
+Los \textit{Fast Radio Bursts} (FRBs) son  eventos transitorios  de milisegundos de origen extragaláctico. Su estudio se ha consolidado como una línea de investigación en radioastronomía y ciencia de datos, en la cual convergen desarrollos de instrumentación, procesamiento de señales y aprendizaje automático. En la actualidad, se han desarrollado métodos y modelos capaces de detectar y clasificar FRBs en distintos contextos, junto con marcos de trabajo que incorporan técnicas de aprendizaje profundo. Sin embargo, estas aproximaciones suelen estar limitadas a implementaciones específicas, de difícil reproducción y con escasa portabilidad. En particular, no se dispone de un flujo de procesamiento consolidado que pueda adaptarse a distintos entornos y extenderse a regímenes de alta frecuencia (mm-wave) sin necesidad de reentrenar los modelos. En este capítulo se describe los detalles de problema y se expone el enfoque que guiará el desarrollo de la memoria.
 
 
 %Este capítulo formula el \textbf{problema} que aborda la memoria: la ausencia de un \textit{pipeline} operativo, reproducible y portable que permita \textbf{detectar y clasificar FRBs en tiempo (casi) real} y que, además, sea \textbf{extensible a regímenes de alta frecuencia} (mm-wave) sin reentrenar modelos. La investigación se sitúa en la intersección de la Informática (ingeniería de software y ML aplicado) y la radioastronomía, utilizando como base el marco conceptual y el código no finalizado de \textbf{DRAFTS}\footnote{\emph{Deep-learning Real-time pAstro nomy FRB TranSients} (DRAFTS). Se usa como punto de partida por disponer de modelos de detección y clasificación y de utilidades de procesamiento, pero su código requiere consolidación para uso productivo.}, sobre el cual se propone construir un \textit{pipeline} robusto.
@@ -53,24 +53,35 @@ En vista de estos desafíos técnicos diferenciados, se han desarrollado herrami
 
 Los desafíos operativos comunes a ambos regímenes incluyen: fricción computacional (archivos grandes y procesamiento intensivo que genera latencia crítica para alertas de seguimiento), altas tasas de falsos positivos (RFI y artefactos instrumentales que exigen validación manual), y la ausencia de pipelines end-to-end que integren modelos de aprendizaje automático con ingeniería de datos, métricas y reportabilidad robustas.
 
+
 \begin{table}[h]
 \centering
 \caption{\textbf{Comparación de características técnicas entre regímenes espectrales relevantes para el diseño del pipeline.}}
 \vspace{0.5em}
-\begin{tabular}{|l|l|l|}
+\small
+\begin{tabular}{l c c}
 \toprule
 \textbf{Aspecto} & \textbf{0.3--3\,GHz} & \textbf{30--100\,GHz} \\
 \midrule
-Retardo por dispersión & Alto; patrones claros en tiempo--DM & Bajo; patrones atenuados \\
-RFI/sistemáticas & RFI ancha banda & Atmósfera, estabilidad de fase, distinta RFI \\
-Productos útiles & Waterfalls, tiempo--DM & Tiempo--frecuencia, polarización/diagnósticos alternativos \\
-Disponibilidad de software & Pipelines consolidados & Prototipos, sin estándar general \\
+Retardo por dispersión & Alto; patrones claros & Bajo; patrones \\
+& en tiempo--DM & atenuados \\
+\midrule
+RFI/sistemáticas & RFI ancha banda & Atmósfera, estabilidad \\
+& & de fase, distinta RFI \\
+\midrule
+Productos útiles & Waterfalls, tiempo--DM & Tiempo--frecuencia, \\
+& & polarización/diagnósticos \\
+\midrule
+Disponibilidad & Pipelines consolidados & Prototipos, sin \\
+de software & & estándar general \\
 \bottomrule
-\vspace{0.2em}
 \end{tabular}
+
+\vspace{0.3em}
 \raggedright
 \small{\textit{Nota: RFI = Radio Frequency Interference (Interferencia de Radiofrecuencia); DM = Dispersion Measure (Medida de Dispersión).}}
 \end{table}
+
 
 \medskip
 %Hoy por hoy existen herramientas clásicas (PRESTO/Heimdall) y marcos específicos de proyectos que han sido eficaces en L/S-band, pero su adopción como \textbf{producto} general es limitada, pues no se consideran escenarios de alta frecuencia. En DL, \textbf{DRAFTS} sugiere una vía: detección en mapas tiempo--DM (estimación de $(t_{arr},,\mathrm{DM})$) + \emph{patch} tiempo--frecuencia para clasificación binaria. La brecha es llevar ese enfoque a un \textit{pipeline} reproducible, con ingeniería de software, monitoreo, métricas y \textbf{adaptación a alta frecuencia} sin reentrenar modelos.
@@ -80,6 +91,34 @@ Disponibilidad de software & Pipelines consolidados & Prototipos, sin estándar 
 \medskip
 %Entonces, luego del contexto anterior, presentamos la formulación del problema; dado un flujo de datos de radioastronomía (FITS/PSRFITS u otros formatos) y dos modelos preentrenados (detección y clasificación), se requiere construir un \textbf{pipeline operativo, reproducible y portable} que: (i) procese en lotes y en línea con control de recursos, (ii) reduzca falsos positivos con una segunda criba basada en DL, (iii) produzca salidas auditables (catálogo de candidatos, recortes, figuras, métricas), y (iv) \textbf{funcione en alta frecuencia} parametrizando adecuadamente DM-grids, escalas temporales y productos diagnósticos (incluida polarización cuando esté disponible). Todo ello \textbf{sin reentrenar} los modelos base.%
 
+
+
+
+\subsection{Diagnóstico del pipeline DRAFTS}
+
+La búsqueda y clasificación de FRBs mediante aprendizaje profundo ha sido explorada en distintos marcos experimentales, entre los cuales destaca \textit{DRAFTS} (Deep Radio Astronomical Fast Transient Search). Este sistema constituye uno de los primeros intentos de integrar modelos neuronales en el flujo de detección y representa un punto de partida relevante para esta memoria. Sin embargo, su arquitectura presenta limitaciones significativas que dificultan su adopción como herramienta operativa en entornos observacionales reales. A continuación, se presenta un análisis detallado de sus principales desafíos y restricciones, que servirán de base para la definición del problema abordado en esta investigación.
+
+\textit{DRAFTS} es un “pseudo-pipeline”, más cercano a un prototipo experimental que a un software astronómico operativo. No obstante, sus modelos de detección y clasificación de FRBs son robustos y completamente funcionales; el problema surge en torno a la infraestructura que los rodea. \textit{DRAFTS} presenta una estructura monolítica con \textit{scripts} independientes, optimizados para condiciones de laboratorio controladas pero incapaces de manejar la variabilidad operacional de entornos observacionales reales. Más que limitaciones incrementales, el código original no constituye un \textit{pipeline} operativo: la búsqueda en datos reales se materializa en programas separados que el usuario debe ejecutar y parametrizar manualmente. No existe un punto de entrada unificado, una interfaz de línea de comandos ni un sistema de configuración versionado; el flujo exige editar variables en el código (rutas, umbrales, \textit{checkpoints}, tamaños de bloque, DM, etc.) y ejecutar etapas desconectadas sin orquestación. El propio \textit{README} instruye a “modificar la ruta de datos y de guardado y ejecutar el archivo”, lo que evidencia la ausencia de un flujo automatizado de extremo a extremo que, con un único \textit{input}, entregue resultados reproducibles y simples para el usuario astrónomo.
+
+En la ingesta de datos se observan supuestos instrumentales rígidos. El lector de PSRFITS asume un esquema específico propio de FAST/GBT, y el repositorio indica explícitamente que para otros telescopios se deben “modificar” funciones internas. No hay detección automática de formato ni un análisis robusto de encabezados; los parámetros observacionales se derivan parcialmente con constantes implícitas y números mágicos (p.ej., factores de decimado temporal y espectral), además de correcciones \textit{ad hoc} como la inversión del eje de frecuencia o normalizaciones mín–máx. Tampoco se calculan marcas temporales precisas a partir de los \textit{headers}, por lo que los tiempos de arribo son relativos y no trazables de manera consistente dentro del archivo ni interoperables con análisis posteriores.
+
+La gestión de datos y memoria es frágil para observaciones prolongadas. El procesamiento es monolítico sobre bloques grandes construidos concatenando archivos contiguos en memoria, y para completar las ventanas de dedispersión en los bordes se recurre a relleno sintético con ruido aleatorio cuando faltan muestras, alterando la estadística de fondo y comprometiendo la validez científica en condiciones reales. La dedispersión GPU (\texttt{numba.cuda}) opera sobre tensores completos de DM–tiempo sin un planificador de \textit{chunking} que respete un presupuesto de memoria; no hay telemetría ni control de uso de VRAM, limpieza sistemática, \textit{fallback} a CPU ante \textit{out-of-memory} o manejo robusto de errores. Esta combinación limita la estabilidad y escalabilidad del sistema cuando la duración, el ancho de banda o la resolución crecen.
+
+La extracción y validación de candidatos carecen de un esqueleto unificado. La detección obtiene cajas en DM–tiempo, pero el filtrado posterior es heurístico (p.ej., exigir \texttt{DM > 20}) y la clasificación está desacoplada en un programa distinto que dedispersa a un DM fijo predefinido, sin realimentación del detector. No existe un validador físico común (coherencia por subbandas, verificación de DM positivo con incertidumbre acotada, consistencia temporal entre ventanas) ni mecanismos de desduplicación de eventos entre \textit{slices} y archivos. Las salidas se limitan a imágenes y algunos archivos \texttt{.npy} por bloque; no se generan artefactos estandarizados (CSV/Parquet con metadatos completos), ni resúmenes por ejecución, ni firmas de modelos y datos que habiliten trazabilidad y auditoría. La ausencia de \textit{logging} estructurado y de semillas controladas impide reproducir resultados de manera fiable.
+
+En operación y extensibilidad, los modelos se cargan desde rutas relativas y su presencia es un prerrequisito tácito; si faltan, el programa simplemente falla sin orientación al usuario. No hay empaquetado ni instalación como librería, pruebas automatizadas, ni documentación de un flujo end–to–end; el entrenamiento existe, pero la integración con la búsqueda es manual. La compatibilidad multibanda y el tratamiento de polarización son limitados (se promedian canales y polarizaciones tempranamente), y no existe un mecanismo para seleccionar estrategias de búsqueda según condiciones físicas (resolución temporal, rango de frecuencias, SNR, disponibilidad de Stokes).
+
+En suma, a pesar de contar con modelos de detección y clasificación bien entrenados, el prototipo carece de un software de \textit{pipeline} que permita, con un único \textit{input}, obtener resultados directos, sencillos y trazables en un entorno observacional real.
+Estas limitaciones motivan el desarrollo de \textit{DRAFTS++}, una nueva versión concebida como un sistema modular, automatizado y reproducible, cuyo diseño y estructura se describen en la siguiente sección.
+
+
+\subsection{Diseño y desarrollo de DRAFTS++}
+
+\textit{DRAFTS++} surge como una reformulación integral del prototipo original, orientada a superar las limitaciones operativas, de portabilidad y de reproducibilidad detectadas en \textit{DRAFTS}. El nuevo sistema redefine el flujo de procesamiento mediante una arquitectura modular y configurable, capaz de adaptarse a distintos instrumentos y regímenes espectrales sin requerir el reentrenamiento de los modelos neuronales. Además, introduce mecanismos de validación, control de recursos y trazabilidad que habilitan su uso en entornos observacionales reales.
+
+\medskip
+
+
 Considerando este contexto, el presente trabajo aborda la siguiente formulación del problema: dado un flujo de datos de radioastronomía (FITS/PSRFITS u otros formatos) y dos modelos preentrenados (detección y clasificación), se requiere construir un **pipeline operativo, reproducible y portable** que: (i) procese datos en lotes y en línea con control eficiente de recursos, (ii) reduzca falsos positivos mediante una segunda criba basada en aprendizaje profundo, (iii) genere salidas completamente auditables (catálogo de candidatos, recortes, figuras diagnósticas y métricas de rendimiento), y (iv) **sea extensible a regímenes de alta frecuencia** mediante parametrización adecuada de rejillas DM, escalas temporales y productos diagnósticos (incluida polarización cuando esté disponible). Todo ello **sin requerir 
 
 \medskip
@@ -87,9 +126,8 @@ Considerando este contexto, el presente trabajo aborda la siguiente formulación
 
 Esta propuesta aborda limitaciones críticas en el área: la alta latencia computacional que impide alertas oportunas de seguimiento, y la falta de robustez operativa que requiere intervención manual extensiva para validar candidatos. La solución aporta valor transversal mediante portabilidad y estandarización de procesos. El impacto esperado es doble: (i) **operativo**, al reducir significativamente los tiempos de procesamiento y automatizar la validación de candidatos; y (ii) **científico**, al habilitar búsquedas sistemáticas y consistentes en el régimen de ondas milimétricas y facilitar la comparabilidad entre diferentes campañas observacionales.
 
-\medskip
 
-\subsection{Objetivos y Resultados Esperados}
+\subsection{Objetivos y resultados esperados}
 
 \textbf{Objetivos}
 \begin{itemize}

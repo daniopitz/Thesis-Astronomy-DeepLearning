@@ -10,56 +10,52 @@
 
 
 
-Esta propuesta abarca la evolución de \textbf{DRAFTS} \cite{zhang2024drafts} desde un prototipo de investigación para la detección y clasificación de FRBs, hacia un \textit{pipeline} 
-\textbf{productivo, robusto y eficiente} diseñado para detectar y clasificar transientes de radio y FRBs de forma sencilla y fácil para el astrónomo. Esta transformación arquitectónica no se limita a 
-mejoras incrementales, sino que además establece una \textbf{extensión fundamental para regímenes de alta frecuencia} que expande significativamente las capacidades de 
-detección en el espectro milimétrico.
+%Esta propuesta abarca la evolución de \textbf{DRAFTS} \cite{zhang2024drafts} desde un prototipo de investigación para la detección y clasificación de FRBs, hacia un \textit{pipeline} 
+%\textbf{productivo, robusto y eficiente} diseñado para detectar y clasificar transientes de radio y FRBs de forma sencilla y fácil para el astrónomo. Esta transformación arquitectónica no se limita a 
+%mejoras incrementales, sino que además establece una \textbf{extensión fundamental para regímenes de alta frecuencia} que expande significativamente las capacidades de 
+%detección en el espectro milimétrico.%
 
-De ahora en adelante, a esta nueva versión de DRAFTS le llamaremos DRAFTS++, que es básicamente toda esta memoria.
+En este capítulo se propone el diseño e implementación de DRAFTS++, una nueva versión de DRAFTS \cite{zhang2024drafts}. A diferencia del prototipo original, centrado en la validación de modelos de detección y clasificación de Fast Radio Bursts (FRBs), DRAFTS++ se concibe como un \textit{pipeline} operativo, robusto y eficiente, capaz de integrar procesos de ingesta, preprocesamiento, inferencia y reporte de resultados en un flujo extremo a extremo.
+Adicionalmente, la propuesta extiende la arquitectura de DRAFTS hacia el régimen de frecuencias milimétricas, ampliando de manera significativa las capacidades de detección y caracterización de transientes de radio en este dominio.
+La propuesta se organiza en dos componentes principales: (i) el desarrollo de DRAFTS++ como pipeline productivo end-to-end, y (ii) su extensión al régimen milimétrico mediante nuevas estrategias de detección y análisis. De aquí en adelante, el término DRAFTS++ se utilizará para referirse a esta propuesta, que constituye el núcleo central de la presente memoria.
 
-\subsection{Vista General: Dos Grandes Bloques de Contribución a los pipelines astronómicos de FRBs}
+%De ahora en adelante, a esta nueva versión de DRAFTS le llamaremos DRAFTS++, que es básicamente toda esta memoria.
 
-Esta propuesta se estructura en \textbf{dos grandes bloques} que abordan desafíos complementarios en la detección de FRBs:
+%\subsection{Vista General: Dos Grandes Bloques de Contribución a los pipelines astronómicos de FRBs}
 
-\begin{itemize}
-    \item \textbf{Bloque 1: DRAFTS++: Pipeline astronómico E2E, Productivo, Robusto y Eficiente}: Este bloque aborda la transformación del prototipo DRAFTS hacia un sistema productivo capaz de operar en entornos observacionales reales. Este bloque incluye la refactorización arquitectónica completa; la implementación de procesamiento eficiente por \emph{chunks}; la gestión eficiente de memoria y recursos; la trazabilidad completa; y artefactos de salida estandarizados.
+%Esta propuesta se estructura en \textbf{dos grandes bloques} que abordan desafíos complementarios en la detección de FRBs:
 
-    \item \textbf{Bloque 2: DRAFTS++: Extensión a Alta Frecuencia - Cuatro Líneas de Investigación:} Este bloque explora estrategias metodológicas para extender las capacidades de detección hacia regímenes de alta frecuencia (30-100 GHz), donde las firmas dispersivas tradicionales se atenúan significativamente. Este bloque presenta cuatro líneas de investigación complementarias que abordan diferentes aspectos del desafío de detección en el espectro milimétrico.
-\end{itemize}
+%\begin{itemize}
+   % \item \textbf{Bloque 1: DRAFTS++: Pipeline astronómico E2E, Productivo, Robusto y Eficiente}: Este bloque aborda la transformación del prototipo DRAFTS hacia un sistema productivo capaz de operar en entornos observacionales reales. Este bloque incluye la refactorización arquitectónica completa; la implementación de procesamiento eficiente por \emph{chunks}; la gestión eficiente de memoria y recursos; la trazabilidad completa; y artefactos de salida estandarizados.
 
-\subsection{Bloque 1: DRAFTS++: Pipeline astronómico E2E, Productivo, Robusto y Eficiente}
+    %\item \textbf{Bloque 2: DRAFTS++: Extensión a Alta Frecuencia - Cuatro Líneas de Investigación:} Este bloque explora estrategias metodológicas para extender las capacidades de detección hacia regímenes de alta frecuencia (30-100 GHz), donde las firmas dispersivas tradicionales se atenúan significativamente. Este bloque presenta cuatro líneas de investigación complementarias que abordan diferentes aspectos del desafío de detección en el espectro milimétrico.
+%\end{itemize}
 
-Como ya se mencionó anteriormente, aquí se contempla la transformación fundamental del prototipo DRAFTS hacia un sistema productivo capaz de operar en entornos observacionales reales. La evolución desde un prototipo de investigación hacia un sistema productivo requiere una transformación arquitectónica fundamental que aborde las limitaciones inherentes del código base original.
+%\subsection{Bloque 1: DRAFTS++: Pipeline astronómico E2E, Productivo, Robusto y Eficiente}
 
-\subsubsection{Desafíos y limitaciones de DRAFTS: diagnóstico claro del prototipo original.}
+%Como ya se mencionó anteriormente, aquí se contempla la transformación fundamental del prototipo DRAFTS hacia un sistema productivo capaz de operar en entornos observacionales reales. La evolución desde un prototipo de investigación hacia un sistema productivo requiere una transformación arquitectónica fundamental que aborde las limitaciones inherentes del código base original.
 
-DRAFTS es un "pseudo-pipeline", mas cerca a ser un prototipo que un software astronomico, pero ojo, en cuanto a lo que son los modelos de redes neuronales estos son modelos de deteccion y clasificacion de FRBs robustos y completamente funcionales, el problema surge al rededor de estos modelos, pues DRAFTS presenta una estructura monolítica con scripts independientes optimizados para condiciones de laboratorio controladas pero incapaces de manejar la variabilidad operacional de entornos observacionales reales. Más que limitaciones incrementales, el código original no constituye un \emph{pipeline} operativo: la búsqueda en datos reales se materializa en programas separados que el usuario debe ejecutar y parametrizar manualmente. No existe un punto de entrada unificado, una interfaz de línea de comandos ni un sistema de configuración versionado; el flujo exige editar variables en el código (rutas, umbrales, \textit{checkpoints}, tamaños de bloque, DM, etc.) y correr etapas desconectadas sin orquestación. El propio \texttt{README} instruye a "modificar la ruta de datos y de guardado y ejecutar el archivo", lo que evidencia la ausencia de un flujo automatizado de extremo a extremo que, con un único \emph{input}, entregue resultados reproducibles, directos y simples para el usuario astrónomo.
+\subsection{Componente 1: DRAFTS++: \textit{Pipeline} astronómico E2E, productivo, robusto y eficiente}
 
-En la ingesta de datos se observan supuestos instrumentales rígidos. El lector de PSRFITS asume un esquema específico propio de FAST/GBT, y el repositorio indica explícitamente que para otros telescopios se deben "modificar" funciones internas. No hay detección automática de formato ni un análisis robusto de encabezados; los parámetros observacionales se derivan parcialmente con constantes implícitas y números mágicos (p.ej., factores de decimado temporal y espectral), además de correcciones ad hoc como la inversión del eje de frecuencia o normalizaciones mín--máx. Tampoco se calculan marcas temporales precisas a partir de los \emph{headers}, por lo que los tiempos de arribo son relativos y no trazables de manera consistente dentro del archivo ni interoperables con análisis posteriores.
+Como se indicó en la introducción de este capítulo, este \textbf{componente} aborda la transición de \textbf{DRAFTS}, concebido originalmente como un prototipo de investigación, hacia un sistema \textbf{productivo y operativo} capaz de funcionar en entornos observacionales reales. Esta transición requiere una \textbf{reformulación arquitectónica profunda}, orientada a superar las limitaciones del código base original y a garantizar la escalabilidad, robustez y reproducibilidad necesarias para su integración en flujos astronómicos de detección de transientes.
 
-La gestión de datos y memoria es frágil para observaciones prolongadas. El procesamiento es monolítico sobre bloques grandes construidos concatenando archivos contiguos en memoria, y para completar las ventanas de dedispersión en los bordes se recurre a relleno sintético con ruido aleatorio cuando faltan muestras, alterando la estadística de fondo y comprometiendo la validez científica en condiciones reales. La dedispersión GPU (\texttt{numba.cuda}) opera sobre tensores completos de DM--tiempo sin un planificador de \textit{chunking} que respete un presupuesto de memoria; no hay telemetría ni control de uso de VRAM, limpieza sistemática, \textit{fallback} a CPU ante \emph{out-of-memory} o manejo robusto de errores. Esta combinación limita la estabilidad y escalabilidad del sistema cuando la duración, el ancho de banda o la resolución crecen.
 
-La extracción y validación de candidatos carecen de un esqueleto unificado. La detección obtiene cajas en DM--tiempo, pero el filtrado posterior es heurístico (p.ej., exigir \texttt{DM > 20}) y la clasificación está desacoplada en un programa distinto que dedispersa a un DM fijo predefinido, sin realimentación del detector. No existe un validador físico común (coherencia por sub--bandas, verificación de DM positivo con incertidumbre acotada, consistencia temporal entre ventanas) ni mecanismos de desduplicación de eventos entre \emph{slices} y archivos. Las salidas se limitan a imágenes y algunos archivos \texttt{.npy} por bloque; no se generan artefactos estandarizados (CSV/Parquet con metadatos completos), ni resúmenes por ejecución, ni firmas de modelos y datos que habiliten trazabilidad y auditoría. La ausencia de \emph{logging} estructurado y de semillas controladas impide reproducir resultados de manera fiable.
 
-En operación y extensibilidad, los modelos se cargan desde rutas relativas y su presencia es un prerrequisito tácito; si faltan, el programa simplemente falla sin orientación al usuario. No hay empaquetado ni instalación como librería, pruebas automatizadas, ni documentación de un flujo end--to--end; el entrenamiento existe, pero la integración con la búsqueda es manual. La compatibilidad multi--banda y el tratamiento de polarización son limitados (se promedian canales y polarizaciones tempranamente), y no existe un mecanismo para seleccionar estrategias de búsqueda según condiciones físicas (resolución temporal, rango de frecuencias, SNR, disponibilidad de Stokes). 
 
-En suma, a pesar de contar con modelos de detección y clasificación bien entrenados, el prototipo carece del software de \emph{pipeline} que permita, con un único \emph{input}, obtener resultados directos, sencillos y trazables en un entorno observacional real, es de ahi que nace DRAFTS++.
+\subsubsection{Construccion de un pipeline end-to-end modular y escalable: DRAFTS++}
 
-\subsubsection{Construccion de un Pipeline End-to-End Modular y Escalable: DRAFTS++}
 
-% Construcción y Diseño de DRAFTS++
+El cambio arquitectónico central de DRAFTS++ consiste en la transición desde un conjunto de scripts independientes, sin integración coherente, hacia un pipeline modular y escalable. Mientras que el prototipo original estaba limitado por la ausencia de organización, reproducibilidad y trazabilidad, DRAFTS++ redefine el sistema como un flujo estructurado con etapas bien delimitadas y servicios transversales de soporte, constituyendo la base para su operación en entornos observacionales reales.
 
-A continuación, se procede a explicar y narrar la transformación arquitectónica fundamental que sufrió DRAFTS para ser DRAFTS++. 
+Para materializar esta transformación, DRAFTS++ se estructura en dos niveles complementarios. Por un lado, se definen etapas encadenadas (ingesta, preprocesamiento, modelos, detección, análisis y visualización), que reciben entradas claramente especificadas y producen salidas bajo contratos formales. Por otro lado, se incorporan servicios transversales (\texttt{core/}, \texttt{config/}, \texttt{logging/}, \texttt{scripts/}), responsables de la orquestación, la validación de configuraciones, la trazabilidad y los puntos de entrada del sistema. Este diseño permite dividir el pipeline en unidades comprensibles y sustituibles, habilitando la evolución independiente de cada componente sin comprometer la coherencia global.
 
-La evolución desde los scripts monolíticos hacia un sistema modular escalable constituye una contribución arquitectónica fundamental que establece las bases para operaciones productivas a gran escala. Esta transformación implementa una arquitectura modular con componentes especializados que establecen separación clara de responsabilidades e interfaces estandarizadas. La reestructuración arquitectónica elimina las limitaciones inherentes del prototipo original, caracterizado por scripts independientes sin integración coherente, y establece un flujo de datos unidireccional que garantiza consistencia operacional y facilita mantenimiento y extensibilidad del sistema.
 
-Para materializar todo esto, DRAFTS++ se gestiona en \textbf{etapas encadenadas} que transforman los datos desde la ingesta hasta los artefactos finales, y en \textbf{servicios transversales} que aseguran orden, reproducibilidad y operación continua. Las etapas (ingesta, preprocesamiento, modelos, detección, análisis y visualización) reciben entradas bien definidas y devuelven salidas contratadas; los transversales (\texttt{core/}, \texttt{config/}, \texttt{logging/}, \texttt{scripts/}) proveen orquestación, configuración validada, trazabilidad y puntos de entrada. Este enfoque divide el problema en unidades comprensibles y sustituibles, habilitando evolución independiente sin comprometer la coherencia global.
+La visión operativa de DRAFTS++ se articula en cuatro ejes: (i) operacionalidad, con un punto de entrada único, configuración centralizada y artefactos estandarizados;(ii) robustez, frente a formatos heterogéneos y condiciones instrumentales diversas, mediante autodetección, validaciones físicas y temporales, y mecanismos de recuperación ante fallos; (iii) eficiencia, a través de procesamiento en \textit{streaming}, gestión explícita de memoria, limpieza determinística y uso optimizado de GPU; y (iv) replicabilidad y auditoría, garantizadas mediante semillas fijas, versionado de datos y modelos, y \textit{logging} estructurado.
 
-La \textbf{visión operativa} se resume en cuatro ejes: (i) un uso \textbf{productivo} del sistema, con punto de entrada único, configuración centralizada y artefactos estandarizados; (ii) \textbf{robustez} frente a formatos y condiciones instrumentales diversas mediante autodetección, validaciones físicas/temporales y recuperación guiada ante fallos; (iii) \textbf{eficiencia} por streaming con presupuestos de memoria explícitos, limpieza determinística y uso controlado de GPU; y (iv) \textbf{replicabilidad/auditoría} garantizada por semillas fijas, versiones y firmas de datos/modelos y \emph{logging} estructurado.
+Estos ejes se sustentan en un conjunto de principios arquitectónicos: modularidad y separación estricta de responsabilidades; flujo de datos unidireccional con contratos formales entre etapas (geometrías, metadatos, candidatos); configuración validada con valores por defecto seguros; \textit{streaming} y \textit{chunking} con solapamiento físico y continuidad temporal verificada; mecanismos de observabilidad mediante métricas y estados normalizados; y salidas estandarizadas que facilitan tanto el consumo externo como la auditoría científica.
 
-Para sostener estos ejes se adoptan \textbf{principios arquitectónicos} claros: modularidad y separación de responsabilidades; flujo de datos estrictamente unidireccional con \textbf{contratos} entre etapas (geometrías, metadatos, candidatos); configuración validada con valores por defecto seguros; \textbf{streaming y \emph{chunking}} con solapamiento físico y continuidad temporal verificada; \textbf{observabilidad} mediante métricas y estados normalizados; y \textbf{outputs estandarizados} que facilitan consumo externo y auditoría científica.
 
-Para entender mejor esto, podemos ver la Figura \ref{fig:workflow-src}, la cual resume el flujo principal y los soportes transversales del pipeline DRAFTS++, que guían el orden de este Bloque 1.
+La Figura~\ref{fig:workflow-src} proporciona una representación esquemática de la arquitectura de DRAFTS++, integrando el flujo principal y los servicios transversales que aseguran consistencia y reproducibilidad, y que guían la organización del presente componente.
 
 \begin{figure}[H]
 \centering
@@ -127,42 +123,43 @@ Para entender mejor esto, podemos ver la Figura \ref{fig:workflow-src}, la cual 
 \label{fig:workflow-src}
 \end{figure}
 
-
-A continuación se presentarán, de manera secuencial y detallada, cada una de estas etapas, para facilitar la comprensión de las mejoras implementadas.
+A continuación se describen, de manera secuencial, las etapas que conforman DRAFTS++, destacando las mejoras implementadas en cada una de ellas.
 
 \subsubsection{Ingesta multi-formato y análisis automático}
 
-La ingesta de datos constituye la primera etapa crítica del pipeline, donde se establece la base para todo el procesamiento posterior. DRAFTS++ implementa un sistema de ingesta completamente automatizado que elimina las limitaciones instrumentales rígidas del prototipo original, proporcionando detección automática de archivos, manejo robusto de múltiples formatos y análisis inteligente de parámetros observacionales.
+La ingesta de datos constituye la primera etapa crítica del pipeline, en la cual se establecen las condiciones iniciales para todo el procesamiento posterior. DRAFTS++ implementa un sistema de ingesta totalmente automatizado que supera las restricciones instrumentales del prototipo original, incorporando detección automática de archivos, manejo robusto de múltiples formatos y análisis inteligente de parámetros observacionales.
 
-\paragraph{Detección automática de archivos astronomicos}
 
-El sistema de detección automática implementado en un modulo, transforma la búsqueda manual de archivos en un proceso completamente automatizado. A diferencia del prototipo original de DRAFTS que requiere especificación manual de rutas y archivos individuales, DRAFTS++ implementa algoritmos que escanean directorios de datos y detectan automáticamente archivos compatibles basándose en el objetivo FRB especificado.
+\paragraph{Detección automática de archivos astronómicos}
 
-El algoritmo de búsqueda opera mediante filtrado inteligente por nombre de archivo, identificando automáticamente archivos FITS y Filterbank que contienen el objetivo especificado en su nombre. Esta aproximación elimina la necesidad de especificar rutas manualmente y reduce significativamente los errores humanos en la selección de archivos para procesamiento. El sistema proporciona logging estructurado que reporta el número de archivos encontrados por tipo, facilitando la validación y monitoreo del proceso de ingesta.
+El sistema de detección automática, implementado en un módulo especializado, reemplaza la búsqueda manual de archivos por un proceso enteramente automatizado. A diferencia del prototipo original de DRAFTS, que requería la especificación manual de rutas y archivos individuales, DRAFTS++ incorpora algoritmos capaces de escanear directorios de datos e identificar automáticamente los archivos compatibles en función del objetivo FRB definido.
 
-La validación automática de compatibilidad implementada verifica la integridad y compatibilidad de cada archivo antes del procesamiento, detectando archivos corruptos, vacíos o con formatos no soportados. Esta validación previene fallos tardíos durante el procesamiento y proporciona mensajes de error informativos que facilitan la resolución de problemas.
+El procedimiento de búsqueda se basa en un filtrado inteligente de nombres de archivo, que permite reconocer de manera automática archivos en formatos FITS y Filterbank que contienen el objetivo especificado en su nomenclatura. Este enfoque elimina la necesidad de intervención manual en la selección de rutas y reduce significativamente los errores humanos asociados a la preparación de datos. Además, el sistema genera \textit{logging} estructurado, en el que se reporta el número de archivos detectados por tipo, lo que facilita la validación y el monitoreo del proceso de ingesta.
+
+Complementariamente, se implementa un mecanismo de validación automática de compatibilidad que examina la integridad de cada archivo antes del procesamiento, identificando aquellos que se encuentran corruptos, vacíos o con formatos no soportados. De esta forma, se previenen fallos en etapas posteriores y se generan mensajes de error informativos que favorecen una resolución expedita de problemas.
+
 
 \paragraph{Manejo robusto de formatos FITS y Filterbank}
 
-La implementación de parsers especializados para múltiples formatos astronómicos constituye una mejora fundamental que elimina las limitaciones instrumentales específicas del prototipo original. DRAFTS++ implementa bloques de codigos controladores que proporcionan manejo nativo y optimizado para formatos PSRFITS, FITS estándar y SIGPROC Filterbank.
+La incorporación de \textit{parsers} especializados para múltiples formatos astronómicos constituye una mejora sustantiva que supera las limitaciones instrumentales del prototipo original. DRAFTS++ integra módulos dedicados que proporcionan soporte nativo y optimizado para los formatos PSRFITS, FITS estándar y SIGPROC Filterbank.  
 
-El parser FITS maneja automáticamente las diferencias entre implementaciones de telescopios específicos, incluyendo correcciones de orden de frecuencia, normalizaciones específicas y manejo de diferentes esquemas de polarización. La implementación incluye detección automática de formatos de datos (1-bit, 8-bit, 32-bit) con conversiones apropiadas y manejo robusto de errores para archivos corruptos o incompletos.
+El \textit{parser} FITS gestiona de manera automática las variaciones introducidas por diferentes telescopios, incluyendo correcciones en el orden de frecuencia, normalizaciones específicas y esquemas heterogéneos de polarización. Asimismo, detecta de forma transparente la profundidad de datos (1-bit, 8-bit, 32-bit), aplicando las conversiones correspondientes y asegurando un manejo robusto de errores frente a archivos corruptos o incompletos.  
 
-El parser Filterbank implementa lectura completa del formato SIGPROC, incluyendo manejo de headers estándar y no estándar, estimación conservadora de parámetros cuando faltan campos críticos, y streaming eficiente para archivos de gran tamaño. Esta implementación garantiza compatibilidad con datos de múltiples observatorios sin requerir modificaciones específicas por instrumento.
+El \textit{parser} Filterbank implementa una lectura completa del estándar SIGPROC, con soporte tanto para \textit{headers} convencionales como no convencionales. Además, incorpora estimaciones conservadoras de parámetros en ausencia de campos críticos y permite el procesamiento en \textit{streaming} de archivos de gran tamaño, garantizando eficiencia y compatibilidad con datos provenientes de múltiples observatorios sin necesidad de ajustes específicos por instrumento.  
 
-La detección automática del tipo de archivo  astronomico, identifica el formato basándose en la extensión del archivo y valida la compatibilidad antes del procesamiento. Esta aproximación elimina la necesidad de especificación manual del formato y previene errores de procesamiento por formatos incompatibles.
+Finalmente, el sistema incluye detección automática del tipo de archivo astronómico, basada en la extensión y validada contra las especificaciones de formato antes del procesamiento. Este mecanismo elimina la necesidad de declarar manualmente el formato y previene errores derivados de incompatibilidades en la ingesta de datos.  
 
 \paragraph{Análisis automático de headers y parámetros observacionales}
 
-El sistema de extracción automática de parámetros o metadatos, transforma la configuración manual y hardcoded del prototipo original en un proceso completamente automatizado que analiza headers y metadatos para determinar parámetros observacionales críticos.
+DRAFTS++ reemplaza la configuración manual y codificada del prototipo original por un proceso completamente automatizado que analiza los headers de los archivos observacionales para determinar parámetros críticos. En lugar de depender de valores constantes predefinidos para operaciones como la decimación temporal, el sistema implementa algoritmos que extraen de forma automática las resoluciones temporal y espectral, las configuraciones de frecuencia, los parámetros de polarización y las marcas temporales relativas directamente desde los headers.
 
-A diferencia del prototipo original que utiliza constantes fijas y números mágicos, como por ejemplo para la decimacion temporal, DRAFTS++ implementa algoritmos que extraen automáticamente resolución temporal, resolución espectral, configuración de frecuencias, parámetros de polarización y marcas temporales relativas directamente desde los headers de los archivos.
+El sistema incluye un mecanismo de validación robusta que verifica la coherencia interna de los datos y detecta inconsistencias que podrían comprometer la calidad del análisis. Esta validación contempla la verificación de rangos válidos, la consistencia entre parámetros relacionados y la detección de valores faltantes o corruptos.
 
-El sistema implementa validación robusta de parámetros extraídos que verifica la coherencia interna de los datos y detecta inconsistencias que podrían comprometer la calidad del análisis. Esta validación incluye verificación de rangos válidos, consistencia entre parámetros relacionados y detección de valores faltantes o corruptos.
+La configuración automática de los factores de decimación ajusta dinámicamente los parámetros de reducción de muestreo (downsampling) en función de las características de cada observación y de los recursos computacionales disponibles, eliminando la necesidad de configuración manual y optimizando el equilibrio entre precisión y eficiencia.
 
-La configuración automática de factores de decimación calcula dinámicamente los parámetros de downsampling basándose en las características específicas de cada observación y los recursos del sistema. Esta aproximación elimina la necesidad de configuración manual y optimiza automáticamente el balance entre precisión y eficiencia computacional.
+Finalmente, el sistema genera un registro detallado del proceso de extracción, que incluye los parámetros obtenidos, las advertencias y los errores detectados, proporcionando trazabilidad completa y facilitando la validación y depuración del proceso de ingesta.
 
-El sistema proporciona logging detallado del proceso de extracción, incluyendo parámetros extraídos, errores detectados y advertencias, facilitando la validación y debugging del proceso de ingesta. Esta información es crítica para la auditoría y trazabilidad del pipeline en entornos observacionales reales.
+
 
 \subsubsection{Preprocesamiento y geometría de datos}
 
@@ -172,7 +169,7 @@ La etapa de preprocesamiento en DRAFTS++ es fundamental para transformar los dat
 
 El prototipo original de DRAFTS utilizaba factores de decimación fijos, lo que limitaba su aplicabilidad a diferentes instrumentos y resoluciones de datos. DRAFTS++ introduce un sistema de decimación adaptativa, que ajusta dinámicamente la resolución temporal y espectral de los datos en función de los parámetros observacionales y los requisitos computacionales. Esto asegura que la fidelidad de la señal se mantenga para la detección de FRBs, mientras se optimiza el uso de memoria y la velocidad de procesamiento.
 
-El algoritmo de decimación adaptativa opera de la siguiente manera:
+El algoritmo de decimación adaptativa, descrito en el Algoritmo~\ref{alg:adaptive-decimation}, opera de la siguiente manera:
 \begin{enumerate}
     \item \textbf{Cálculo de resolución efectiva:} Se determina la resolución temporal y espectral real de los datos de entrada a partir de los metadatos extraídos.
     \item \textbf{Determinación de factores de decimación:} Basándose en umbrales predefinidos y la resolución efectiva, se calculan los factores de decimación óptimos para el tiempo (\texttt{down\_time\_rate}) y la frecuencia (\texttt{down\_freq\_rate}). Estos factores buscan reducir el tamaño de los datos sin comprometer la capacidad de detectar transientes rápidos.
@@ -215,13 +212,13 @@ Esta aproximación permite que DRAFTS++ se adapte a una amplia gama de configura
 \end{algorithmic}
 \end{algorithm}
 
-El cálculo de la resolución temporal decimada se realiza mediante la fórmula:
+El cálculo de la resolución temporal después de la decimación $dt_{ds}$ se realiza mediante la fórmula:
 
 \[
 dt_{ds} = \text{TIME\_RESO} \times \text{DOWN\_TIME\_RATE}
 \]
 
-donde $dt_{ds}$ es la resolución temporal efectiva después de la decimación, $\text{TIME\_RESO}$ es la resolución temporal original del instrumento, y $\text{DOWN\_TIME\_RATE}$ es el factor de decimación temporal calculado dinámicamente.
+, donde $\text{TIME\_RESO}$ es la resolución temporal original del instrumento, y $\text{DOWN\_TIME\_RATE}$ es el factor de decimación temporal calculado dinámicamente.
 
 \paragraph{Planificación de chunks y slices}\label{sec:chunk-slice-planning}
 
@@ -262,11 +259,11 @@ donde:
     \item El factor $1000$: Convierte de segundos a milisegundos para mantener consistencia con las unidades de entrada
 \end{itemize}
 
-Esta aproximación garantiza que cada \emph{slice} mantenga una duración temporal consistente mientras respeta las restricciones de muestreo del sistema. Para el mecanismo de ejecución en flujo, emisión/consumo de bloques y metadatos por \emph{chunk}, véase la Sección \ref{sec:streaming-continuity}. Para el presupuesto de VRAM, políticas de limpieza y \textit{fallback} a CPU que acotan este plan, consúltese la Sección \ref{sec:gpu-memory}.
+Esta aproximación asegura que cada \emph{slice} conserve una duración temporal consistente, al tiempo que respeta las restricciones de muestreo impuestas por el sistema. El mecanismo de ejecución en flujo, junto con la emisión y consumo de bloques y los metadatos asociados a cada \emph{chunk}, se describe en la Sección~\ref{sec:streaming-continuity}. Por su parte, las consideraciones sobre el presupuesto de VRAM, las políticas de limpieza y el mecanismo de \textit{fallback} a CPU que limitan este plan se presentan en la Sección~\ref{sec:gpu-memory}.
 
 \paragraph{Sistema integrado de streaming y continuidad temporal}\label{sec:streaming-continuity}
 
-La limitación fundamental del prototipo original era su incapacidad para procesar observaciones de larga duración debido a restricciones de memoria y la falta de un mecanismo robusto para asegurar la continuidad temporal. DRAFTS++ resuelve esto con un \textbf{Sistema Integrado de Streaming y Continuidad Temporal}. Esta sección ejecuta el plan definido en la Sección \ref{sec:chunk-slice-planning} y se apoya en las garantías de recursos descritas en la Sección \ref{sec:gpu-memory}.
+La limitación fundamental de DRAFTS es su incapacidad para procesar observaciones de larga duración debido a restricciones de memoria y la falta de un mecanismo robusto para asegurar la continuidad temporal. DRAFTS++ resuelve esto con un \textbf{Sistema Integrado de Streaming y Continuidad Temporal}. Esta sección ejecuta el plan definido en la Sección \ref{sec:chunk-slice-planning} y se apoya en las garantías de recursos descritas en la Sección \ref{sec:gpu-memory}.
 
 Este sistema opera bajo los siguientes pilares:
 \begin{enumerate}

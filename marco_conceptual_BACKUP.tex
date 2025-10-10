@@ -52,7 +52,7 @@ Una de las explicaciones para el comportamiento periódico de los FRBs es un esc
 
 Otros escenarios propuestos incluyen sistemas binarios compactos, colapsos de estrellas masivas, y fusiones de objetos compactos, pero la evidencia observacional favorece actualmente el modelo de magnetar como mecanismo principal para la producción de FRBs \citep{Petroff_2022}.
 
-\subsection{Magnetares y el Potencial del Régimen de Alta Frecuencia}
+\subsection{Magnetares como Laboratorio de Alta Frecuencia: Conexión entre Emisión Galáctica y FRBs Extragalácticos}
 
 \subsubsection{Fundamentos de Magnetares: Campos Extremos y Emisión de Radio Coherente}
 
@@ -66,41 +66,11 @@ El magnetar del Centro Galáctico, PSR J1745-2900, representa un caso único par
 
 Las observaciones de PSR J1745-2900 han revelado pulsos de radio hasta frecuencias de 154 GHz \citep{Torne2017}, demostrando la viabilidad de detectar emisión de magnetares en el régimen milimétrico. Más recientemente, observaciones con ALMA en modo phased han detectado pulsos a 86 GHz (Band 3), proporcionando evidencia directa de emisión de radio coherente de magnetares en alta frecuencia \citep{veracasanova2025}.
 
-\subsubsection{Detecciones con ALMA y Evidencia de Viabilidad en mm-wave}
+\subsubsection{Estado del Arte en Alta Frecuencia: Detecciones con ALMA y el Territorio Inexplorado de mm-wave}
 
 Las observaciones de pulsos del magnetar del Centro Galáctico con ALMA han abierto nuevas perspectivas para la detección de FRBs en el régimen milimétrico \citep{veracasanova2025}. Este hallazgo se enmarca en una serie de resultados revisados que demuestran emisión coherente de magnetares en mm hasta 225--291\,GHz \citep{Torne2015,Torne2017}. En paralelo, para FRBs extragalácticos se han reportado detecciones robustas a 4--8\,GHz \citep{Gajjar2018,Bethapudi2023} y a 2.2--2.3\,GHz con instrumentación independiente \citep{Majid2021}, lo que respalda la prospección hacia bandas aún más altas aunque las detecciones confirmadas en mm siguen siendo un objetivo abierto.
 
 Las ventajas del régimen milimétrico incluyen menor scattering y mayor resolución angular, mientras que las desventajas incluyen menor flujo esperado y supresión de la dispersión temporal. Estas tensiones instrumentales demandan estrategias de detección adaptadas a las características específicas del régimen milimétrico \citep{veracasanova2025} y representan requisitos que DRAFTS++ debe anticipar desde su diseño.
-
-\subsubsection{Lagunas en la Literatura: Ausencia de Detecciones Confirmadas de FRBs Extragalácticos por Encima de 10 GHz}
-
-A pesar del progreso en pipelines de FRBs, existe un vacío significativo en la literatura cuando consideramos búsquedas a radiofrecuencias más altas (por encima de las típicas bandas centimétricas). Hasta la fecha, la gran mayoría de FRBs se han detectado en frecuencias entre $\sim$0.4 y 1.7 GHz, con apenas algunas excepciones llegando a la banda C ($\sim$4--8 GHz) en fuentes repetidoras extraordinariamente activas \citep{Gajjar2018,Bethapudi2023}. Por encima de $\sim$10 GHz (ondas milimétricas), no se ha confirmado ningún FRB extragaláctico antes de 2025.
-
-Esta falta de resultados no implica que los FRBs no emitan a frecuencias altas, sino que responde en parte a desafíos tecnológicos y metodológicos: las señales en mm-wave son intrínsecamente más débiles debido a los espectros típicamente decrecientes de las fuentes de radio, lo que exige telescopios extremadamente sensibles. Por otro lado, observar a frecuencias mayores puede mitigar ciertos problemas de propagación: en entornos densos (como el centro galáctico o las regiones circundantes a posibles fuentes de FRB), el scattering y la dispersión temporal inducida por el plasma hacen casi imposible detectar pulsos a 1 GHz, mientras que en bandas milimétricas esos efectos se reducen drásticamente.
-
-Explorar el "territorio inexplorado" de las altas frecuencias podría revelar FRBs que hoy permanecen ocultos por el scattering y la dispersión a bajas frecuencias. Los estudios piloto más recientes—por ejemplo, la detección de pulsos de un magnetar galáctico a $\sim$86 GHz con ALMA \citep{veracasanova2025}—sugieren que instrumentos como ALMA pueden abrir una nueva ventana, pero son necesarios software y algoritmos especializados para explotar plenamente esa oportunidad. Antes de 2025 no se habían realizado búsquedas con ALMA en modo faseado para intentar detectar FRBs extragalácticos, evidenciando esta laguna crítica en el estado del arte.
-
-\subsection{Desafíos Observacionales Diferenciales entre Regímenes de Frecuencia}
-
-\subsubsection{Compresión Dispersiva en mm-wave: Supresión del Patrón Bow-Tie y Pérdida de Contraste}
-
-A frecuencias de decenas a centenas de GHz, $\Delta t\propto \nu^{-2}$ reduce el contraste dispersivo en banda; la señal aparece casi simultánea en frecuencia, dificultando discriminación frente a ruido/RFI \citep{LorimerKramer2004,CordesChatterjee2019}. Esta "compresión dispersiva" significa que el patrón bow-tie característico se aplana, eliminando el principal discriminador visual entre señales astrofísicas genuinas e interferencia de radiofrecuencia.
-
-La supresión de dispersión en el régimen milimétrico tiene implicancias fundamentales para las estrategias de detección. El criterio DM deja de ser tan discriminante, y los métodos tradicionales basados en la firma dispersiva pierden efectividad. Esto requiere el desarrollo de estrategias alternativas que no dependan del patrón bow-tie para la detección inicial \citep{veracasanova2025}.
-
-\subsubsection{Requisitos Técnicos Diferenciales: Resolución, Ancho de Banda y Sensibilidad}
-
-Los requisitos instrumentales para detección en alta frecuencia incluyen resolución temporal y ancho de banda críticos. La sensibilidad instrumental y la tasa de datos exigen procesamiento de baja latencia, mientras que las consecuencias para S/N y selección del plan DM requieren ajustes significativos en los parámetros de búsqueda \citep{veracasanova2025}.
-
-Las evidencias de pulsos de magnetar en mm que motivan el régimen incluyen las detecciones del magnetar del Centro Galáctico con ALMA en modo phased, demostrando viabilidad de detectar transientes a $\sim$100\,GHz \citep{veracasanova2025}. Esto abre la puerta a búsquedas de FRBs repetidores en mm, estableciendo precedentes importantes para el desarrollo de detectores especializados.
-
-\subsubsection{Estrategias de Adaptación a Alta Frecuencia: Polarización, Multi-banda y Re-entrenamiento con Datos mm}
-
-Las estrategias de adaptación para alta frecuencia incluyen ampliar el rango y paso de DM, desarrollar features alternativos como polarización (muchos transientes presentan polarización fuerte a altas frecuencias que podría distinguirse del ruido), coincidencias multi-banda, y periodic gating. El re-entrenamiento con datos/simulaciones mm y la integración con ALMA Phased son componentes críticos para el éxito en este régimen \citep{veracasanova2025}.
-
-Las particularidades del régimen mm-wave requieren manejar anchos de banda mucho mayores y diferentes características de RFI (en mm-wave suele haber menos interferencia humana, pero la instrumentación y el ambiente pueden introducir ruido distinto). Los pulsos podrían aparecer con menor S/N debido a la pendiente espectral negativa de la emisión de la mayoría de púlsares y FRBs, requiriendo optimizaciones en la formación de las imágenes dispersas (tiempo vs DM) para realzar mejor cualquier traza sutil en los datos.
-
-Aumentar cobertura (DM/anchos/sub-bandas) incrementa fuertemente el costo; se requieren estrategias focalizadas y aceleración eficiente \citep{zhang2024drafts,Zackay_2014_FDMT}. La RFI y su variabilidad entre instrumentos exigen estrategias dinámicas (p.ej., IQRM, morfología TF, SK) y robustez de dominio \citep{Morello_2021_IQRM,Offringa2010,Offringa2012}.
 
 \subsection{Pipelines Clásicos de Búsqueda de Pulsos: Arquitectura, Técnicas y Desafíos Computacionales}
 
@@ -120,7 +90,7 @@ Heimdall representa una implementación GPU-acelerada que utiliza dedispersión 
 
 TransientX constituye un paquete moderno de alto rendimiento para búsquedas de single-pulse, diseñado específicamente para procesamiento eficiente de grandes volúmenes de datos \citep{2024A&A...683A.183M}.
 
-\subsubsection{Técnicas de Mitigación de Interferencia de Radiofrecuencia (RFI)}
+\subsubsection{Mitigación de Interferencia de Radiofrecuencia (RFI): Técnicas desde Máscaras Estáticas hasta Métodos Estadísticos Avanzados}
 
 El primer obstáculo en cualquier búsqueda de FRBs es la abundancia de interferencia de radiofrecuencia (RFI) de origen humano que contamina los datos. Las señales artificiales—provenientes de comunicaciones, radares, satélites, dispositivos electrónicos—suelen ser mucho más intensas que los tenues pulsos astrofísicos y, por lo tanto, pueden enmascarar o imitar falsamente a un FRB. Dado que cualquier señal no astrofísica se considera RFI en radioastronomía, se han desarrollado numerosas estrategias para identificar y filtrar estas interferencias sin eliminar las posibles señales cósmicas de interés.
 
@@ -166,6 +136,14 @@ La curtosis espectral (SK) examina la forma de la distribución de potencia en c
 \paragraph{Mitigación RFI Off-line (Secundaria)}
 
 A pesar de todos los filtros aplicados en vivo, es común que tras la detección inicial de un FRB se realice una limpieza secundaria fuera de línea para optimizar la calidad de los datos almacenados. Cuando el pipeline detecta un candidato por encima de cierto umbral, se congela y guarda ese segmento de datos de alta resolución para análisis posterior. Se pueden aplicar técnicas más intensivas que serían demasiado lentas para el pipeline en tiempo real: varias pasadas de filtrado, recalcular estadísticas globales de ruido, identificar outliers más sutiles, y emplear métodos en el dominio de Fourier para suprimir tonos periódicos débiles. Estas limpiezas off-line pueden mejorar la relación señal/ruido final del FRB detectado, recuperando detalles finos de la forma del pulso que estaban ocultos por ruido.
+
+\subsubsection{Fortalezas y Limitaciones de los Pipelines Clásicos: Madurez vs. Escalabilidad y Falsos Positivos}
+
+Las fortalezas de los pipelines clásicos incluyen su madurez, comunidad amplia de usuarios, e integración robusta con formatos astronómicos estándar. Estas herramientas han sido probadas extensivamente en una variedad de proyectos y han demostrado su efectividad para detectar pulsares y transientes en condiciones controladas.
+
+Sin embargo, las limitaciones son significativas: alta tasa de falsos positivos, necesidad de tuning manual extensivo, escalabilidad limitada en grandes DM-planes y datos largos, y contraste reducido en el régimen milimétrico \citep{Barsdell_2012}. La de-dispersión exhaustiva tiene alto costo computacional por redundancias, y un mismo pulso puede generar duplicados a DMs cercanas. Además, incluso tras la filtración inicial, siempre quedan ruidos e interferencias residuales, e incluso pueden introducirse artefactos nuevos durante la propia mitigación de RFI. 
+
+El costo computacional elevado deriva en operaciones ineficientes que producen resultados incompletos y una avalancha de falsos positivos, obligando a una verificación manual intensiva para distinguir las verdaderas señales astrofísicas. En la práctica, proyectos como CHIME/FRB producen grandes volúmenes de candidatos diarios, de los que solo una fracción es real \citep{CHIME2021}. Esta limitación de escalabilidad frente al creciente volumen de datos esperado en radioastronomía ha motivado a la comunidad a desarrollar algoritmos más eficientes y automatizados para futuras búsquedas de FRBs en tiempo real.
 
 \subsubsection{Técnicas de Dedispersión: Desde Fuerza Bruta hasta Algoritmos Optimizados en GPU}
 
@@ -233,14 +211,6 @@ En paralelo al guardado de datos, el pipeline emite una \textbf{alerta pública}
 
 En suma, el pipeline no termina en "encontré un FRB", sino que activa una serie de acciones para maximizar el retorno científico: guarda los datos crudos para análisis pormenorizado y alerta a la comunidad para obtener datos complementarios.
 
-\subsubsection{Fortalezas y Limitaciones de los Pipelines Clásicos: Madurez vs. Escalabilidad y Falsos Positivos}
-
-Las fortalezas de los pipelines clásicos incluyen su madurez, comunidad amplia de usuarios, e integración robusta con formatos astronómicos estándar. Estas herramientas han sido probadas extensivamente en una variedad de proyectos y han demostrado su efectividad para detectar pulsares y transientes en condiciones controladas.
-
-Sin embargo, las limitaciones son significativas: alta tasa de falsos positivos, necesidad de tuning manual extensivo, escalabilidad limitada en grandes DM-planes y datos largos, y contraste reducido en el régimen milimétrico \citep{Barsdell_2012}. La de-dispersión exhaustiva tiene alto costo computacional por redundancias, y un mismo pulso puede generar duplicados a DMs cercanas. Además, incluso tras la filtración inicial, siempre quedan ruidos e interferencias residuales, e incluso pueden introducirse artefactos nuevos durante la propia mitigación de RFI. 
-
-El costo computacional elevado deriva en operaciones ineficientes que producen resultados incompletos y una avalancha de falsos positivos, obligando a una verificación manual intensiva para distinguir las verdaderas señales astrofísicas. En la práctica, proyectos como CHIME/FRB producen grandes volúmenes de candidatos diarios, de los que solo una fracción es real \citep{CHIME2021}. Esta limitación de escalabilidad frente al creciente volumen de datos esperado en radioastronomía ha motivado a la comunidad a desarrollar algoritmos más eficientes y automatizados para futuras búsquedas de FRBs en tiempo real.
-
 
 \subsection{Machine Learning en Radioastronomía: De la Clasificación Post-hoc a la Detección Integrada}
 
@@ -297,6 +267,35 @@ No obstante, DRAFTS presenta limitaciones y "puntos ciegos" importantes:
 
 Este balance entre éxito demostrado y limitaciones identificadas motiva el desarrollo de DRAFTS++, abordado en las secciones posteriores.
 
+\subsection{El Desafío de Alta Frecuencia (mm-wave): Compresión Dispersiva y Nuevas Estrategias de Detección}
+
+\subsubsection{Compresión Dispersiva en mm-wave: Supresión del Patrón Bow-Tie y Pérdida de Contraste}
+
+A frecuencias de decenas a centenas de GHz, $\Delta t\propto \nu^{-2}$ reduce el contraste dispersivo en banda; la señal aparece casi simultánea en frecuencia, dificultando discriminación frente a ruido/RFI \citep{LorimerKramer2004,CordesChatterjee2019}. Esta "compresión dispersiva" significa que el patrón bow-tie característico se aplana, eliminando el principal discriminador visual entre señales astrofísicas genuinas e interferencia de radiofrecuencia.
+
+La supresión de dispersión en el régimen milimétrico tiene implicancias fundamentales para las estrategias de detección. El criterio DM deja de ser tan discriminante, y los métodos tradicionales basados en la firma dispersiva pierden efectividad. Esto requiere el desarrollo de estrategias alternativas que no dependan del patrón bow-tie para la detección inicial \citep{veracasanova2025}.
+
+\subsubsection{Requisitos Técnicos para Detección en mm-wave: Resolución, Ancho de Banda y Sensibilidad}
+
+Los requisitos instrumentales para detección en alta frecuencia incluyen resolución temporal y ancho de banda críticos. La sensibilidad instrumental y la tasa de datos exigen procesamiento de baja latencia, mientras que las consecuencias para S/N y selección del plan DM requieren ajustes significativos en los parámetros de búsqueda \citep{veracasanova2025}.
+
+Las evidencias de pulsos de magnetar en mm que motivan el régimen incluyen las detecciones del magnetar del Centro Galáctico con ALMA en modo phased, demostrando viabilidad de detectar transientes a $\sim$100\,GHz \citep{veracasanova2025}. Esto abre la puerta a búsquedas de FRBs repetidores en mm, estableciendo precedentes importantes para el desarrollo de detectores especializados.
+
+\subsubsection{Lagunas en la Literatura: Ausencia de Detecciones Confirmadas de FRBs Extragalácticos por Encima de 10 GHz}
+
+A pesar del progreso en pipelines de FRBs, existe un vacío significativo en la literatura cuando consideramos búsquedas a radiofrecuencias más altas (por encima de las típicas bandas centimétricas). Hasta la fecha, la gran mayoría de FRBs se han detectado en frecuencias entre $\sim$0.4 y 1.7 GHz, con apenas algunas excepciones llegando a la banda C ($\sim$4--8 GHz) en fuentes repetidoras extraordinariamente activas \citep{Gajjar2018,Bethapudi2023}. Por encima de $\sim$10 GHz (ondas milimétricas), no se ha confirmado ningún FRB extragaláctico antes de 2025.
+
+Esta falta de resultados no implica que los FRBs no emitan a frecuencias altas, sino que responde en parte a desafíos tecnológicos y metodológicos: las señales en mm-wave son intrínsecamente más débiles debido a los espectros típicamente decrecientes de las fuentes de radio, lo que exige telescopios extremadamente sensibles. Por otro lado, observar a frecuencias mayores puede mitigar ciertos problemas de propagación: en entornos densos (como el centro galáctico o las regiones circundantes a posibles fuentes de FRB), el scattering y la dispersión temporal inducida por el plasma hacen casi imposible detectar pulsos a 1 GHz, mientras que en bandas milimétricas esos efectos se reducen drásticamente.
+
+Explorar el "territorio inexplorado" de las altas frecuencias podría revelar FRBs que hoy permanecen ocultos por el scattering y la dispersión a bajas frecuencias. Los estudios piloto más recientes—por ejemplo, la detección de pulsos de un magnetar galáctico a $\sim$86 GHz con ALMA \citep{veracasanova2025}—sugieren que instrumentos como ALMA pueden abrir una nueva ventana, pero son necesarios software y algoritmos especializados para explotar plenamente esa oportunidad. Antes de 2025 no se habían realizado búsquedas con ALMA en modo faseado para intentar detectar FRBs extragalácticos, evidenciando esta laguna crítica en el estado del arte.
+
+\subsubsection{Estrategias de Adaptación a Alta Frecuencia: Polarización, Multi-banda y Re-entrenamiento con Datos mm}
+
+Las estrategias de adaptación para alta frecuencia incluyen ampliar el rango y paso de DM, desarrollar features alternativos como polarización (muchos transientes presentan polarización fuerte a altas frecuencias que podría distinguirse del ruido), coincidencias multi-banda, y periodic gating. El re-entrenamiento con datos/simulaciones mm y la integración con ALMA Phased son componentes críticos para el éxito en este régimen \citep{veracasanova2025}.
+
+Las particularidades del régimen mm-wave requieren manejar anchos de banda mucho mayores y diferentes características de RFI (en mm-wave suele haber menos interferencia humana, pero la instrumentación y el ambiente pueden introducir ruido distinto). Los pulsos podrían aparecer con menor S/N debido a la pendiente espectral negativa de la emisión de la mayoría de púlsares y FRBs, requiriendo optimizaciones en la formación de las imágenes dispersas (tiempo vs DM) para realzar mejor cualquier traza sutil en los datos.
+
+Aumentar cobertura (DM/anchos/sub-bandas) incrementa fuertemente el costo; se requieren estrategias focalizadas y aceleración eficiente \citep{zhang2024drafts,Zackay_2014_FDMT}. La RFI y su variabilidad entre instrumentos exigen estrategias dinámicas (p.ej., IQRM, morfología TF, SK) y robustez de dominio \citep{Morello_2021_IQRM,Offringa2010,Offringa2012}.
 
 \subsection{Técnicas Avanzadas y Perspectivas Futuras: Transformadas, Computación Cuántica y la Era de SKA/ngVLA}
 
