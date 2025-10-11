@@ -1,18 +1,68 @@
 \secnumbersection{VALIDACIÓN DE LA SOLUCIÓN}
 
-La validación de la solución propuesta representa el componente más crítico de esta investigación, ya que permite demostrar empíricamente la efectividad, robustez y capacidad de descubrimiento científico de los dos componentes desarrollados. Esta validación se estructura en dos componentes principales: la validación del componente de bajas frecuencias (DRAFTS++) y la validación del componente de altas frecuencias (High Frequency Detection).
+La validación de la solución propuesta representa tanto los resultados como la discusión de esta memoria, ya que permite demostrar empíricamente la efectividad, robustez y capacidad de descubrimiento científico de los dos componentes desarrollados. De forma muy similar a la propuesta de solución,  la validación se estructura en dos componentes: validación del componente de bajas frecuencias (DRAFTS++) y la validación del componente de altas frecuencias (High Frequency Detection), los cuales engloban a DRAFTS++ y su extensión respectiva al régimen de alta frecuencia.
 
-La metodología de validación implementada sigue un enfoque sistemático y comparativo que garantiza la reproducibilidad de los resultados. Para cada componente, se establecieron métricas de evaluación específicas, se utilizaron datasets de referencia validados por la literatura científica, y se implementaron protocolos de verificación independientes con grupos de astrónomos colaboradores.
+% La metodología de validación implementada sigue un enfoque sistemático y comparativo que garantiza la reproducibilidad de los resultados. Para cada componente, se establecieron métricas de evaluación específicas, se utilizaron datasets de referencia validados por la literatura científica, y se implementaron protocolos de verificación independientes con grupos de astrónomos colaboradores.
 
-Los objetivos principales de esta validación incluyen: (1) demostrar la superioridad de los pipelines desarrollados respecto a métodos existentes, (2) validar la capacidad de procesamiento de archivos de gran tamaño, (3) confirmar la precisión temporal y espacial en la detección de eventos, (4) evaluar la eficiencia computacional y escalabilidad del sistema, y (5) establecer la capacidad de descubrimiento científico mediante la detección de eventos nuevos no reportados previamente en la literatura.
+% Los objetivos principales de esta validación incluyen: (1) demostrar la superioridad de los pipelines desarrollados respecto a métodos existentes, (2) validar la capacidad de procesamiento de archivos de gran tamaño, (3) confirmar la precisión temporal y espacial en la detección de eventos, (4) evaluar la eficiencia computacional y escalabilidad del sistema, y (5) establecer la capacidad de descubrimiento científico mediante la detección de eventos nuevos no reportados previamente en la literatura.
 
 \subsection{VALIDACIÓN DEL COMPONENTE 1: DRAFTS++ - Pipeline astronómico E2E, Productivo, Robusto y Eficiente}
 
-La validación de DRAFTS++ se realizó mediante un proceso incremental que permitió verificar cada componente del sistema antes de su implementación completa. Este enfoque metodológico aseguró la robustez y confiabilidad del pipeline desarrollado.
+La validación del Componente 1 adopta una \textbf{estrategia de validación incremental por etapas del pipeline}, donde cada caso de uso ejercita múltiples subsistemas de manera integrada bajo condiciones de complejidad creciente. A diferencia de validar cada mejora arquitectónica de forma aislada (lo cual sería artificial y redundante), este enfoque valida las siete etapas del pipeline propuesto (input, preprocessing, models, detection, analysis, visualization y output, véase Figura~\ref{fig:workflow-src}) mediante tres casos representativos que cubren progresivamente todo el flujo operativo:
 
-\subsubsection{Validación Inicial con Dataset de Entrenamiento}
+\begin{enumerate}
+    \item \textbf{Caso 1 - FAST-FREX (validación funcional básica)}: Dataset de entrenamiento que valida el flujo completo end-to-end en condiciones controladas, ejercitando todas las etapas del pipeline desde ingesta multi-formato hasta generación de artefactos estandarizados. Confirma funcionalidad básica de ingesta, preprocesamiento, integración de modelos (CenterNet/ResNet18), detección, análisis de métricas (DM, SNR), visualización científica y output estructurado.
+    
+    \item \textbf{Caso 2 - Pulsar B0355+54 (validación de robustez temporal)}: Pulsar brillante con 752 pulsos teóricos en 117 segundos que valida específicamente las mejoras de preprocesamiento: sistema de streaming por slices, continuidad temporal quirúrgica entre ventanas, trazabilidad temporal sub-milisegundo, y robustez de detección bajo periodicidad estricta. El éxito (732/752 pulsos, 97.3\%) demuestra que la geometría de datos y el procesamiento secuencial operan según diseño.
+    
+    \item \textbf{Caso 3 - FRB 121102 (validación de escalabilidad E2E y descubrimiento)}: Observaciones FAST multi-gigabyte que fuerzan la operación integrada del sistema completo bajo máxima exigencia computacional, validando específicamente: ingesta de archivos masivos, chunking con solapamiento controlado, planificación dinámica de recursos (core/), gestión inteligente de memoria RAM/VRAM con fallback automático a CPU, procesamiento E2E sin intervención manual, y capacidad de descubrimiento científico genuino. El éxito (Recall 100\%, 2 nuevos bursts confirmados) constituye la validación definitiva del Componente 1.
+\end{enumerate}
 
-El proceso de validación inició con el dataset FAST-FREX (FAST dataset for Fast Radio bursts EXploration), el mismo conjunto de datos utilizado para el entrenamiento de los modelos de detección. Esta etapa fue fundamental para validar todas las nuevas funcionalidades implementadas en DRAFTS++, incluyendo los nuevos tipos de visualización y el manejo de archivos de entrada, antes incluso del desarrollo del sistema de chunking.
+Esta estrategia por etapas permite demostrar rigurosamente que todas las mejoras arquitectónicas propuestas operan de manera coordinada y robusta: si alguna etapa del pipeline (ingesta, preprocesamiento, modelos, detección, análisis, visualización, output) fallara, o si los módulos transversales de soporte (core/, config/, logging/, scripts/) no operaran correctamente, el sistema completo fallaría en alguno de los tres casos validados. El éxito progresivo confirma, por tanto, la correcta implementación de la transformación desde prototipo hacia sistema productivo operacional.
+
+\begin{table}[H]
+\centering
+\caption{Mapeo entre etapas del pipeline DRAFTS++ y casos de validación implementados. Cada caso ejercita múltiples etapas de manera integrada, demostrando cobertura completa del sistema mediante validación E2E.}
+\label{tab:mapeo_validacion_etapas_componente1}
+\small
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Etapa del Pipeline} & \textbf{Caso 1} & \textbf{Caso 2} & \textbf{Caso 3} \\
+\textbf{(Figura~\ref{fig:workflow-src})} & \textbf{FAST-FREX} & \textbf{B0355+54} & \textbf{FRB121102} \\
+\hline
+\texttt{input/} Ingesta & \checkmark & \checkmark & \textbf{Masivo} \\
+\texttt{preprocessing/} Preprocesamiento & Básico & \textbf{Streaming} & \textbf{Chunking} \\
+\texttt{models/} Modelos & \checkmark & \checkmark & \checkmark \\
+\texttt{detection/} Detección & \checkmark & \textbf{732 pulsos} & \textbf{Recall 100\%} \\
+\texttt{analysis/} Análisis & \checkmark & \textbf{Temporal} & \textbf{Física} \\
+\texttt{visualization/} Visualización & \checkmark & \checkmark & \checkmark \\
+\texttt{output/} Artefactos & \checkmark & \checkmark & \checkmark \\
+\hline
+\texttt{core/} Orquestación & Implícito & Implícito & \textbf{Memoria} \\
+\texttt{config/} Configuración & \checkmark & \checkmark & \checkmark \\
+\texttt{logging/} Registro & \checkmark & \checkmark & \checkmark \\
+\texttt{scripts/} CLI & \checkmark & \checkmark & \checkmark \\
+\hline
+\textbf{Foco de Validación} & Funcionalidad & Robustez & Escalabilidad \\
+ & básica E2E & temporal & + Descubrimiento \\
+\hline
+\end{tabular}
+\end{table}
+
+\noindent\textbf{Leyenda:} \checkmark = Validado implícitamente; Básico = Configuración simple; \textbf{Énfasis} = Validación explícita crítica para el caso.
+
+\subsubsection{Caso 1 - FAST-FREX: Validación Funcional Básica del Flujo E2E}
+
+El proceso de validación inició con el dataset FAST-FREX (FAST dataset for Fast Radio bursts EXploration), el mismo conjunto de datos utilizado para el entrenamiento de los modelos de detección. Esta etapa fue fundamental para validar el flujo completo del pipeline desde ingesta hasta output, ejercitando las siguientes etapas del sistema (véase Tabla~\ref{tab:mapeo_validacion_etapas_componente1}):
+
+\begin{itemize}
+    \item \textbf{Ingesta multi-formato robusta}: Detección automática de archivos astronómicos, parsers especializados FITS/Filterbank, y manejo de formatos heterogéneos sin intervención manual
+    \item \textbf{Análisis automático de headers}: Extracción automática de parámetros observacionales (resolución temporal/espectral, configuración de frecuencia, polarización), eliminando la configuración manual codificada del prototipo original
+    \item \textbf{Sistema de visualización integrado}: Nuevos tipos de visualización científica (mapas DM-tiempo, waterfalls crudos/dedispersados, perfiles SNR) que permiten validación visual rigurosa de detecciones
+    \item \textbf{Integración automatizada de modelos}: Orquestación automática de CenterNet (detección) y ResNet18 (clasificación) en un flujo unificado sin procesamiento manual por lotes separado
+\end{itemize}
+
+Esta validación inicial permitió confirmar la funcionalidad básica del pipeline antes del desarrollo del sistema de chunking para archivos masivos, estableciendo las bases para validaciones posteriores más exigentes.
 
 \begin{figure}[H]
     \centering
@@ -28,9 +78,19 @@ El proceso de validación inició con el dataset FAST-FREX (FAST dataset for Fas
     \label{fig:frb20201124_0009_slice004}
 \end{figure}
 
-\subsubsection{Validación de Continuidad Temporal y Time Domain}
+\subsubsection{Caso 2 - Pulsar B0355+54: Validación de Robustez Temporal y Procesamiento Secuencial}
 
-Una vez establecida la funcionalidad básica, se procedió a evaluar una característica crítica para cualquier pipeline de detección: la continuidad temporal y la precisión en el dominio del tiempo. Para esta validación se utilizó el pulsar de prueba B0355+54\_FB\_20220918, seleccionado por sus características ideales para este propósito:
+Una vez establecida la funcionalidad básica del flujo E2E, se procedió a evaluar características arquitectónicas críticas del Componente 1 que diferencian fundamentalmente a DRAFTS++ del prototipo original. Esta validación se centró específicamente en las mejoras de la etapa de preprocesamiento (véase Tabla~\ref{tab:mapeo_validacion_etapas_componente1}), verificando:
+
+\begin{itemize}
+    \item \textbf{Contigüidad temporal quirúrgica}: Garantía de que cada slice termina exactamente donde comienza el siguiente, eliminando solapamientos y huecos temporales entre ventanas de procesamiento
+    \item \textbf{Arquitectura de streaming por slices}: Procesamiento secuencial de datos en slices con gestión automática de memoria, permitiendo manejar observaciones de duración arbitraria
+    \item \textbf{Trazabilidad temporal relativa precisa}: Cálculo exacto de timestamps mediante multiplicación de muestras por resolución temporal, proporcionando localización temporal sub-milisegundo
+    \item \textbf{Manejo de discontinuidades}: Detección y gestión automática de interrupciones temporales en datos sin generar errores o artefactos falsos
+    \item \textbf{Validación física integrada}: Cálculo automatizado de métricas SNR y verificación de coherencia temporal en cada candidato detectado
+\end{itemize}
+
+Para esta validación se utilizó el pulsar de prueba B0355+54\_FB\_20220918, seleccionado por sus características ideales para este propósito:
 
 \begin{itemize}
     \item \textbf{Brightness}: Pulsar sumamente brillante que facilita la detección
@@ -69,37 +129,19 @@ Este resultado confirmó la capacidad del sistema para mantener la continuidad t
     \label{fig:b0355_slice013}
 \end{figure}
 
-\subsubsection{Validación con Datos del FRB 121102}
+\subsubsection{Caso 3 - FRB 121102: Validación de Escalabilidad E2E y Descubrimiento Científico}
 
-Para evaluar el rendimiento del sistema en condiciones reales y con archivos de gran tamaño, se utilizó el dataset del FRB 121102, basado en el trabajo de \cite{cruces2020frb121102}. Este dataset presentó desafíos computacionales significativos que requirieron la implementación del sistema de chunking y la optimización del consumo de recursos.
+Los casos previos (FAST-FREX y pulsar B0355+54) validaron el flujo E2E básico y la robustez temporal del preprocesamiento, pero operaron sobre archivos de tamaño manejable que cabían completamente en memoria. La validación definitiva del Componente 1 requiere demostrar operación robusta sobre archivos masivos de observaciones reales que exceden ampliamente la memoria disponible, forzando la operación integrada de todas las etapas del pipeline (véase Tabla~\ref{tab:mapeo_validacion_etapas_componente1}): ingesta de archivos multi-gigabyte, chunking con solapamiento controlado, gestión inteligente de memoria RAM/VRAM (módulo core/), procesamiento E2E sin intervención manual, y capacidad de descubrimiento científico genuino.
 
-\paragraph{Metodología de Validación}
+El dataset del FRB 121102 proporciona este escenario desafiante. Los archivos de observación del telescopio Effelsberg presentan tamaños de varios gigabytes, requiriendo la operación integrada de todas las mejoras arquitectónicas: sistema de chunking con solapamiento controlado, planificación dinámica de recursos, gestión inteligente de memoria GPU con fallback automático a CPU, y continuidad temporal quirúrgica entre chunks. Adicionalmente, este dataset permite validación científica rigurosa mediante comparación directa con resultados publicados en literatura.
 
-La validación se realizó mediante una comparación directa con los resultados reportados en la literatura por Cruces et al. (2020) \cite{cruces2020frb121102}, quienes estudiaron el comportamiento repetitivo de FRB 121102 incluyendo periodicidad, tiempos de espera y distribución de energía. Se analizaron los mismos archivos de observación para asegurar una evaluación equitativa.
+Se utilizaron 6 archivos de observación, correspondientes a los reportados por \cite{cruces2020frb121102} en su estudio de periodicidad y comportamiento temporal. Esta referencia proporciona ground truth de 24 eventos confirmados, permitiendo evaluar recall del sistema mediante comparación directa. 
 
-\paragraph{Resultados de Detección del Pipeline DRAFTS++}
+El pipeline procesó exitosamente los 6 archivos de observación, detectando 41 eventos distribuidos a lo largo de las sesiones. El sistema recuperó la totalidad de los 24 bursts reportados por Cruces et al. (2021), logrando Recall = 100\% sobre eventos conocidos. Este resultado confirma que el sistema de chunking no introduce pérdida de sensibilidad: eventos cercanos a bordes de chunks fueron detectados correctamente gracias al solapamiento controlado implementado.
 
-El análisis de FRB121102 con el pipeline DRAFTS++ produjo 41 detecciones distribuidas en 6 archivos de observación (3096, 3098, 3099, 3100, 3101, 3102). Los resultados se clasificaron en tres categorías principales:
+Adicionalmente, el sistema identificó 17 candidatos nuevos no reportados en literatura. La validación científica independiente confirmó 2 de estos eventos como bursts genuinos (Figuras \ref{fig:new_event_3096} y \ref{fig:new_event_3102}), mientras que los 15 restantes permanecen como candidatos prometedores pendientes de análisis adicional. Los eventos confirmados muestran SNR de 6.3$\sigma$ y 12.0$\sigma$ respectivamente, con DM~564 pc cm$^{-3}$ consistente con la fuente, y morfología temporal característica de FRB 121102.
 
-\begin{enumerate}
-    \item \textbf{Bursts confirmados por literatura} (24 eventos): Detectados tanto por DRAFTS++ como reportados por Cruces et al. (2020)
-    \item \textbf{Nuevos candidatos sin confirmar} (15 eventos): Detectados únicamente por DRAFTS++, pendientes de validación científica
-    \item \textbf{Nuevos eventos confirmados} (2 eventos): Detectados por DRAFTS++ y 100\% confirmados por el grupo de astrónomos colaboradores
-\end{enumerate}
-
-\subparagraph{Bursts Confirmados por Literatura}
-
-Los 24 bursts que fueron detectados tanto por el pipeline DRAFTS++ como reportados en la literatura por Cruces et al. (2020) se presentan en detalle en el Anexo A (Tabla \ref{tab:anexo_confirmed_bursts}), demostrando la capacidad del sistema para identificar correctamente eventos conocidos.
-
-\subparagraph{Nuevos Candidatos Sin Confirmar}
-
-Los 15 nuevos candidatos detectados únicamente por DRAFTS++ que aún requieren confirmación científica se presentan en detalle en el Anexo A (Tabla \ref{tab:anexo_candidate_bursts}). Estos representan el potencial de descubrimiento del sistema.
-
-\subparagraph{Nuevos Eventos Confirmados}
-
-Los 2 nuevos eventos de bursts que fueron detectados por DRAFTS++ y posteriormente 100\% confirmados por el grupo de astrónomos colaboradores se presentan en detalle en el Anexo A (Tabla \ref{tab:anexo_new_confirmed_bursts}).
-
-Estos dos nuevos eventos representan descubrimientos científicos genuinos realizados por DRAFTS++, como se muestra en las Figuras \ref{fig:new_event_3096} y \ref{fig:new_event_3102}. Las visualizaciones confirman la detección robusta de ambos eventos con altos valores de SNR después de la dedispersión.
+% Las detecciones completas se documentan en Anexo A: bursts confirmados por literatura (Tabla \ref{tab:anexo_confirmed_bursts}), nuevos eventos confirmados (Tabla \ref{tab:anexo_new_confirmed_bursts}), y candidatos pendientes (Tabla \ref{tab:anexo_candidate_bursts}). El histograma de distribución temporal (Figura \ref{fig:frb121102_histogram}) muestra concentración de eventos en archivos 3098 y 3100, consistente con ventanas de actividad del repetidor.
 
 \begin{figure}[H]
     \centering
@@ -115,454 +157,189 @@ Estos dos nuevos eventos representan descubrimientos científicos genuinos reali
     \label{fig:new_event_3102}
 \end{figure}
 
-\paragraph{Análisis de Distribución Temporal}
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=0.8\textwidth]{figures/frb121102_detection_histogram.png}
+%     \caption[Histograma de detecciones FRB121102]{Distribución temporal de detecciones por archivo de observación. Morado: bursts confirmados por literatura; Celeste: nuevos candidatos sin confirmar; Verde: nuevos eventos confirmados. La concentración en archivos 3098 y 3100 es consistente con ventanas de actividad del repetidor. \textit{Fuente: Elaboración propia}.}
+%     \label{fig:frb121102_histogram}
+% \end{figure}
 
-Para visualizar la distribución temporal de los diferentes tipos de detecciones, se generó un histograma que muestra la frecuencia de bursts por archivo de observación. Esta visualización permite identificar patrones en la detección y validar la consistencia del sistema a lo largo de las diferentes sesiones de observación.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{figures/frb121102_detection_histogram.png}
-    \caption[Histograma de detecciones FRB121102]{Histograma de distribución de detecciones de FRB121102 por archivo de observación. Las barras muestran: \textcolor{purple}{\textbf{Morado}} = bursts confirmados por literatura, \textcolor{cyan}{\textbf{Celeste}} = nuevos candidatos sin confirmar, \textcolor{green}{\textbf{Verde}} = nuevos eventos confirmados. \textit{Fuente: Elaboración propia}.}
-    \label{fig:frb121102_histogram}
-\end{figure}
-
-\paragraph{Análisis de Resultados}
-
-Los resultados obtenidos superaron significativamente las expectativas establecidas en la literatura:
-
-\begin{itemize}
-    \item \textbf{Bursts de literatura detectados}: 24/24 (100\% de detección) - todos los bursts reportados por Cruces et al. (2020) fueron identificados correctamente por DRAFTS++
-    \item \textbf{Nuevos eventos confirmados}: 2 eventos adicionales detectados por DRAFTS++ y 100\% confirmados por el grupo de astrónomos colaboradores
-    \item \textbf{Candidatos adicionales}: 15 candidatos nuevos detectados únicamente por DRAFTS++, pendientes de confirmación científica
-    \item \textbf{Total de detecciones}: 41 eventos distribuidos en 6 archivos de observación
-\end{itemize}
-
-\paragraph{Validación de Funcionalidades}
-
-Esta validación confirmó exitosamente todas las mejoras implementadas en DRAFTS++:
-
-\begin{itemize}
-    \item \textbf{Manejo robusto de archivos}: Procesamiento eficiente de archivos FITS y Filterbank de gran tamaño
-    \item \textbf{Control de parámetros}: Configuración total por parte del usuario a través del sistema centralizado
-    \item \textbf{Continuidad temporal}: Precisión quirúrgica en el manejo de timestamps entre chunks y slices
-    \item \textbf{Precisión de detección}: Identificación correcta de todos los eventos conocidos de la literatura
-    \item \textbf{Eficiencia computacional}: Sistema de chunking y overlap optimizado para archivos masivos
-    \item \textbf{Capacidad de descubrimiento}: Detección de eventos nuevos no reportados previamente
-    \item \textbf{Generación de outputs}: Visualizaciones y reportes apropiados para análisis científico
-\end{itemize}
-
-\paragraph{Implicaciones Científicas}
-
-Los resultados obtenidos no solo validan la funcionalidad técnica del pipeline DRAFTS++, sino que también contribuyen significativamente al conocimiento científico del campo. La detección de 2 nuevos bursts confirmados y 15 candidatos adicionales representa un avance importante en el estudio de FRB 121102, demostrando la capacidad del sistema para realizar descubrimientos científicos genuinos.
-
-\subsubsection{Métricas Cuantitativas del Componente de Bajas Frecuencias}
-
-Con el fin de complementar la validación cualitativa con un análisis cuantitativo, se incorporan las métricas estándar de evaluación en sistemas de detección y clasificación: \textbf{Accuracy}, \textbf{Precision}, \textbf{Recall} y \textbf{F1}. Estas métricas se definen a partir de la matriz de confusión \((TP, FP, FN, TN)\):
-
-\begin{align}
-\text{Accuracy} &= \frac{TP + TN}{TP + FP + FN + TN} \\
-\text{Precision} &= \frac{TP}{TP + FP} \\
-\text{Recall} &= \frac{TP}{TP + FN} \\
-\text{F1} &= 2\cdot\frac{\text{Precision}\cdot\text{Recall}}{\text{Precision}+\text{Recall}}
-\end{align}
-
-En el dominio de FRBs, disponer de verdaderos negativos \((TN)\) etiquetados a gran escala no siempre es posible en observaciones reales. Sin embargo, la identificación de falsos positivos \((FP)\) es factible mediante validación científica posterior. Por ello, se reportan a continuación métricas bien definidas con la evidencia disponible y se explicita el alcance de cada cálculo.
-
-En la \textbf{validación de continuidad temporal} con el pulsar B0355+54 (archivo de 117.23 s, 752 pulsos teóricos), el conjunto de referencia ofrece un número esperado de pulsos (positivos) por ventana temporal. Con 732 pulsos detectados de 752 esperados, se obtiene un \textbf{Recall} de \(732/752 = 97.3\%\). La \textbf{Precision} y el \textbf{F1} no son directamente computables en este experimento sin un protocolo adicional de etiquetado manual de falsos positivos a nivel de evento, por lo que se dejan como trabajo complementario.
-
-En la validación con \textbf{FRB 121102}, se dispone de una clasificación completa de candidatos mediante validación científica posterior. El pipeline detectó 41 candidatos en total, distribuidos como sigue: 24 eventos confirmados por literatura, 2 nuevos eventos confirmados por astrónomos colaboradores, y 15 candidatos sin confirmar que probablemente representan falsos positivos. Esto permite el cálculo de métricas cuantitativas robustas:
-
-\begin{itemize}
-    \item \textbf{True Positives (TP)}: 26 eventos genuinos (24 de literatura + 2 nuevos confirmados)
-    \item \textbf{False Positives (FP)}: 15 candidatos sin confirmar
-    \item \textbf{False Negatives (FN)}: 0 eventos de literatura no detectados
-    \item \textbf{True Negatives (TN)}: No calculable sin etiquetado manual completo del archivo
-\end{itemize}
-
-Con estos valores se obtienen las siguientes métricas:
-
-\begin{align}
-\text{Recall} &= \frac{TP}{TP + FN} = \frac{26}{26 + 0} = 100\% \\
-\text{Precision} &= \frac{TP}{TP + FP} = \frac{26}{26 + 15} = 63.4\% \\
-\text{F1} &= 2 \cdot \frac{\text{Precision} \cdot \text{Recall}}{\text{Precision} + \text{Recall}} = 2 \cdot \frac{0.634 \cdot 1.0}{0.634 + 1.0} = 77.5\%
-\end{align}
-
-Estas métricas demuestran que DRAFTS++ logra una detección completa de eventos conocidos (Recall=100\%) con una precisión aceptable (Precision=63.4\%) en condiciones reales de observación. El valor F1 de 77.5\% refleja un balance satisfactorio entre sensibilidad y precisión. En conjunto con la demostración de procesamiento \emph{end-to-end} sobre archivos masivos (sistema de \textit{chunking}, continuidad temporal y generación de artefactos), estos resultados sustentan la efectividad del Componente 1 en condiciones que preservan la firma dispersiva.
+Los resultados validan integralmente el Componente 1. El pipeline procesó exitosamente archivos multi-gigabyte sin errores de memoria ni degradación de rendimiento, operando sin intervención manual desde ingesta hasta visualización. El recall perfecto (26/26 eventos detectados: 24 de literatura + 2 nuevos confirmados) demuestra que el sistema de chunking con solapamiento controlado no introduce puntos ciegos temporales, validando la continuidad temporal quirúrgica implementada. El descubrimiento de 2 nuevos bursts confirmados demuestra capacidad de descubrimiento científico genuino.
 
 \subsection{VALIDACIÓN DEL COMPONENTE 2: DRAFTS++ - Extensión a Alta Frecuencia - Cuatro Líneas de Investigación}
 
-La validación del componente de altas frecuencias se centró en el dataset del observatorio ALMA, específicamente los datos del magnetar del Centro Galáctico PSR J1745-2900, basado en el trabajo de \cite{veracasanova2025}.
+La validación del Componente 2 examina la efectividad de DRAFTS++ en el régimen milimétrico (86 GHz), donde la firma dispersiva tradicional se comprime significativamente debido a la dependencia $\Delta t_{\mathrm{ms}} \propto \nu^{-2}$. En este régimen, el patrón bow-tie característico de FRBs en bajas frecuencias (1.4 GHz) colapsa, desafiando a detectores entrenados en firmas dispersivas desarrolladas.
 
-\paragraph{Referencia de Validación}
-
-Para esta validación se utilizó como referencia los resultados oficiales reportados por Vera-Casanova et al. (2025), quienes detectaron 8 pulsos del magnetar PSR J1745-2900 en los siguientes archivos y tiempos:
+Para todas las líneas de investigación se valido utilizando observaciones del radiotelescopio ALMA del magnetar del Centro Galáctico PSR J1745-2900 a 86 GHz, proporcionadas por \cite{veracasanova2025}. Este dataset constituye ground truth mediante 8 pulsos confirmados independientemente con PRESTO (Tabla~\ref{tab:veracasanova_reference}), permitiendo evaluación objetiva de cada estrategia.
 
 \begin{table}[H]
     \centering
-    \caption{Pulsos del magnetar PSR J1745-2900 reportados por Vera-Casanova et al. (2025). \textit{Fuente: Vera-Casanova et al. (2025) \cite{veracasanova2025}.}}
+\caption{Ground truth: Pulsos del magnetar PSR J1745-2900 reportados por Vera-Casanova et al. (2025), utilizados para validación de todas las líneas de investigación.}
     \label{tab:veracasanova_reference}
+\small
     \begin{tabular}{|c|c|}
         \hline
-        \textbf{File} & \textbf{Time(s)} \\
+\textbf{File} & \textbf{Timestamp (s)} \\
         \hline
         142\_0003 & 39.977 \\
-        142\_0006 & 10.882 \\
-        142\_0006 & 25.829 \\
+142\_0006 & 10.882, 25.829 \\
         153\_0006 & 23.444 \\
-        230\_0002 & 2.3 \\
-        230\_0002 & 17.395 \\
+230\_0002 & 2.3, 17.395 \\
         230\_0003 & 36.548 \\
         242\_0005 & 44.919 \\
+        \hline
+\multicolumn{2}{|c|}{Total: 8 pulsos confirmados} \\
+\hline
+    \end{tabular}
+\end{table}
+
+Las métricas de evaluación son estándar: Recall, que mide sensibilidad (fracción de pulsos genuinos detectados), Precision, que cuantifica especificidad (proporción de detecciones correctas), y F1-score que sintetiza el balance entre ambas. Los resultados se complementan con análisis de casos representativos que ilustran modos de éxito y falla de cada estrategia.
+
+\subsubsection{Línea 1: Validación de Transferibilidad del Pipeline Clásico mediante Adaptación Paramétrica}
+
+Esta línea establece el baseline de rendimiento del pipeline clásico (CenterNet + ResNet18) en alta frecuencia sin modificaciones arquitecturales, evaluando si ajustes paramétricos simples pueden compensar la compresión del bow-tie. El experimento compara dos configuraciones de umbral de detección: conservadora (DET\_PROB = 0.3, optimizada en bajas frecuencias) y sensible (DET\_PROB = 0.05, factor x6 más permisivo), aislando el efecto del umbral sobre sensibilidad y especificidad.
+
+Los resultados revelaron comportamiento bimodal dramático. Con el umbral estándar (DET\_PROB = 0.3), el sistema falló completamente: ninguno de los 8 pulsos de referencia fue detectado. Este resultado confirma que modelos optimizados para bow-ties desarrollados no transfieren directamente a regímenes comprimidos, independientemente de la calidad del entrenamiento original.
+
+Al reducir el umbral en factor x6 (DET\_PROB = 0.05), el sistema recuperó sensibilidad parcial detectando 7/8 pulsos (Recall = 87.5\%), pero introdujo aproximadamente 12 candidatos espurios, degradando la precisión a 36.8\%. El F1-score de 51.8\% refleja el trade-off fundamental entre sensibilidad y especificidad inherente a la adaptación paramétrica: ajustar el umbral desplaza el punto de operación en la curva ROC pero no expande el dominio de representación del modelo. La Tabla \ref{tab:comparacion_umbrales_linea1} sintetiza estas métricas.
+
+\begin{table}[H]
+    \centering
+    \caption{Rendimiento del pipeline clásico adaptado según configuración de umbral. Las métricas cuantifican el trade-off fundamental entre sensibilidad (recall) y especificidad (precision) en adaptación paramétrica para alta frecuencia. \textit{Fuente: Elaboración propia}.}
+    \label{tab:comparacion_umbrales_linea1}
+    \begin{tabular}{|l|c|c|}
+        \hline
+        \textbf{Métrica} & \textbf{Conservadora} & \textbf{Sensible} \\
+         & \textbf{(DET\_PROB = 0.3)} & \textbf{(DET\_PROB = 0.05)} \\
+        \hline
+        Recall & 0\% (0/8) & 87.5\% (7/8) \\
+        \hline
+        Precision & Indefinida & 36.8\% (7/19) \\
+        \hline
+        F1-Score & Indefinida & 51.8\% \\
+        \hline
+        Falsos Positivos & 0 & ~12 (estimado) \\
+        \hline
+        Caracterización & Específico/Insensible & Sensible/Impreciso \\
         \hline
     \end{tabular}
 \end{table}
 
-\subsubsection{Línea 1: Validación del Pipeline Clásico Adaptado}
+Dos casos ilustran el espectro de comportamientos observados. El primer pulso (Archivo 142\_0003, t=39.977s) no fue detectado con umbral conservador (Figura \ref{fig:142_0003_slice133_highProb}), pero apareció con probabilidad marginal 9\% al reducir el umbral (Figura \ref{fig:142_0003_slice133_lowProb}). Este éxito parcial sugiere que el modelo captura características relevantes de alta frecuencia, aunque requiere umbral permisivo para activarse. El costo es evidente: candidatos espurios adicionales emergen simultáneamente, introduciendo ruido de clasificación.
 
-La primera línea de validación se centró en evaluar la efectividad del pipeline DRAFTS++ clásico en el dominio de altas frecuencias sin modificaciones arquitecturales, utilizando únicamente ajustes paramétricos para adaptar la sensibilidad del sistema. Esta aproximación conservadora permitió establecer una línea base de rendimiento y identificar las limitaciones inherentes del enfoque tradicional en el nuevo régimen observacional.
-
-\paragraph{Metodología de Adaptación Paramétrica}
-
-El pipeline clásico fue adaptado al dominio de altas frecuencias mediante la modificación sistemática del umbral de probabilidad de detección (\texttt{DET\_PROB}), manteniendo intacta la arquitectura de redes neuronales entrenadas en bajas frecuencias. Esta estrategia de adaptación mínima permitió evaluar la transferibilidad de los modelos pre-entrenados y establecer el impacto de los parámetros de detección en la sensibilidad del sistema.
-
-Se diseñó un experimento controlado con dos configuraciones contrastantes de umbral:
-
-\begin{itemize}
-    \item \textbf{Umbral Conservador (DET\_PROB = 0.3)}: Representa el valor estándar optimizado para bajas frecuencias, garantizando alta especificidad pero limitando la sensibilidad a señales sutiles características del dominio de alta frecuencia.
-    \item \textbf{Umbral Sensible (DET\_PROB = 0.05)}: Umbral experimental reducido en un factor de 6, diseñado para explorar la capacidad máxima de detección del sistema en condiciones de alta sensibilidad, sacrificando especificidad para maximizar el recall.
-\end{itemize}
-
-Ambas configuraciones mantuvieron parámetros constantes (polarización lineal, arquitectura de red, preprocesamiento) para asegurar comparabilidad directa y aislamiento del efecto del umbral de detección.
-
-\paragraph{Resultados Experimentales}
-
-La evaluación sistemática reveló un comportamiento bimodal del pipeline clásico adaptado, con diferencias dramáticas en el rendimiento según la configuración de umbral:
-
-\begin{itemize}
-    \item \textbf{Umbral Conservador (DET\_PROB = 0.3)}: Falla total en la detección (0/8 pulsos), confirmando la incompatibilidad del umbral estándar con las características espectrales de alta frecuencia.
-    \item \textbf{Umbral Sensible (DET\_PROB = 0.05)}: Detección parcial exitosa (7/8 pulsos), demostrando la sensibilidad paramétrica del sistema pero revelando limitaciones fundamentales.
-\end{itemize}
-
-\paragraph{Análisis de Casos Representativos}
-
-Para caracterizar cualitativamente el comportamiento del sistema, se analizaron casos específicos que ilustran tanto las capacidades como las limitaciones del pipeline clásico adaptado:
-
-\subparagraph{Caso de Éxito Parcial: Archivo 142\_0003 (Tiempo 39.977s)}
-
-Este caso representa el escenario más favorable para el pipeline clásico adaptado, donde la reducción del umbral permitió la detección exitosa de un pulso genuino:
-
-\begin{itemize}
-    \item \textbf{Umbral Conservador}: Falla total - ausencia absoluta de candidatos detectados (Figura \ref{fig:142_0003_slice133_highProb})
-    \item \textbf{Umbral Sensible}: Detección exitosa con probabilidad marginal (9\%) y presencia de falsos positivos adicionales (Figura \ref{fig:142_0003_slice133_lowProb})
-\end{itemize}
-
-Este caso demuestra que la adaptación paramétrica puede recuperar detecciones perdidas, pero a costa de introducir ruido de clasificación y reducir la confiabilidad de las predicciones.
-
-\subparagraph{Caso de Falla Total: Archivo 242\_0005 (Tiempo 44.169s)}
-
-Este caso ilustra las limitaciones fundamentales del pipeline clásico, donde ni siquiera la máxima sensibilidad paramétrica permite la detección:
-
-\begin{itemize}
-    \item \textbf{Umbral Conservador}: Falla total - ausencia de detecciones (Figura \ref{fig:242_0005_slice149_highProb})
-    \item \textbf{Umbral Sensible}: Falla persistente - ausencia de detecciones incluso con umbral extremadamente permisivo (Figura \ref{fig:242_0005_slice149_lowProb})
-\end{itemize}
-
-Este caso evidencia que ciertas características espectrales de alta frecuencia escapan completamente al dominio de aplicación del pipeline clásico, independientemente de los ajustes paramétricos.
+El segundo caso (Archivo 242\_0005, t=44.169s) permaneció indetectable en ambas configuraciones (Figuras \ref{fig:242_0005_slice149_highProb} y \ref{fig:242_0005_slice149_lowProb}). Esta falla persistente revela limitaciones arquitecturales irreductibles: ciertas señales de alta frecuencia escapan completamente al dominio de representación aprendido por el modelo, independientemente de ajustes paramétricos.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{figures/2017-04-03-08-16-13_142_0003_t39.977_slice133.png}
-    \caption[Pipeline clásico: Umbral conservador (142\_0003)]{Validación del pipeline clásico adaptado con umbral conservador (DET\_PROB = 0.3) para el archivo 142\_0003, slice 133. El mapa de detección muestra la ausencia total de candidatos, confirmando que el umbral estándar optimizado para bajas frecuencias es incompatible con las características espectrales de alta frecuencia. Este resultado establece la necesidad de adaptación paramétrica para el dominio ALMA. \textit{Fuente: Elaboración propia}.}
+    \includegraphics[width=0.9\textwidth]{figures/2017-04-03-08-16-13_142_0003_t39.977_slice133.png}
+    \caption[Caso A: Configuración conservadora]{Caso A con configuración conservadora (DET\_PROB = 0.3). El mapa de detección DM-tiempo muestra ausencia total de candidatos para el pulso confirmado en t=39.977s. El umbral estándar optimizado para bajas frecuencias resulta incompatible con características espectrales de alta frecuencia. \textit{Fuente: Elaboración propia}.}
     \label{fig:142_0003_slice133_highProb}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{figures/2017-04-03-08-16-13_142_0003_t39.977_slice133-lowProb.png}
-    \caption[Pipeline clásico: Umbral sensible (142\_0003)]{Validación del pipeline clásico adaptado con umbral sensible (DET\_PROB = 0.05) para el archivo 142\_0003, slice 133. El sistema logró detectar el pulso principal en el tiempo 39.976s con probabilidad marginal del 9\%, junto con candidatos adicionales producto de la confusión de la red en umbrales bajos. Este resultado demuestra la sensibilidad paramétrica del sistema pero revela limitaciones en la especificidad. \textit{Fuente: Elaboración propia}.}
+    \includegraphics[width=0.9\textwidth]{figures/2017-04-03-08-16-13_142_0003_t39.977_slice133-lowProb.png}
+    \caption[Caso A: Configuración sensible]{Caso A con configuración sensible (DET\_PROB = 0.05). El sistema detecta el pulso genuino en t=39.976s con probabilidad marginal 9\%, junto con candidatos espurios adicionales. La recuperación de detección mediante reducción de umbral demuestra sensibilidad paramétrica, pero a costa de especificidad reducida. \textit{Fuente: Elaboración propia}.}
     \label{fig:142_0003_slice133_lowProb}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{figures/2017-04-03-13_38_31_242_0005_t44.169_slice149.png}
-    \caption[Pipeline clásico: Umbral conservador (242\_0005)]{Validación del pipeline clásico adaptado con umbral conservador (DET\_PROB = 0.3) para el archivo 242\_0005, slice 149. El mapa de detección muestra la ausencia total de detecciones, ilustrando las limitaciones fundamentales del pipeline clásico para ciertas características espectrales de alta frecuencia, independientemente de la configuración paramétrica. \textit{Fuente: Elaboración propia}.}
+    \includegraphics[width=0.9\textwidth]{figures/2017-04-03-13_38_31_242_0005_t44.169_slice149.png}
+    \caption[Caso B: Configuración conservadora]{Caso B con configuración conservadora (DET\_PROB = 0.3). Ausencia total de detecciones para pulso confirmado en t=44.169s, consistente con falla sistemática observada en configuración estándar. \textit{Fuente: Elaboración propia}.}
     \label{fig:242_0005_slice149_highProb}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{figures/2017-04-03-13_38_31_242_0005_t44.169_slice149-lowProb.png}
-    \caption[Pipeline clásico: Umbral sensible (242\_0005)]{Validación del pipeline clásico adaptado con umbral sensible (DET\_PROB = 0.05) para el archivo 242\_0005, slice 149. A pesar del umbral extremadamente permisivo, el sistema no logró detectar el pulso confirmado, demostrando limitaciones arquitecturales fundamentales del pipeline clásico que requieren soluciones más allá de la adaptación paramétrica. \textit{Fuente: Elaboración propia}.}
+    \includegraphics[width=0.9\textwidth]{figures/2017-04-03-13_38_31_242_0005_t44.169_slice149-lowProb.png}
+    \caption[Caso B: Configuración sensible]{Caso B con configuración sensible (DET\_PROB = 0.05). A pesar del umbral extremadamente permisivo, el pulso confirmado permanece indetectable. Esta falla persistente evidencia limitaciones arquitecturales fundamentales: ciertas características espectrales de alta frecuencia escapan al dominio de aplicación del modelo pre-entrenado, independientemente de ajustes paramétricos. \textit{Fuente: Elaboración propia}.}
     \label{fig:242_0005_slice149_lowProb}
 \end{figure}
+Los resultados establecen el límite superior del pipeline clásico en alta frecuencia: Recall máximo 87.5\% con Precision 36.8\%. El umbral estándar (0\% recall) resulta completamente inadecuado, mientras que el umbral permisivo recupera sensibilidad a costa de especificidad degradada. 
 
-\paragraph{Métricas Cuantitativas del Pipeline Clásico Adaptado}
 
-Para evaluar cuantitativamente el rendimiento del pipeline clásico adaptado, se calcularon métricas de evaluación estándar considerando los resultados obtenidos con cada configuración de umbral:
+\subsubsection{Línea 2: Validación de Estrategia Híbrida SNR-Threshold + Clasificación CNN}
 
-\subparagraph{Evaluación con Umbral Conservador (DET\_PROB = 0.3)}
+Esta línea evalúa un enfoque híbrido que elimina la dependencia del patrón DM-tiempo: propuesta de candidatos por SNR-threshold (inspirada en PRESTO) seguida de clasificación con ResNet18 pre-entrenado. La hipótesis es que el clasificador, operando sobre patches frecuencia-tiempo dedispersados y normalizados, puede ser invariante al régimen espectral. El pipeline opera en tres etapas: (i) detección de picos SNR con filtrado adaptado (boxcar $w \in \{1,\ldots,30\}$ muestras, umbral 6-10$\sigma$), (ii) estimación local de $\mathrm{DM}^*$ por máxima coherencia temporal, y (iii) clasificación binaria del patch dedispersado. El experimento incluye validación cruzada con 8 pulsos PRESTO adicionales.
 
-Con respecto a los 8 pulsos reportados por Vera-Casanova et al. (2025):
+Los resultados superaron expectativas dramáticamente. El enfoque híbrido detectó la totalidad de pulsos de referencia: 8/8 pulsos de literatura (Vera-Casanova et al. 2025), logrando Recall = 100\%. Esto contrasta con el 87.5\% máximo alcanzable por Línea 1, demostrando que eliminar la dependencia del bow-tie recupera completamente la sensibilidad perdida.
 
-\begin{itemize}
-    \item \textbf{True Positives (TP)}: 0 pulsos detectados
-    \item \textbf{False Negatives (FN)}: 8 pulsos no detectados
-    \item \textbf{False Positives (FP)}: 0 candidatos espurios (por ausencia total de detecciones)
-    \item \textbf{True Negatives (TN)}: No calculable sin etiquetado completo del dataset
-\end{itemize}
+Más notable aún, el sistema descubrió 44 nuevos pulsos confirmados posteriormente por astrónomos colaboradores, expandiendo el censo conocido en factor ×5.5. Adicionalmente, identificó 101 candidatos prometedores con morfología consistente, pendientes de validación polarimétrica completa. El total de 161 eventos (60 confirmados + 101 pendientes) evidencia capacidad de descubrimiento científico genuino.
 
-Con estos valores se obtienen las siguientes métricas:
-
-\begin{align}
-\text{Recall} &= \frac{TP}{TP + FN} = \frac{0}{0 + 8} = 0\% \\
-\text{Precision} &= \frac{TP}{TP + FP} = \frac{0}{0 + 0} = \text{Indefinida} \\
-\text{F1} &= \text{Indefinida (por Recall = 0\%)}
-\end{align}
-
-\subparagraph{Evaluación con Umbral Sensible (DET\_PROB = 0.05)}
-
-Para la configuración de umbral sensible:
-
-\begin{itemize}
-    \item \textbf{True Positives (TP)}: 7 pulsos de literatura detectados
-    \item \textbf{False Negatives (FN)}: 1 pulso de literatura no detectado
-    \item \textbf{False Positives (FP)}: Estimación conservadora de 10-15 candidatos espurios (basado en observación de candidatos adicionales en las figuras)
-    \item \textbf{True Negatives (TN)}: No calculable sin etiquetado completo del dataset
-\end{itemize}
-
-Con estos valores se obtienen las siguientes métricas:
-
-\begin{align}
-\text{Recall} &= \frac{TP}{TP + FN} = \frac{7}{7 + 1} = 87.5\% \\
-\text{Precision} &= \frac{TP}{TP + FP} = \frac{7}{7 + 12} = 36.8\% \\
-\text{F1} &= 2 \cdot \frac{\text{Precision} \cdot \text{Recall}}{\text{Precision} + \text{Recall}} = 2 \cdot \frac{0.368 \cdot 0.875}{0.368 + 0.875} = 51.8\%
-\end{align}
-
-\paragraph{Análisis Comparativo de Configuraciones}
-
-La comparación directa entre ambas configuraciones de umbral revela un trade-off fundamental en el rendimiento del pipeline clásico adaptado:
+Las métricas globales confirman el rendimiento excepcional: Recall = 100\%, Precision = 37.3\%, F1 = 54.4\%. La comparación con Línea 1 (Tabla \ref{tab:comparacion_lineas_alma}) revela que el enfoque híbrido mantiene precisión similar (37.3\% vs 36.8\%) pero logra recall perfecto, superando cuantitativamente el baseline establecido.
 
 \begin{table}[H]
     \centering
-    \caption{Comparación de Rendimiento: Umbral Conservador vs. Umbral Sensible. \textit{Fuente: Elaboración propia}.}
-    \label{tab:comparacion_umbrales_linea1}
+    \caption{Comparación cuantitativa Línea 1 vs. Línea 2. El enfoque híbrido (Línea 2) supera dramáticamente al pipeline clásico adaptado (Línea 1), logrando recall perfecto (100\%) y descubriendo 44 eventos nuevos confirmados. \textit{Fuente: Elaboración propia}.}
+    \label{tab:comparacion_lineas_alma}
     \begin{tabular}{|l|c|c|}
         \hline
-        \textbf{Métrica} & \textbf{DET\_PROB = 0.3} & \textbf{DET\_PROB = 0.05} \\
+        \textbf{Métrica} & \textbf{Línea 1 (DM-Tiempo)} & \textbf{Línea 2 (SNR-Híbrido)} \\
         \hline
-        Recall & 0\% & 87.5\% \\
+        Recall (Literatura) & 87.5\% (7/8) & 100\% (8/8) \\
         \hline
-        Precision & Indefinida & 36.8\% \\
+        Recall (PRESTO) & 0\% (0/8) & 100\% (8/8) \\
         \hline
-        F1-Score & Indefinida & 51.8\% \\
+        Precision & 36.8\% & 37.3\% \\
         \hline
-        Detecciones Totales & 0 & 7/8 \\
+        F1-Score & 51.8\% & 54.4\% \\
         \hline
-        Falsos Positivos & 0 & 12 (estimado) \\
+        Nuevos Confirmados & 0 & 44 \\
         \hline
-        Confiabilidad & Alta (específico) & Baja (sensible) \\
+        Candidatos Prometedores & ~12 & 101 \\
         \hline
     \end{tabular}
 \end{table}
 
-\paragraph{Implicaciones Técnicas y Limitaciones Identificadas}
-
-Los resultados del pipeline clásico adaptado revelan tres limitaciones fundamentales:
-
-\begin{enumerate}
-    \item \textbf{Incompatibilidad Paramétrica}: El umbral estándar (DET\_PROB = 0.3) optimizado para bajas frecuencias es completamente inadecuado para alta frecuencia, resultando en recall nulo.
-    
-    \item \textbf{Trade-off Sensibilidad-Especificidad}: La adaptación paramétrica (DET\_PROB = 0.05) recupera detecciones pero introduce falsos positivos significativos, reduciendo la precision a 36.8\%.
-    
-    \item \textbf{Limitaciones Arquitecturales}: Un pulso (242\_0005) permanece indetectable incluso con máxima sensibilidad paramétrica, sugiriendo limitaciones fundamentales en la transferibilidad del modelo.
-\end{enumerate}
-
-\paragraph{Conclusión de la Línea 1}
-
-La validación del pipeline clásico adaptado demuestra que la adaptación paramétrica puede mejorar significativamente el recall (0\% → 87.5\%) pero a costa de reducir la precision y confiabilidad del sistema. Estos resultados establecen la necesidad de enfoques más sofisticados para el dominio de altas frecuencias, justificando el desarrollo de la Línea 2 con estrategias híbridas que combinen detección tradicional con clasificación avanzada.
-
-\subsubsection{Línea 2: Detección por SNR con clasificación binaria en flujo}
-
-La segunda línea de validación implementó un enfoque híbrido revolucionario que combina detección tradicional por relación señal-ruido (SNR) con clasificación binaria mediante redes neuronales convolucionales. Esta estrategia fue diseñada específicamente para superar las limitaciones identificadas en la Línea 1, donde el pipeline clásico mostró sensibilidad insuficiente para el dominio de altas frecuencias.
-
-\paragraph{Metodología del Enfoque Híbrido}
-
-El enfoque híbrido opera en dos etapas secuenciales: primero, se aplica detección tradicional basada en SNR para identificar candidatos preliminares, y segundo, se emplea clasificación binaria mediante CNN para filtrar falsos positivos y confirmar pulsos genuinos. Esta combinación aprovecha la robustez de los métodos tradicionales para la detección inicial y la precisión de las técnicas de machine learning para la validación final.
-
-\paragraph{Resultados Excepcionales de Detección}
-
-El análisis con el pipeline híbrido SNR + clasificación binaria produjo resultados que superaron todas las expectativas establecidas:
-
-\begin{itemize}
-    \item \textbf{Re-detección de pulsos PRESTO}: 8/8 pulsos previamente detectados con PRESTO (100\% de recall)
-    \item \textbf{Detección de pulsos de literatura}: 8/8 pulsos reportados por Vera-Casanova et al. (2025) (100\% de recall)
-    \item \textbf{Nuevos pulsos confirmados}: 44 eventos adicionales detectados y 100\% confirmados por astrónomos colaboradores
-    \item \textbf{Candidatos prometedores}: 101 candidatos con características morfológicas prometedoras pendientes de validación
-    \item \textbf{Total de detecciones}: 161 eventos distribuidos en múltiples archivos de observación
-\end{itemize}
-
-\paragraph{Validación de Re-detección con PRESTO}
-
-Para demostrar la efectividad del enfoque híbrido, se seleccionaron casos específicos donde pulsos previamente detectados con PRESTO fueron exitosamente re-detectados y clasificados por el pipeline DRAFTS++. Las Figuras \ref{fig:alma_presence_validation_1} y \ref{fig:alma_presence_validation_2} ilustran ejemplos representativos de esta validación.
+Las Figuras \ref{fig:alma_presence_validation_1}--\ref{fig:alma_new_candidate_validation} ilustran detecciones representativas, incluyendo re-detecciones de pulsos PRESTO y nuevos descubrimientos con morfología excepcional.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{figures/DRAFTS-HF-SNR/2017-04-03-12_56_05_230_0003_t36.548_slice121.png}
-    \caption[Re-detección PRESTO: Archivo 230\_0003, Tiempo 36.548s]{Validación de re-detección con PRESTO - Archivo 230\_0003, slice 121. El pipeline híbrido SNR + clasificación binaria detectó exitosamente dos componentes del pulso previamente identificado con PRESTO en el tiempo 36.548s. Ambos componentes muestran DM=46.9 pc cm$^{-3}$ y clasificación "BURST" con scores de detección de 0.99 y 0.43, y score de clasificación de 1.00. Los paneles inferiores muestran la transformación exitosa de la señal dispersa (Raw Waterfall) a la señal dedispersada (Dedispersed SNR), con picos de SNR de 13.8$\sigma$ y 15.8$\sigma$ respectivamente. \textit{Fuente: Elaboración propia}.}
+    \includegraphics[width=0.95\textwidth]{figures/DRAFTS-HF-SNR/2017-04-03-12_56_05_230_0003_t36.548_slice121.png}
+    \caption[Re-detección PRESTO: Archivo 230\_0003]{Re-detección exitosa de pulso PRESTO (Archivo 230\_0003, t=36.548s). El enfoque híbrido detectó dos componentes con DM=46.9 pc cm$^{-3}$ y clasificación "BURST" (scores 1.00). Los paneles inferiores muestran transformación de señal dispersa (Raw Waterfall) a dedispersada (Dedispersed SNR), con picos 13.8$\sigma$ y 15.8$\sigma$. \textit{Fuente: Elaboración propia}.}
     \label{fig:alma_presence_validation_1}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{figures/DRAFTS-HF-SNR/2017-04-03-08_16_13_0003_slice133.png}
-    \caption[Re-detección PRESTO: Archivo 142\_0003, Tiempo 39.977s]{Validación de re-detección con PRESTO - Archivo 142\_0003, slice 133. El pipeline híbrido detectó tres componentes del pulso previamente identificado con PRESTO en el tiempo 39.977s. Todos los componentes muestran DM=46.9 pc cm$^{-3}$ y clasificación "BURST" con scores de clasificación de 1.00. El panel de SNR dedispersado muestra un pico claro de 9.0$\sigma$ (block) / 8.2$\sigma$ (candidate), confirmando la efectividad del enfoque híbrido para re-detecta pulsos conocidos con alta precisión. \textit{Fuente: Elaboración propia}.}
+    \includegraphics[width=0.95\textwidth]{figures/DRAFTS-HF-SNR/2017-04-03-08_16_13_0003_slice133.png}
+    \caption[Re-detección PRESTO: Archivo 142\_0003]{Re-detección exitosa de pulso PRESTO (Archivo 142\_0003, t=39.977s). El enfoque híbrido detectó tres componentes con DM=46.9 pc cm$^{-3}$ y clasificación "BURST" (scores 1.00). SNR dedispersado muestra pico 9.0$\sigma$ (block) / 8.2$\sigma$ (candidate). Este pulso fue indetectable en Línea 1 con configuración conservadora. \textit{Fuente: Elaboración propia}.}
     \label{fig:alma_presence_validation_2}
 \end{figure}
 
-\paragraph{Descubrimiento de Nuevos Candidatos Prometedores}
-
-Además de re-detectar pulsos conocidos, el enfoque híbrido demostró capacidad excepcional para descubrir nuevos candidatos prometedores. La Figura \ref{fig:alma_new_candidate_validation} presenta un ejemplo representativo de un candidato nuevo detectado con características morfológicas excepcionales.
-
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{figures/DRAFTS-HF-SNR/2017-04-03-08_16_13_0001_slice143.png}
-    \caption[Nuevo candidato prometedor: Archivo 142\_0001, Tiempo 43.136s]{Ejemplo de nuevo candidato prometedor detectado por el pipeline híbrido - Archivo 142\_0001, slice 143. El candidato muestra DM=46.9 pc cm$^{-3}$ y clasificación "BURST" con score de clasificación de 1.00. Los paneles de SNR muestran picos excepcionales de 9.4$\sigma$ (raw y dedispersado) y 10.3$\sigma$ (candidate), con morfología claramente distinguible en los waterfall plots. Este candidato representa uno de los 101 nuevos candidatos prometedores detectados por el sistema, pendientes de validación en polarizaciones lineales y circulares. \textit{Fuente: Elaboración propia}.}
+    \includegraphics[width=0.95\textwidth]{figures/DRAFTS-HF-SNR/2017-04-03-08_16_13_0001_slice143.png}
+    \caption[Nuevo descubrimiento: Archivo 142\_0001]{Ejemplo de nuevo candidato prometedor (Archivo 142\_0001, t=43.136s). El candidato muestra DM=46.9 pc cm$^{-3}$, clasificación "BURST" (score 1.00), y picos SNR excepcionales de 9.4$\sigma$ (raw/dedispersado) y 10.3$\sigma$ (candidate). Morfología claramente distinguible en waterfalls. Representa uno de 101 candidatos prometedores pendientes de validación polarimétrica completa. \textit{Fuente: Elaboración propia}.}
     \label{fig:alma_new_candidate_validation}
 \end{figure}
 
-\paragraph{Métricas Cuantitativas del Enfoque Híbrido}
+Los resultados validan la estrategia híbrida: el clasificador ResNet18 transfiere exitosamente a alta frecuencia (scores ~1.00 para pulsos genuinos), mientras que la propuesta SNR-threshold recupera completamente todos los pulsos conocidos (16/16), superando el límite de Línea 1 (87.5\%). El descubrimiento de 44 nuevos pulsos confirmados ( x5.5 respecto a literatura) demuestra capacidad de descubrimiento científico genuino. La Precision moderada (37.3\%) refleja filosofía de diseño apropiada para sistemas exploratorios: sensibilidad máxima tolerando candidatos prometedores pendientes de validación polarimétrica.
 
-Para evaluar cuantitativamente el rendimiento del enfoque híbrido, se calcularon las métricas estándar de evaluación considerando los diferentes tipos de detecciones obtenidas:
+\subsubsection{Línea 3: Validación de Representaciones 2D Alternativas para Generación Artificial de Firmas Discriminativas}
 
-\subparagraph{Detección de Pulsos de Literatura}
-
-Con respecto a los 8 pulsos reportados por Vera-Casanova et al. (2025), el enfoque híbrido logró:
+Esta línea explora y valida representaciones 2D alternativas diseñadas para compensar la pérdida de contraste del patrón DM-tiempo en alta frecuencia, mediante la generación artificial de firmas visuales discriminativas que permiten a detectores tipo CNN mantener separabilidad frente a RFI en regímenes donde el bow-tie es irresoluble. Las estrategias propuestas incluyen:
 
 \begin{itemize}
-    \item \textbf{True Positives (TP)}: 8 pulsos de literatura detectados
-    \item \textbf{False Negatives (FN)}: 0 pulsos de literatura no detectados
-    \item \textbf{Recall}: $\frac{TP}{TP + FN} = \frac{8}{8 + 0} = 100\%$
+    \item \textbf{Espectrogramas polarimétricos multicanal (Stokes IQUV)}: Aprovechamiento de polarización extrema típica de FRBs (>50\%) versus RFI terrestre no polarizada para crear firmas multicanal coherentes
+    \item \textbf{Mapas tiempo-ancho de pulso (multi-escala temporal)}: Exploración de respuesta de señal a diferentes ventanas de integración, generando patrones tipo "triángulo invertido" característicos de pulsos astrofísicos
+    \item \textbf{Mapas tiempo-RM (rotación Faraday)}: Detección de pulsos con rotación Faraday elevada (entornos magnetizados cósmicos) distinguibles de RFI local cerca de RM=0
+    \item \textbf{Mapas de coherencia espectral}: Medición de extensión en frecuencia mediante autocorrelación espectral, distinguiendo emisiones broadband astrofísicas de RFI narrowband
+    \item \textbf{Combinación multi-representación}: Concatenación de representaciones para generar "bow-tie artificial" en espacio de características de alta dimensión
 \end{itemize}
 
-\subparagraph{Detección de Pulsos PRESTO}
+Esta línea se encuentra actualmente en implementación en rama separada del repositorio DRAFTS++ en GitHub. A la fecha no se incluyen resultados cuantitativos completos; se deja planteado el protocolo de evaluación para trabajo futuro con métricas de precisión/recobrado sobre banco de datos polarimétricos con ground truth curado por validación científica independiente.
 
-Para los 8 pulsos previamente detectados con PRESTO, el enfoque híbrido mostró:
+\subsubsection{Línea 4: Validación de Estrategias Avanzadas de Zhang para Recuperación de Morfología Dispersiva y Fishing DM-Aware (PROBABLEMENTE LO ELIMINE)}
+
+Esta línea valida dos estrategias complementarias propuestas por Yong-Kun Zhang (autor original de DRAFTS), diseñadas específicamente para abordar la compresión dispersiva en alta frecuencia mediante enfoques que preservan la filosofía DM-centrada del pipeline original. Las estrategias evaluadas son:
 
 \begin{itemize}
-    \item \textbf{True Positives (TP)}: 8 pulsos PRESTO re-detectados
-    \item \textbf{False Negatives (FN)}: 0 pulsos PRESTO no re-detectados
-    \item \textbf{Recall}: $\frac{TP}{TP + FN} = \frac{8}{8 + 0} = 100\%$
+    \item \textbf{Estrategia 1 - Expansión de rejilla DM}: Forzamiento de apertura morfológica del bow-tie mediante exploración sistemática con rangos DM ampliados y pasos más gruesos ($\gamma > 1$), permitiendo que modelos entrenados en bow-ties desarrollados recuperen sensibilidad en regímenes comprimidos
+    \item \textbf{Estrategia 2 - Fishing a DM$\approx$0 + validación DM-aware}: Detección primaria permisiva en DM mínima seguida de validación física rigurosa mediante: (i) ajuste de DM por maximización de SNR en sub-bandas, (ii) verificación de consistencia entre sub-bandas ($>$ umbral mínimo), y (iii) coherencia temporal entre chunks procesados independientemente
+    \item \textbf{Validación DM-aware multi-criterio}: Implementación de validador físico estricto que requiere dispersión medible ($\mathrm{DM}_{\mathrm{best-fit}} > \epsilon_{\mathrm{DM}}$), coherencia espectral, y consistencia temporal para discriminar señales astrofísicas genuinas de RFI residual
+    \item \textbf{Módulos de rejilla adaptativa}: Desarrollo de sistema que calcula dinámicamente parámetros de expansión ($\gamma$, $d_{\min}$) basados en características observacionales (frecuencia central, ancho de banda, resolución temporal)
 \end{itemize}
 
-\subparagraph{Evaluación Global del Sistema}
-
-Considerando todos los candidatos detectados (161 total) y su clasificación posterior:
-
-\begin{itemize}
-    \item \textbf{True Positives (TP)}: 60 eventos genuinos (8 literatura + 8 PRESTO + 44 nuevos confirmados)
-    \item \textbf{False Positives (FP)}: 101 candidatos prometedores pendientes de validación
-    \item \textbf{False Negatives (FN)}: 0 eventos conocidos no detectados
-    \item \textbf{True Negatives (TN)}: No calculable sin etiquetado completo del dataset
-\end{itemize}
-
-Con estos valores se obtienen las siguientes métricas:
-
-\begin{align}
-\text{Recall} &= \frac{TP}{TP + FN} = \frac{60}{60 + 0} = 100\% \\
-\text{Precision} &= \frac{TP}{TP + FP} = \frac{60}{60 + 101} = 37.3\% \\
-\text{F1} &= 2 \cdot \frac{\text{Precision} \cdot \text{Recall}}{\text{Precision} + \text{Recall}} = 2 \cdot \frac{0.373 \cdot 1.0}{0.373 + 1.0} = 54.4\%
-\end{align}
-
-\paragraph{Análisis Comparativo con Línea 1}
-
-La comparación directa entre la Línea 1 (pipeline clásico adaptado) y la Línea 2 (enfoque híbrido) revela mejoras dramáticas:
-
-\begin{table}[H]
-    \centering
-    \caption{Comparación de Rendimiento: Línea 1 vs. Línea 2. \textit{Fuente: Elaboración propia}.}
-    \label{tab:comparacion_lineas_alma}
-    \begin{tabular}{|l|c|c|}
-        \hline
-        \textbf{Métrica} & \textbf{Línea 1 (Clásico)} & \textbf{Línea 2 (Híbrido)} \\
-        \hline
-        Recall (Pulsos Literatura) & 87.5\% & 100\% \\
-        \hline
-        Recall (Pulsos PRESTO) & 0\% & 100\% \\
-        \hline
-        Precision & N/A & 37.3\% \\
-        \hline
-        F1-Score & N/A & 54.4\% \\
-        \hline
-        Nuevos Descubrimientos & 0 & 44 confirmados \\
-        \hline
-        Candidatos Prometedores & 0 & 101 pendientes \\
-        \hline
-    \end{tabular}
-\end{table}
-
-\paragraph{Implicaciones Científicas y Técnicas}
-
-Los resultados obtenidos con el enfoque híbrido representan un avance significativo en la detección de pulsos en el dominio de altas frecuencias. La capacidad de re-detectar 100\% de los pulsos conocidos (tanto de literatura como PRESTO) demuestra la robustez del sistema, mientras que la detección de 44 nuevos pulsos confirmados y 101 candidatos prometedores evidencia su potencial de descubrimiento científico. El balance entre sensibilidad (Recall=100\%) y precisión (Precision=37.3\%) refleja un sistema optimizado para maximizar el descubrimiento sin comprometer la detección de eventos conocidos.
-
-\subsubsection{Línea 3: Nuevos Plots Característicos}
-
-Esta línea explora representaciones 2D alternativas para compensar la pérdida de contraste del patrón DM--tiempo en alta frecuencia, por ejemplo: (i) espectrogramas polarimétricos multicanal (Stokes IQUV), (ii) mapas tiempo--ancho de pulso (multi-escala temporal), (iii) mapas tiempo--RM (rotación Faraday) y (iv) mapas de coherencia espectral. La hipótesis de validación es que estas vistas inducen firmas visuales discriminativas que permiten a detectores tipo CNN recuperar separabilidad frente a RFI en regímenes donde el \emph{bow-tie} es irrelevante. A la fecha no se incluyen resultados cuantitativos; se deja planteado el protocolo de evaluación para trabajo futuro con métricas de precisión/recobrado sobre un banco de datos polarimétricos y \emph{ground truth} curado.
-
-\subsubsection{Línea 4: Estrategias Alternativas del Autor de DRAFTS}
-
-Esta línea considera dos estrategias complementarias propuestas por el autor original de DRAFTS: (i) expansión de la rejilla de DM para forzar la apertura morfológica del \emph{bow-tie} y (ii) \emph{fishing} a DM \(\approx\) 0 con validación \emph{DM-aware} por sub-bandas y consistencia entre \emph{chunks}. Su validación requiere instrumentar módulos de búsqueda con rejillas adaptativas y validadores físicos estrictos. Aunque no se reportan resultados experimentales en esta memoria, se especifica el plan de evaluación y trazabilidad de artefactos para su futura integración y comparación directa con la Línea 2.
-
-\subsection{VALIDACIÓN POR TRANSITIVIDAD DE LA ARQUITECTURA UNIFICADA}
-
-Es importante destacar que la validación de la arquitectura unificada de DRAFTS++ se demuestra por transitividad a través de todos los resultados presentados. Cada experimento de validación se ejecutó utilizando el pipeline end-to-end completo de DRAFTS++, desde la ingesta automática de archivos hasta la generación de artefactos finales. Esta demostración por transitividad confirma que:
-
-\begin{itemize}
-    \item \textbf{Integración exitosa de Componentes 1 y 2}: Todos los resultados utilizan la infraestructura modular del Componente 1 (streaming, gestión de memoria, modelos integrados) combinada con las estrategias especializadas del Componente 2 según el régimen observacional.
-    \item \textbf{Orquestación automática}: El sistema selecciona automáticamente la estrategia apropiada (clásica vs. alta frecuencia) basándose en el criterio físico de resolubilidad $\Delta t_{\mathrm{ms}} > \alpha t_{\mathrm{samp}}$.
-    \item \textbf{Flujo end-to-end unificado}: Desde la detección automática de archivos hasta la validación científica posterior, todo el procesamiento se ejecuta en un flujo continuo sin intervención manual.
-    \item \textbf{Artefactos estandarizados}: Todos los resultados generan outputs consistentes (CSV, visualizaciones, métricas) independientemente de la estrategia de detección utilizada.
-\end{itemize}
-
-\paragraph{Estado de las Líneas 3 y 4 de Investigación}
-
-Las Líneas 3 (Nuevos Plots Característicos) y Línea 4 (Estrategias de Zhang) se encuentran actualmente en desarrollo activo en ramas separadas del repositorio de DRAFTS++ en GitHub. Estas implementaciones están aisladas del pipeline principal para permitir investigación y desarrollo independiente sin comprometer la estabilidad del sistema productivo. La validación experimental de estas líneas se realizará una vez que alcancen un estado de madurez suficiente para su integración en el pipeline principal.
-
-\subsection{VALIDACIÓN DE MÉTRICAS DE RENDIMIENTO Y ESCALABILIDAD}
-
-La validación de métricas de rendimiento y escalabilidad del sistema se demuestra a través de la verificación independiente con PRESTO de los candidatos detectados. Todos los eventos reportados (tanto los confirmados por literatura como los nuevos descubrimientos) fueron validados utilizando el pipeline clásico PRESTO, estableciendo un estándar de referencia para la evaluación de rendimiento.
-
-\paragraph{Validación Cruzada con PRESTO}
-
-Los candidatos detectados por DRAFTS++ fueron sometidos a análisis independiente con PRESTO para confirmar:
-\begin{itemize}
-    \item \textbf{Precisión temporal}: Los timestamps reportados por DRAFTS++ fueron verificados mediante análisis PRESTO independiente, confirmando precisión temporal sub-milisegunda.
-    \item \textbf{Precisión en DM}: Las medidas de dispersión reportadas fueron validadas mediante ajuste de DM independiente en PRESTO.
-    \item \textbf{SNR y calidad de señal}: Las métricas de SNR calculadas por DRAFTS++ fueron corroboradas mediante análisis espectral PRESTO.
-    \item \textbf{Escalabilidad}: La capacidad del sistema para procesar archivos de gran tamaño se demuestra mediante el procesamiento exitoso de observaciones de larga duración (117+ segundos para FRB 121102, múltiples archivos para ALMA).
-\end{itemize}
-
-Esta validación cruzada con PRESTO confirma que DRAFTS++ no solo mantiene la precisión científica de los métodos clásicos, sino que los supera en eficiencia y capacidad de descubrimiento, estableciendo las métricas de rendimiento y escalabilidad del sistema.
-
-%\subsection{ANÁLISIS COMPARATIVO DE RESULTADOS}
-
-%Los resultados de validación demuestran la efectividad diferenciada de cada bloque según su dominio de aplicación:
-
-%\begin{table}[ht]
-%    \centering
-%    \caption{Resumen de Resultados de Validación por Bloque. Fuente: Elaboración Propia.}
-%    \label{table:resultados_validacion}
-%    \begin{tabular}{|l|l|l|l|}
-%        \toprule
-%         \textbf{Métrica} & \textbf{Bajas Frecuencias} & \textbf{Altas Frecuencias} & \textbf{Total} \\
-%         \midrule
-%         Eficiencia de Detección & 97.3\% & 100\% & 98.7\% \\
-%         \midrule
-%         Nuevos Descubrimientos & 2 bursts confirmados & 44 pulsos confirmados & 46 eventos confirmados \\
-%         \midrule
-%         Candidatos Adicionales & 15 candidatos & 273 candidatos & 288 candidatos \\
-%         \midrule
-%         Archivos Procesados & FITS/Filterbank & FITS & Ambos formatos \\
-%         \bottomrule
-%     \end{tabular}
-% \end{table}
+Esta línea se encuentra actualmente en implementación en rama dedicada del repositorio DRAFTS++ en GitHub. Aunque no se reportan resultados experimentales completos en esta memoria, se especifica el plan de evaluación y trazabilidad de artefactos para su futura integración y comparación directa con Líneas 1-2, estableciendo métricas de rendimiento comparables (recall, precision, F1) bajo condiciones experimentales controladas.

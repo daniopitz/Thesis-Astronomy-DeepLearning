@@ -1,56 +1,180 @@
 \secnumbersection{MARCO CONCEPTUAL}
 
+% Redefinición de \paragraph para que el contenido comience en nueva línea
+\makeatletter
+\renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
+  {3.25ex \@plus1ex \@minus.2ex}%
+  {1.5ex \@plus .2ex}%
+  {\normalfont\normalsize\bfseries}}
+\makeatother
+
 \subsection{Propósito y Alcance del Capítulo}
 
 Este capítulo establece las bases físicas, observacionales y computacionales necesarias para comprender, diseñar y validar DRAFTS++. Cumple una función dual crítica: por un lado, proporciona el contexto científico necesario para entender el problema de la detección de FRBs, y por otro, justifica las decisiones arquitectónicas y metodológicas adoptadas en el desarrollo del sistema.
 
-Los objetivos principales incluyen: (1) contextualizar científicamente qué son los FRBs y su relevancia astronómica, (2) fundamentar técnicamente cómo funcionan los pipelines actuales y sus limitaciones, especialmente en alta frecuencia, (3) justificar metodológicamente por qué los enfoques de machine learning representan una evolución necesaria, y (4) establecer el marco de referencia para estándares, formatos de datos y criterios de evaluación.
+Se buscara contextualizar científicamente qué son los FRBs y su relevancia astronómica, ademas de fundamentar técnicamente cómo funcionan los pipelines astronómicos de FRBs actuales y sus limitaciones, especialmente en alta frecuencia, buscaremos también justificar metodológicamente por qué los enfoques de machine learning representan una evolución necesaria, y finalmente buscaremos establecer el marco de referencia para estándares, formatos de datos y criterios de evaluación.
 
-Las preguntas guía que orientan este marco son: ¿Qué son los FRBs y por qué son importantes? ¿Cómo funcionan los pipelines actuales de detección? ¿Qué desafíos plantea la alta frecuencia? ¿Cómo este marco fundamenta las decisiones de arquitectura, entrenamiento y validación del pipeline?
+Las preguntas guía que orientan este marco son: ¿Qué son los FRBs y por qué son importantes? ¿Cómo funcionan los pipelines actuales de detección? ¿Qué desafíos plantea la alta frecuencia? ¿Cómo este marco fundamenta las decisiones de arquitectura, entrenamiento y validación del pipeline?.
 
-En síntesis, el capítulo fija las coordenadas conceptuales que permiten transitar desde la fenomenología de las ráfagas rápidas de radio hasta las decisiones técnicas adoptadas en DRAFTS++. Cada sección se conecta con los requisitos que luego se materializan en el diseño, entrenamiento y validación del pipeline, asegurando que la discusión tecnológica repose sobre fundamentos astrofísicos sólidos.
+El capítulo fija las coordenadas conceptuales que permiten transitar desde la fenomenología de las ráfagas rápidas de radio hasta las decisiones técnicas adoptadas en DRAFTS++. Cada sección se conecta con los requisitos que luego se materializan en el diseño, entrenamiento y validación del pipeline, asegurando que la discusión tecnológica repose sobre fundamentos astrofísicos sólidos.
 
 \subsection{Fundamentos Físicos de los FRBs: Origen, Propiedades y Fenomenología Observacional}
 
 \subsubsection{Definición y Características Observacionales: Energética, Dispersión y Tipología}
 
-En radioastronomía, además de las fuentes permanentes o de emisión continua, existe una variedad de fenómenos transitorios caracterizados por emisiones de corta duración. Estos eventos incluyen los pulsos emitidos por púlsares y magnetares (señales periódicas o esporádicas de origen galáctico) y estallidos únicos o poco frecuentes como los Rotating Radio Transients (RRATs) y las recientemente descubiertas ráfagas rápidas de radio (\textit{Fast Radio Bursts}, FRBs) \citep{Petroff_2022}.
+En radioastronomía, además de las fuentes permanentes o de emisión continua, existe una variedad de fenómenos transitorios caracterizados por emisiones de corta duración. Estos eventos incluyen los pulsos emitidos por púlsares y magnetares (señales periódicas o esporádicas de origen galáctico), estallidos únicos o poco frecuentes como los Rotating Radio Transients (RRATs), y las ráfagas rápidas de radio (\textit{Fast Radio Bursts}, FRBs) \citep{Petroff_2022,LorimerKramer2004}.
 
-Los FRBs son pulsos de radio altamente energéticos ($10^{36}$--$10^{41}$\,erg) con duraciones que van desde microsegundos hasta milisegundos, provenientes de fuentes extragalácticas \citep{Lorimer2007}. Típicamente muestran un espectro de frecuencia amplio (decenas a cientos de MHz de ancho de banda) y una alta brillantitud, emitiendo una energía del orden de $10^{38}$--$10^{40}$\,erg en pocos milisegundos \citep{Petroff_2022}.
+Las ráfagas rápidas de radio (FRBs) se definen operacionalmente como pulsos de radio de duración milisegunda provenientes de fuentes extragalácticas, caracterizados por tres propiedades observacionales fundamentales: (1) duraciones extremadamente cortas (microsegundos hasta milisegundos), (2) alta energética (fluencias típicas de 0.1--100 Jy\,ms), y (3) dispersión temporal consistente con propagación a través del medio intergaláctico \citep{Lorimer2007,Petroff_2022}.
 
-Presentan una marcada dispersión temporal: las frecuencias más bajas del pulso llegan más tarde que las altas, siguiendo la ley de dispersión en plasma $\Delta t \propto \mathrm{DM}\,\nu^{-2}$. Este retardo se manifiesta como una curvatura característica en datos frecuencia-tiempo, cuantificada por la DM, columna integrada de electrones libres a lo largo de la línea de visión \citep{LorimerKramer2004}. Las FRBs descubiertas hasta ahora tienen DM que van desde $\sim$50 hasta varios miles de pc\,cm$^{-3}$, excediendo lo atribuible a la Vía Láctea. Muchas muestran altos grados de polarización lineal, e índices espectrales diversos \citep{CHIME2021}.
+\paragraph{Energética y Escalas Temporales}
 
-Basándose en su detección, los FRBs pueden categorizarse en dos tipos principales: \textit{one-offs}, que han sido detectados solo una vez, y \textit{repetidores}, que muestran actividad recurrente. Los estudios morfológicos de FRBs demuestran que los one-offs y repetidores tienen estructuras espectrales y temporales distintas \citep{Pleunis2021}, sugiriendo que provienen de poblaciones diferentes y potencialmente tienen orígenes distintos.
+Los FRBs exhiben luminosidades isotrópicas extraordinarias. Asumiendo que la emisión es isotrópica y corrigiendo por distancia cosmológica, la energía radiada en radiofrecuencias se estima en el rango $10^{38}$--$10^{41}$\,erg en pocos milisegundos \citep{Petroff_2022,Lorimer2007}. Esta brillantez implica temperaturas de brillo ($T_b$) que alcanzan $10^{35}$ K o más, indicando emisión coherente y procesos no térmicos extremos \citep{LorimerKramer2004}. Las duraciones observadas típicamente abarcan de $\sim$0.1 ms hasta $\sim$10 ms, aunque existen casos excepcionales con estructuras que se extienden por segundos (e.g., FRB\,20191221A) o componentes sub-milisegundos ($\sim$30 $\mu$s en FRB\,121102) \citep{Pleunis2021}. El espectro de frecuencia es amplio, con anchos de banda observados de decenas a cientos de MHz, y en algunos casos cubriendo más de una octava \citep{CHIME2021}.
 
-El amplio rango de propiedades observadas impulsa preguntas sobre su origen y evolución. Para comprender cómo se instaló el campo en la agenda científica es necesario revisar el primer hallazgo y la evolución de los catálogos, lo que da pie a la siguiente sección.
+\paragraph{Dispersión Temporal: Firma de Propagación a través del Plasma}
+
+La característica observacional más diagnóstica de los FRBs es su dispersión temporal. Cuando una señal de radio de banda ancha atraviesa el plasma del medio interestelar e intergaláctico, las ondas electromagnéticas de diferentes frecuencias viajan a distintas velocidades de grupo, produciendo un retardo temporal que depende de la frecuencia según la relación de dispersión en plasma frío:
+\begin{equation}
+\Delta t \approx 4.149 \times 10^3 \, \mathrm{ms} \times \mathrm{DM} \left[\frac{\nu_{\mathrm{low}}^{-2} - \nu_{\mathrm{high}}^{-2}}{\mathrm{GHz}^{-2}}\right]
+\end{equation}
+donde $\nu_{\mathrm{low}}$ y $\nu_{\mathrm{high}}$ son las frecuencias observadas (en GHz), y DM es la \textit{Medida de Dispersión} (\textit{Dispersion Measure}), definida como la integral de la densidad electrónica libre a lo largo de la línea de visión \citep{LorimerKramer2004,CordesMcLaughlin2003}:
+\begin{equation}
+\mathrm{DM} = \int_0^d n_e(l) \, dl
+\end{equation}
+con $n_e$ la densidad de electrones libres y $d$ la distancia a la fuente. La DM se expresa en unidades de pc\,cm$^{-3}$ (parsecs por centímetro cúbico). Este retardo se manifiesta como una curvatura característica en espectrogramas frecuencia-tiempo, donde las componentes de baja frecuencia llegan con retraso respecto a las altas, generando la firma parabólica conocida como \textit{bow-tie} o "corbata de moño" \citep{LorimerKramer2004}.
+
+Los FRBs descubiertos hasta la fecha presentan medidas de dispersión que van desde $\sim$50 pc\,cm$^{-3}$ hasta más de 3000 pc\,cm$^{-3}$ \citep{CHIME2021,Petroff_2022}. La contribución de la Vía Láctea a la DM en cualquier línea de visión (incluyendo el medio interestelar y el halo galáctico) típicamente no excede $\sim$100--150 pc\,cm$^{-3}$ para latitudes galácticas altas \citep{CordesMcLaughlin2003}. El exceso de DM por encima de la contribución galáctica ($\mathrm{DM}_{\mathrm{exc}} = \mathrm{DM}_{\mathrm{obs}} - \mathrm{DM}_{\mathrm{MW}}$) constituye la evidencia primaria del origen extragaláctico de los FRBs, reflejando la columna integrada de electrones en el medio intergaláctico y en la galaxia anfitriona.
+
+\paragraph{Propiedades Espectrales y Polarización}
+
+Las propiedades espectrales de los FRBs son diversas. Los índices espectrales reportados varían ampliamente, con algunos FRBs mostrando espectros planos ($\alpha \sim 0$), otros espectros pronunciadamente descendentes ($\alpha < -5$, donde el flujo $S_\nu \propto \nu^\alpha$), y casos con estructuras complejas de sub-bandas \citep{CHIME2021,Pleunis2021}. Esta diversidad espectral sugiere mecanismos de emisión variados o efectos de propagación complejos.
+
+Muchos FRBs exhiben polarización lineal significativa, con fracciones de polarización lineal que alcanzan hasta $\sim$100\% en algunos casos \citep{Petroff_2022}. Adicionalmente, se ha medido rotación de Faraday sustancial en varios FRBs repetidores, cuantificada por la \textit{Medida de Rotación} (RM, del inglés \textit{Rotation Measure}), que puede alcanzar valores de varios cientos a miles de rad\,m$^{-2}$, indicando la presencia de campos magnéticos intensos en entornos densos cercanos a la fuente \citep{CHIME2021}. Estas propiedades magnéticas proporcionan información crucial sobre el entorno inmediato del progenitor.
+
+\paragraph{Tipología Observacional: \textit{One-offs} y Repetidores}
+
+Basándose en el comportamiento temporal de detección, los FRBs se clasifican en dos categorías principales. Los FRBs \textit{one-off} (o aparentemente no repetidores) han sido detectados una sola vez a pesar de campañas de seguimiento extensas. Los FRBs repetidores muestran actividad recurrente, con múltiples ráfagas detectadas de la misma posición celeste \citep{Spitler2016,CHIME2021}.
+
+Los estudios morfológicos revelan diferencias sistemáticas entre estas poblaciones. Los repetidores tienden a exhibir: (1) estructuras temporales más complejas, con sub-estructuras y componentes múltiples \citep{Pleunis2021}, (2) anchos de pulso más estrechos ($<$ 1 ms típicamente), (3) DMs más altas en promedio, y (4) índices espectrales más pronunciadamente negativos en comparación con los \textit{one-offs} \citep{Pleunis2021,CHIME2021}. Estas diferencias morfológicas sugieren que los \textit{one-offs} y repetidores podrían constituir poblaciones físicamente distintas, posiblemente originadas por progenitores diferentes o capturadas en distintas etapas evolutivas, aunque la dicotomía podría también reflejar sesgos observacionales relacionados con la actividad intrínseca y la sensibilidad instrumental.
+
+El amplio rango de propiedades observadas—energética, dispersión, espectro, polarización y comportamiento temporal—plantea preguntas fundamentales sobre el origen, mecanismos de emisión y evolución de estos objetos. Para comprender cómo se estableció este campo como disciplina científica, es esencial revisar el descubrimiento inicial y la evolución posterior de los catálogos, tema que se aborda en la siguiente subsección.
 
 \subsubsection{Descubrimiento Histórico y Evolución del Campo: De la Ráfaga de Lorimer a Catálogos con Miles de Eventos}
 
-El descubrimiento inicial de un FRB en 2007, conocido como la ráfaga de Lorimer, marcó un hito al detectar un pulso de $\sim$5 ms cuya intensidad y retardo por dispersión sugerían que provenía de fuera de nuestra galaxia \citep{Lorimer2007}. Se reporto este evento excepcional en la banda de 1.4\,GHz, con un DM de 375\,pc\,cm$^{-3}$, mucho mayor al esperado por el contenido de electrones en la Vía Láctea, lo que implicaba un origen cosmológico \citep{Lorimer2007,CordesMcLaughlin2003}.
+El campo de los FRBs nació formalmente con la publicación del descubrimiento de la "ráfaga de Lorimer" (FRB\,010724, posteriormente renombrado FRB\,20010724) por Lorimer et al. en 2007 \citep{Lorimer2007}. Este evento fue detectado mediante análisis retrospectivo de datos de archivo del radiotelescopio Parkes (Australia), obtenidos originalmente durante observaciones de púlsares en 2001. El pulso exhibió una duración de $\sim$5 ms, una fluencia de 30 Jy\,ms a 1.4 GHz, y una medida de dispersión de 375 pc\,cm$^{-3}$ \citep{Lorimer2007}. Esta DM excedía considerablemente el valor máximo esperado de la contribución galáctica en esa línea de visión ($\mathrm{DM}_{\mathrm{MW}} \sim 50$ pc\,cm$^{-3}$, según el modelo NE2001 \citep{CordesMcLaughlin2003}), proporcionando la primera evidencia convincente de un pulso de radio transitorio de origen extragaláctico.
 
-Desde entonces, numerosos radiotelescopios y búsquedas ciegas han descubierto centenares de FRBs; catálogos recientes han consolidado varios miles de eventos y fuentes \citep{CHIME2021,CHIMEFRB_2021_Catalog1}. La evolución del campo ha sido extraordinaria: de un evento aislado a miles de detecciones, estableciendo los FRBs como una nueva clase de fenómenos astrofísicos extremos con implicancias cosmológicas significativas \citep{Petroff_2022}.
+La interpretación cosmológica del evento fue reforzada por la ausencia de contrapartes en otras longitudes de onda y la imposibilidad de explicar la alta DM mediante estructuras locales en la Vía Láctea \citep{Lorimer2007}. Estimaciones basadas en la relación DM-distancia para el medio intergaláctico sugirieron un corrimiento al rojo $z \sim 0.3$, situando la fuente a distancias cosmológicas ($\sim$1 Gpc), con implicaciones energéticas extraordinarias ($\sim 10^{40}$ erg en radiofrecuencias) \citep{Lorimer2007}.
 
- El salto desde un único burst a catálogos con miles de eventos habilita estudios estadísticos sobre la población. Esto motiva describir la diversidad observacional (DM, RM, anchos, entornos) que hoy caracteriza al campo y que orienta estrategias de detección.
+Inicialmente, existió escepticismo en la comunidad sobre si este evento representaba un fenómeno astrofísico genuino o un artefacto instrumental. Sin embargo, descubrimientos subsiguientes de eventos similares—incluyendo la ráfaga de Thornton y otros transientes detectados por Parkes, Arecibo, y posteriormente por el Green Bank Telescope (GBT)—consolidaron la realidad de esta nueva clase de fenómenos \citep{Petroff_2022}. Un hito crítico fue el descubrimiento del primer FRB repetidor, FRB\,121102, en 2016 \citep{Spitler2016}, que demostró inequívocamente que al menos algunos FRBs provienen de fuentes persistentes localizables, eliminando modelos cataclísmicos de evento único y permitiendo localizaciones precisas mediante interferometría.
+
+La tasa de descubrimientos se aceleró dramáticamente con la entrada en operación del Canadian Hydrogen Intensity Mapping Experiment (CHIME) en 2018, cuyo amplio campo de visión ($\sim$200 grados cuadrados) y capacidad de monitoreo continuo permitieron detectar decenas de FRBs por mes \citep{CHIME2021}. El primer catálogo de CHIME/FRB, publicado en 2021, reportó 536 eventos detectados entre 2018 y 2019 \citep{CHIMEFRB_2021_Catalog1}, incrementando el censo conocido en más de un orden de magnitud. Publicaciones subsiguientes han ampliado este catálogo a varios miles de eventos, estableciendo una base estadística robusta para caracterizar la población \citep{CHIME2021}.
+
+En paralelo, otros instrumentos han contribuido significativamente al censo: el Australian Square Kilometre Array Pathfinder (ASKAP) ha detectado y localizado FRBs con precisión de segundos de arco mediante su sistema de formación de haces (fly's eye), permitiendo identificar galaxias anfitrionas y medir corrimientos al rojo directamente \citep{Petroff_2022}; el Five-hundred-meter Aperture Spherical radio Telescope (FAST) en China ha revelado miles de ráfagas de repetidores activos como FRB\,121102 y FRB\,20190520B \citep{zhang2024drafts}; y el Deep Synoptic Array (DSA-110) ha demostrado localización sub-segundo-de-arco en tiempo real.
+
+La evolución del campo en menos de dos décadas—desde un único evento archivado hasta catálogos con miles de detecciones y decenas de fuentes localizadas—ha sido extraordinaria. Los FRBs han pasado de ser una curiosidad observacional a constituir una herramienta cosmológica prometedora para mapear la distribución de materia bariónica en el universo, sondear campos magnéticos intergalácticos, y estudiar física de plasmas en condiciones extremas \citep{Petroff_2022}. El salto desde detecciones individuales a estudios estadísticos poblacionales habilita ahora análisis sistemáticos de correlaciones entre propiedades observacionales (DM, RM, espectro, morfología temporal) y características de las galaxias anfitrionas, orientando estrategias de búsqueda y refinando modelos de progenitores. Esta abundancia de datos motiva el desarrollo de técnicas de detección más eficientes y completas, tema central de esta tesis.
 
 \subsubsection{Casos Emblemáticos de Repetidores: FRB 121102, FRB 20180916B y FRB 20190520B como Laboratorios de Referencia}
 
-Un subconjunto de FRBs, en particular FRB\,121102, FRB\,20180916B y FRB\,20190520B, exhibe actividad repetitiva y entornos densos \citep{CHIME2021,Niu2022_FRB20190520B}. Estos objetos se han transformado en laboratorios de referencia, ya que permiten correlacionar propiedades temporales, espectrales y ambientales con modelos de emisión y canal de dispersión.
+La naturaleza recurrente de ciertos FRBs los convierte en objetivos privilegiados para estudios multi-época y multi-longitud de onda, permitiendo caracterizar sistemáticamente sus propiedades de emisión, entornos locales, y posibles mecanismos físicos. Tres fuentes repetidoras han emergido como casos emblemáticos que han transformado nuestra comprensión del fenómeno: FRB\,121102, FRB\,20180916B, y FRB\,20190520B. Estos objetos sirven como "laboratorios de referencia" por su abundante actividad, propiedades bien caracterizadas, y diversidad de comportamientos observados \citep{Spitler2016,CHIME_FRB_Collaboration_2020,Niu2022_FRB20190520B}.
 
-El FRB 121102 fue el primer repetidor confirmado \citep{Spitler2016}. Su localización precisa en una galaxia enana de baja metalicidad y formación estelar activa a $z = 0.19273(8)$ \citep{2017Natur.541...58C,Tendulkar2017}, junto a su asociación con una fuente de radio persistente, aportó evidencia sólida de que los FRBs pueden residir en entornos extremos y compactos. Estudios de cadencia revelaron periodicidades en su actividad: inicialmente 157 días \citep{2020MNRAS.495.3551R} y luego refinadas a 161.3 días con una ventana activa del $\sim$60\% \citep{cruces2020frb121102}. Su abundante producción de bursts lo convierte en un dataset de entrenamiento y validación idóneo para pipelines de detección, incluido nuestro DRAFTS++ \citep{zhang2024drafts}.
+\paragraph{FRB 121102: El Primer Repetidor y Arquetipo del Campo}
 
-Por otro lado, FRB 20180916B exhibe periodicidad de 16.35 días con una ventana activa del $\sim$31\%, lo que facilita campañas coordinadas multi-longitud de onda \citep{CHIME_FRB_Collaboration_2020}. Por su parte, FRB 20190520B combina repetición con una fuente de radio persistente y alta DM extragaláctica, reforzando la conexión con entornos densos \citep{Niu2022_FRB20190520B}. Estos casos complementan a FRB 121102 y brindan contraste para estudiar cómo el entorno y la periodicidad condicionan la morfología de las ráfagas.
+FRB\,121102 (descubierto en 2012 en el Arecibo PALFA survey) fue el primer FRB confirmado como repetidor mediante la detección de 10 ráfagas adicionales en 2015 \citep{Spitler2016}. Este descubrimiento fue transformador: demostró inequívocamente que al menos algunos FRBs provienen de fuentes no cataclísmicas capaces de emitir repetidamente, descartando modelos de evento único como fusiones de objetos compactos o colapsos estelares para esta subpoblación.
 
-El perfil diverso de los repetidores genuinos sugiere la necesidad de modelos progenitores capaces de sostener actividad recurrente y entornos magnetizados. Esto conduce naturalmente a la discusión sobre magnetares y otros escenarios, tratada en la siguiente subsubsección.
+La localización interferométrica de alta precisión mediante observaciones con el Very Large Array (VLA) situó FRB\,121102 en una galaxia enana de baja metalicidad y formación estelar vigorosa a $z = 0.19273(8)$, correspondiente a una distancia comóvil de $\sim$970 Mpc \citep{2017Natur.541...58C,Tendulkar2017}. La galaxia anfitriona exhibe una tasa de formación estelar específica excepcionalmente alta ($\sim$0.3 M$_\odot$ yr$^{-1}$) y baja metalicidad ($\sim$0.2 Z$_\odot$), características típicas de ambientes propicios para magnetares jóvenes \citep{Tendulkar2017}.
+
+Un hallazgo notable fue la asociación de FRB\,121102 con una fuente de radio persistente compacta (< 0.7 pc) de luminosidad $\sim 10^{29}$ erg s$^{-1}$ Hz$^{-1}$ \citep{2017Natur.541...58C}. Esta fuente persistente, interpretada como un remanente de viento de púlsar o nebulosa de viento de magnetar, sugiere que el FRB reside en un entorno magnetizado denso. Consistentemente, observaciones polarimétricas revelaron una medida de rotación extremadamente alta (RM $\sim$ +$10^{5}$ rad m$^{-2}$, con variaciones temporales), indicando campos magnéticos de varios mG en el entorno inmediato de la fuente \citep{CHIME2021}.
+
+Análisis de cadencia temporal de miles de ráfagas detectadas por múltiples telescopios (Arecibo, GBT, Effelsberg, FAST) han revelado periodicidades en la actividad de FRB\,121102. Inicialmente se reportó un periodo de 157 días \citep{2020MNRAS.495.3551R}, posteriormente refinado a 161.3 $\pm$ 1.5 días con una ventana activa del $\sim$60\% del ciclo \citep{cruces2020frb121102}. El mecanismo de esta periodicidad permanece debatido, con propuestas que incluyen precesión del eje de emisión, modulación orbital en un sistema binario, o ciclos de actividad magnética \citep{cruces2020frb121102}.
+
+Desde la perspectiva metodológica, FRB\,121102 constituye un recurso invaluable. Su prolífica producción de ráfagas (miles detectadas hasta la fecha) proporciona el conjunto de datos más extenso disponible para desarrollar, entrenar y validar algoritmos de detección automática, incluido el pipeline DRAFTS++ que se presenta en esta tesis \citep{zhang2024drafts}.
+
+\paragraph{FRB 20180916B: Periodicidad Corta y Campañas Multi-longitud de Onda}
+
+FRB\,20180916B, descubierto por CHIME en 2018, se distingue por su periodicidad marcada de 16.35 días con una ventana activa del $\sim$31\% ($\sim$5 días) del ciclo \citep{CHIME_FRB_Collaboration_2020}. Esta periodicidad relativamente corta, comparada con FRB\,121102, facilita campañas de seguimiento coordinadas multi-instrumento y multi-longitud de onda durante las fases activas predichas.
+
+Localización interferométrica con el European VLBI Network situó la fuente en una galaxia espiral masiva a $z = 0.0337$ ($\sim$150 Mpc), contrastando con el entorno de galaxia enana de FRB\,121102 \citep{CHIME_FRB_Collaboration_2020}. Esta diferencia en tipo de galaxia anfitriona sugiere que repetidores pueden originarse en diversos ambientes galácticos, posiblemente reflejando distintas edades o canales evolutivos.
+
+Observaciones multi-frecuencia han revelado una correlación entre la fase del ciclo de actividad y las frecuencias en las que se detectan las ráfagas: las emisiones de alta frecuencia ($>$600 MHz) tienden a ocurrir al inicio de la ventana activa, mientras que las de baja frecuencia ($<$400 MHz) predominan hacia el final \citep{CHIME_FRB_Collaboration_2020}. Este comportamiento espectral evolutivo dentro del ciclo sugiere modulación del medio de propagación o cambios intrínsecos en el mecanismo de emisión.
+
+FRB\,20180916B ha sido objeto de intensas campañas en rayos X, óptico, e infrarrojo durante ventanas activas, sin contrapartes confirmadas hasta la fecha, imponiendo límites restrictivos sobre modelos que predicen emisión significativa en otras bandas \citep{Petroff_2022}.
+
+\paragraph{FRB 20190520B: Entorno Extremo y Fuente Persistente}
+
+FRB\,20190520B, detectado por FAST en 2019, combina características que lo convierten en un caso particularmente intrigante \citep{Niu2022_FRB20190520B}. Similar a FRB\,121102, exhibe: (1) actividad repetitiva proliferada (cientos de ráfagas detectadas), (2) asociación con una fuente de radio persistente compacta, y (3) una DM excepcionalmente alta (DM $\sim$ 1205 pc cm$^{-3}$) para su corrimiento al rojo relativamente bajo ($z = 0.241$), sugiriendo un exceso de DM local de varios cientos de pc cm$^{-3}$ \citep{Niu2022_FRB20190520B}.
+
+Este exceso de DM local implica que FRB\,20190520B reside en un entorno circundante extraordinariamente denso, posiblemente una nebulosa de viento de magnetar o remanente de supernova joven. Observaciones polarimétricas revelan RM variable temporalmente con valores absolutos de $|$RM$| \sim 10^4$ rad m$^{-2}$, consistente con campos magnéticos de varios mG en un medio denso ($n_e \sim 10^2$ cm$^{-3}$) \citep{Niu2022_FRB20190520B}.
+
+Adicionalmente, FRB\,20190520B muestra variación temporal de la DM del orden de $\sim$1--2 pc cm$^{-3}$ en escalas de semanas a meses, fenómeno interpretado como evidencia de evolución del medio circundante o cambios en la línea de visión a través de estructuras inhomogéneas \citep{Niu2022_FRB20190520B}. Estas variaciones dinámicas proporcionan una sonda única de la física del medio cercano al progenitor.
+
+\paragraph{Síntesis: Implicaciones para Modelos de Progenitores}
+
+Estos tres repetidores emblemáticos exhiben simultáneamente propiedades comunes y diferencias significativas. Las similitudes—actividad recurrente, entornos densos y magnetizados, asociaciones con fuentes persistentes en algunos casos—apuntan hacia una clase de progenitores relacionados, posiblemente magnetares jóvenes en distintas etapas evolutivas o configuraciones ambientales. Las diferencias—periodicidades distintas (o ausencia detectable de periodicidad en algunos casos), tipos diversos de galaxias anfitrionas, variabilidad espectral y temporal—sugieren que el fenómeno de repetición puede manifestarse en un rango de condiciones físicas.
+
+Estos casos de referencia han sido fundamentales para refinar modelos teóricos, establecer estrategias observacionales optimizadas, y proporcionar conjuntos de datos ricos para desarrollo y validación de pipelines automáticos de detección. La diversidad observada entre repetidores motiva el desarrollo de modelos de progenitores suficientemente flexibles para acomodar esta variedad, tema que se desarrolla en la siguiente subsección.
 
 \subsubsection{Progenitores y Mecanismos de Emisión: El Rol de los Magnetares y Escenarios Alternativos}
 
-La identificación de progenitores de FRBs ha sido uno de los desafíos más importantes del campo. El descubrimiento de SGR 1935+2154 como fuente de un FRB galáctico \citep{Bochenek2020,CHIME_SGR2020} proporcionó la primera evidencia directa de que los magnetares pueden producir FRBs, estableciendo este modelo como el "leading case" para explicar al menos una fracción significativa de la población.
+La identificación de los progenitores físicos de los FRBs—los objetos astrofísicos responsables de estas emisiones extraordinarias—ha constituido uno de los desafíos centrales del campo desde su inicio. La diversidad de propiedades observadas (energética, duración, repetición, entorno) sugiere que múltiples canales físicos podrían contribuir a la población de FRBs. No obstante, evidencia observacional reciente ha convergido hacia los magnetares como progenitores primarios, al menos para una fracción significativa de los eventos, particularmente los repetidores.
 
-Los magnetares son estrellas de neutrones con campos magnéticos extremos ($B \sim 10^{14}$--$10^{15}$ G) que pueden producir emisiones de radio coherentes a través de mecanismos de reconexión magnética, choques magnetosféricos o erupciones de superficie \citep{Bochenek2020}. La evidencia de SGR 1935+2154, que produjo un FRB con propiedades similares a los extragalácticos, sugiere que los FRBs repetidores podrían originarse en magnetares jóvenes o en entornos magnetizados densos \citep{CHIME_SGR2020}.
+\paragraph{Evidencia Directa: SGR 1935+2154 y la Conexión con Magnetares Galácticos}
 
-Una de las explicaciones para el comportamiento periódico de los FRBs es un escenario de formación que involucra un sistema binario, donde la periodicidad surge del período orbital. Otra posibilidad, señalada específicamente para FRB 20180916B, es que la periodicidad se debe a la precesión de un magnetar \citep{Feng2024}. Aunque aún no conocemos el origen exacto de estos FRBs, su comportamiento periódico facilita las observaciones de seguimiento y las campañas multi-longitud de onda, permitiendo caracterizar su extensión de emisión y constreñir su fuente progenitora.
+El hito definitivo en la identificación de progenitores ocurrió el 28 de abril de 2020, cuando el magnetar galáctico SGR\,1935+2154—previamente conocido por sus emisiones de rayos X y gamma—produjo una ráfaga de radio brillante simultáneamente detectada por múltiples instrumentos, incluyendo CHIME/FRB y el experimento STARE2 \citep{Bochenek2020,CHIME_SGR2020}. Esta ráfaga exhibió propiedades características de FRBs extragalácticos: duración milisegunda ($\sim$1 ms), estructura de doble pico, y polarización lineal significativa.
 
-Otros escenarios propuestos incluyen sistemas binarios compactos, colapsos de estrellas masivas, y fusiones de objetos compactos, pero la evidencia observacional favorece actualmente el modelo de magnetar como mecanismo principal para la producción de FRBs \citep{Petroff_2022}.
+La fluencia observada ($\sim$1.5 MJy\,ms a 600 MHz) fue varios órdenes de magnitud más intensa que los pulsos de radio típicos de magnetares, pero comparable a FRBs extragalácticos una vez extrapolada a distancias cosmológicas. Específicamente, si SGR\,1935+2154 (a $\sim$5 kpc) se situara a la distancia de, por ejemplo, FRB\,121102 ($\sim$1 Gpc), su fluencia aparente sería $\sim$0.1--1 Jy\,ms, perfectamente consistente con FRBs típicos \citep{Bochenek2020}.
+
+Este evento proporcionó la primera evidencia directa e inequívoca de que los magnetares pueden producir emisiones tipo FRB, validando años de especulación teórica. Adicionalmente, la asociación con una erupción de rayos X/gamma establece un vínculo entre la actividad magnetosférica extrema y la emisión de radio coherente \citep{CHIME_SGR2020}.
+
+\paragraph{Magnetares: Física Fundamental y Mecanismos de Emisión}
+
+Los magnetares son estrellas de neutrones con campos magnéticos superficiales extraordinariamente intensos, $B_{\mathrm{surf}} \sim 10^{14}$--$10^{15}$ G, excediendo el campo magnético crítico cuántico $B_Q \equiv m_e^2 c^3 / (e\hbar) \simeq 4.4 \times 10^{13}$ G \citep{Bochenek2020}. Estos campos extremos pueden decaer en escalas de tiempo de $10^3$--$10^4$ años, liberando energía magnética mediante reconexión, fracturamiento de la corteza, o inestabilidades magnetosféricas.
+
+Los mecanismos propuestos para la generación de FRBs en magnetares incluyen:
+
+\begin{itemize}
+    \item \textbf{Reconexión magnética:} Reconfiguración súbita de líneas de campo magnético libera energía ($\sim 10^{40}$--$10^{42}$ erg) en forma de partículas relativistas que, al moverse en el campo magnético intenso, generan emisión coherente de radio vía mecanismos de maser síncrotron-curvatura o plasma \citep{Bochenek2020}.
+    
+    \item \textbf{Choques magnetosféricos:} Eyecciones de plasma desde la superficie del magnetar generan frentes de choque que aceleran partículas, produciendo emisión coherente mediante inestabilidades de haces de partículas \citep{Petroff_2022}.
+    
+    \item \textbf{Interacción con material circumestelar:} Para magnetares jóvenes embebidos en remanentes de supernova o nebulosas de viento, la interacción del viento relativista del magnetar con el medio denso circundante puede amplificar la emisión o modular el espectro observado \citep{Tendulkar2017}.
+\end{itemize}
+
+Estos procesos ocurren en escalas espaciales compactas ($\sim$10--100 km) y temporales extremadamente cortas (microsegundos a milisegundos), consistentes con las duraciones y brillanteces observadas en FRBs.
+
+\paragraph{Periodicidad en FRBs: Precesión, Orbitalidad y Modulación Ambiental}
+
+La periodicidad observada en FRB\,121102 (161.3 días) y FRB\,20180916B (16.35 días) plantea interrogantes sobre su origen físico. Varios escenarios han sido propuestos:
+
+\begin{itemize}
+    \item \textbf{Precesión del magnetar:} Si el eje magnético del magnetar no está alineado con su eje de rotación, la precesión libre del cuerpo rígido puede modular geométricamente la emisión, haciendo que el haz de emisión barra periódicamente nuestra línea de visión \citep{Feng2024}. Los periodos de precesión de $\sim$10--100 días son compatibles con parámetros físicos razonables de magnetares jóvenes.
+    
+    \item \textbf{Sistema binario:} Un magnetar en órbita con una estrella compañera (e.g., estrella de helio, enana blanca) podría experimentar modulación orbital de la emisión o del medio de propagación. La periodicidad reflejaría el periodo orbital, con la ventana activa correspondiendo a fases orbitales específicas donde la geometría favorece la detección \citep{Petroff_2022}.
+    
+    \item \textbf{Modulación por viento estelar:} En configuraciones binarias, el viento de la estrella compañera podría modular la dispersión, scattering, o absorción de la señal de radio del magnetar, generando ventanas de visibilidad periódicas \citep{CHIME_FRB_Collaboration_2020}.
+\end{itemize}
+
+La distinción observacional entre estos escenarios requiere mediciones detalladas de la evolución de la DM, RM, y propiedades espectrales a través del ciclo, junto con búsquedas de contrapartes ópticas/infrarrojas de posibles compañeras.
+
+\paragraph{Escenarios Alternativos y Poblaciones Mixtas}
+
+Aunque el modelo de magnetar ha ganado preeminencia, escenarios alternativos permanecen viables para explicar subpoblaciones de FRBs, particularmente los \textit{one-offs}:
+
+\begin{itemize}
+    \item \textbf{Fusiones de objetos compactos:} Fusiones de estrellas de neutrones binarias o de estrella de neutrones con agujero negro podrían producir un único FRB brillante asociado con el evento cataclísmico, aunque la falta de contrapartes gravitacionales o electromagnéticas consistentes limita este modelo \citep{Petroff_2022}.
+    
+    \item \textbf{Colapso de estrellas supramasivas:} Estrellas supramasivas rotantes colapsando a estrellas de neutrones o agujeros negros podrían generar emisiones transitorias de radio, aunque la tasa esperada es baja comparada con las tasas de detección observadas.
+    
+    \item \textbf{Cúspides de densidad en halos de materia oscura:} Modelos exóticos proponen que aniquilación o desintegración de partículas de materia oscura en cúspides densas podría producir señales de radio, aunque carecen de predicciones específicas verificables.
+\end{itemize}
+
+Es plausible que la población de FRBs sea heterogénea, con repetidores predominantemente originados por magnetares jóvenes en entornos densos, y \textit{one-offs} potencialmente incluyendo tanto magnetares viejos con baja tasa de actividad como contribuciones de eventos cataclísmicos raros.
+
+\paragraph{Implicaciones Observacionales y Estrategias de Seguimiento}
+
+La conexión establecida entre magnetares y FRBs tiene implicaciones directas para estrategias observacionales. La periodicidad predicha en repetidores facilita campañas de seguimiento coordinadas multi-longitud de onda durante ventanas activas, permitiendo: (1) búsquedas de contrapartes en rayos X/gamma coincidentes con ráfagas de radio, (2) caracterización de la evolución espectral y temporal dentro del ciclo de actividad, y (3) mediciones de variaciones de DM/RM que sondean el entorno circundante dinámico \citep{CHIME_FRB_Collaboration_2020,Niu2022_FRB20190520B}.
+
+Para \textit{one-offs}, la localización precisa y caracterización de galaxias anfitrionas (tipo morfológico, tasa de formación estelar, metalicidad) proporciona restricciones estadísticas sobre progenitores, distinguiendo entre modelos que predicen asociación con formación estelar activa (magnetares jóvenes) versus poblaciones estelares viejas (fusiones de sistemas compactos antiguos).
+
+El consenso emergente posiciona a los magnetares como el mecanismo primario para FRBs repetidores, con evidencia directa proporcionada por SGR\,1935+2154 y evidencia circunstancial de entornos densos y magnetizados observados en FRB\,121102 y FRB\,20190520B. La naturaleza de los \textit{one-offs} permanece más incierta, posiblemente reflejando una mezcla de magnetares de baja actividad y eventos cataclísmicos raros. La identificación definitiva de progenitores requiere continuar la caracterización multi-longitud de onda sistemática de FRBs localizados y sus entornos, un esfuerzo que se beneficiará críticamente de pipelines de detección eficientes y completos como DRAFTS++.
 
 \subsection{Magnetares y el Potencial del Régimen de Alta Frecuencia}
 

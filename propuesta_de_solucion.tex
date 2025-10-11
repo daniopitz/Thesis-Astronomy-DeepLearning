@@ -921,8 +921,6 @@ La detección primaria consiste en seleccionar instantes $t_i$ tales que $\mathr
 
 En frecuencias milimétricas, la ausencia de la firma dispersiva clásica (``bow-tie'') elimina el principal discriminador visual entre señales astrofísicas genuinas e interferencia de radiofrecuencia. Esta pérdida de información morfológica requiere la exploración de representaciones 2D alternativas que capturen características distintivas de pulsos cósmicos en regímenes donde $\Delta t_{\mathrm{ms}} \ll t_{\mathrm{samp}}$. Las siguientes propuestas de \textit{plots} característicos buscan ``engañar'' a las redes neuronales de detección mediante la generación artificial de patrones visuales que permitan la identificación de FRBs a pesar de la compresión dispersiva.
 
-\paragraph{Estado de Desarrollo}
-
 La implementación de las representaciones 2D alternativas se encuentra actualmente en desarrollo activo en una rama separada del repositorio de DRAFTS++ en GitHub. Esta línea de investigación está aislada del pipeline principal para permitir experimentación y refinamiento independiente sin comprometer la estabilidad del sistema productivo. La integración en el pipeline unificado se realizará una vez que las implementaciones alcancen un estado de madurez suficiente para su validación experimental completa.
 
 \paragraph{Espectrograma Dinámico Polarimétrico (Tiempo–Frecuencia con Stokes IQUV)}
@@ -963,11 +961,9 @@ donde $\mathbf{I}_{\mathrm{width}}$, $\mathbf{I}_{\mathrm{RM}}$, y $\mathbf{I}_{
 
 Esta estrategia de ``engaño neuronal'' preserva la filosofía DM-centrada de DRAFTS mientras adapta la detección a regímenes donde la dispersión temporal es despreciable, manteniendo la capacidad discriminativa mediante representaciones alternativas que capturan aspectos fundamentales de la física de pulsos astrofísicos.
 
-\subsubsection{Línea 4: Estrategias Alternativas del Autor de DRAFTS}
+\subsubsection{Línea 4: Estrategias Alternativas del Autor de DRAFTS (PROBABLEMENTE LO ELIMINE)}
 
 En respuesta a los desafíos específicos de detección de FRBs en frecuencias milimétricas, \textbf{Yong-Kun Zhang}, autor original de DRAFTS, ha propuesto dos estrategias complementarias para abordar la atenuación del retardo dispersivo en regímenes de alta frecuencia. Estas propuestas surgen directamente de la limitación fundamental del paradigma DM-centrado: cuando $\Delta t_{\mathrm{ms}} \ll t_{\mathrm{samp}}$, la firma dispersiva \textit{bow-tie} se comprime hasta volverse indistinguible del ruido, eliminando la capacidad discriminativa principal entre señales astrofísicas genuinas e interferencia de radiofrecuencia (RFI).
-
-\paragraph{Estado de Desarrollo}
 
 Las estrategias alternativas de Zhang se encuentran actualmente en implementación en una rama dedicada del repositorio de DRAFTS++ en GitHub. Esta línea de investigación está siendo desarrollada de forma aislada para permitir experimentación extensiva con los algoritmos de expansión de rejilla DM y validación DM-aware, sin afectar la estabilidad del pipeline principal. La integración completa en el sistema unificado se realizará tras la validación experimental de estas estrategias avanzadas.
 
