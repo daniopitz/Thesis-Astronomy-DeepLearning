@@ -317,29 +317,60 @@ Las Figuras \ref{fig:alma_presence_validation_1}--\ref{fig:alma_new_candidate_va
 
 Los resultados validan la estrategia híbrida: el clasificador ResNet18 transfiere exitosamente a alta frecuencia (scores ~1.00 para pulsos genuinos), mientras que la propuesta SNR-threshold recupera completamente todos los pulsos conocidos (16/16), superando el límite de Línea 1 (87.5\%). El descubrimiento de 44 nuevos pulsos confirmados ( x5.5 respecto a literatura) demuestra capacidad de descubrimiento científico genuino. La Precision moderada (37.3\%) refleja filosofía de diseño apropiada para sistemas exploratorios: sensibilidad máxima tolerando candidatos prometedores pendientes de validación polarimétrica.
 
-\subsubsection{Línea 3: Validación de Representaciones 2D Alternativas para Generación Artificial de Firmas Discriminativas}
+\paragraph{Caso Excepcional: Detección de Pulso Único con Morfología Temporal Extendida}
 
-Esta línea explora y valida representaciones 2D alternativas diseñadas para compensar la pérdida de contraste del patrón DM-tiempo en alta frecuencia, mediante la generación artificial de firmas visuales discriminativas que permiten a detectores tipo CNN mantener separabilidad frente a RFI en regímenes donde el bow-tie es irresoluble. Las estrategias propuestas incluyen:
+Un resultado particularmente notable de la Línea 2 corresponde a la detección de un **pulso único** del magnetar PSR J1745-2900 con morfología temporal excepcionalmente extendida, observado en slices consecutivos del archivo 2017-04-03-12\_47\_05\_0002. Este evento, obtenido con una ventana de análisis de 2 segundos y downsampling de 1080, presenta características que contrastan significativamente con pulsos típicos de magnetares, manifestándose como múltiples componentes temporales del mismo pulso principal.
 
-\begin{itemize}
-    \item \textbf{Espectrogramas polarimétricos multicanal (Stokes IQUV)}: Aprovechamiento de polarización extrema típica de FRBs (>50\%) versus RFI terrestre no polarizada para crear firmas multicanal coherentes
-    \item \textbf{Mapas tiempo-ancho de pulso (multi-escala temporal)}: Exploración de respuesta de señal a diferentes ventanas de integración, generando patrones tipo "triángulo invertido" característicos de pulsos astrofísicos
-    \item \textbf{Mapas tiempo-RM (rotación Faraday)}: Detección de pulsos con rotación Faraday elevada (entornos magnetizados cósmicos) distinguibles de RFI local cerca de RM=0
-    \item \textbf{Mapas de coherencia espectral}: Medición de extensión en frecuencia mediante autocorrelación espectral, distinguiendo emisiones broadband astrofísicas de RFI narrowband
-    \item \textbf{Combinación multi-representación}: Concatenación de representaciones para generar "bow-tie artificial" en espacio de características de alta dimensión
-\end{itemize}
+El análisis de los slices consecutivos revela **13 componentes temporales** distribuidos en ~0.6 segundos, todos caracterizados por DM=46.9 pc cm$^{-3}$ y clasificación "BURST" con scores perfectos (1.00). El slice 036 (10.801-11.101s) presenta 7 componentes con SNR crudo de 6.1$\sigma$ y candidato optimizado de 7.3$\sigma$, mientras que el slice 037 (11.101-11.401s) muestra 6 componentes adicionales con SNR candidato de 8.3$\sigma$ y ancho temporal extendido de ~30.7 ms, considerablemente mayor que pulsos típicos.
 
-Esta línea se encuentra actualmente en implementación en rama separada del repositorio DRAFTS++ en GitHub. A la fecha no se incluyen resultados cuantitativos completos; se deja planteado el protocolo de evaluación para trabajo futuro con métricas de precisión/recobrado sobre banco de datos polarimétricos con ground truth curado por validación científica independiente.
+La **secuencia temporal continua** de 13 componentes corresponde a un pulso único con estructura temporal excepcionalmente compleja, sugiriendo mecanismos físicos específicos: dispersión temporal intrínseca por plasma circumpulsar denso, scattering múltiple en el medio interestelar, o emisión con estructura de haz compleja. El análisis polarimétrico independiente (Figura \ref{fig:pulso_polarimetrico}) revela polarización lineal dominante (~13-14$\sigma$) sobre circular (~4-5$\sigma$), confirmando la naturaleza de emisión de púlsar con espectro dinámico de banda ancha uniforme (85.25-87.00 GHz).
 
-\subsubsection{Línea 4: Validación de Estrategias Avanzadas de Zhang para Recuperación de Morfología Dispersiva y Fishing DM-Aware (PROBABLEMENTE LO ELIMINE)}
+Este resultado demuestra la capacidad excepcional del enfoque híbrido para **resolver estructura temporal fina** de pulsos con morfología extendida, **mantener especificidad alta** identificando correctamente múltiples componentes del mismo evento, y **capturar pulsos de ancho temporal atípico** que escapan a detectores basados exclusivamente en patrones dispersivos desarrollados. La capacidad de detectar un pulso único manifestado como 13 componentes temporales distintos representa un logro significativo en la caracterización de emisiones de magnetares en alta frecuencia.
 
-Esta línea valida dos estrategias complementarias propuestas por Yong-Kun Zhang (autor original de DRAFTS), diseñadas específicamente para abordar la compresión dispersiva en alta frecuencia mediante enfoques que preservan la filosofía DM-centrada del pipeline original. Las estrategias evaluadas son:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{figures/DRAFTS-HF-SNR/2017-04-03-12_47_05_0002_slice036.png}
+    \caption[Componentes temporales - Slice 036]{Detección de 7 componentes temporales del mismo pulso en slice 036 (10.801-11.101s). Mapa de detección DM-tiempo muestra componentes consistentes en DM=46.9 pc cm$^{-3}$ con clasificación perfecta (1.00). Waterfalls revelan SNR crudo 6.1$\sigma$, dedispersado 6.1$\sigma$, y candidato optimizado 7.3$\sigma$. La estructura temporal extendida sugiere dispersión temporal intrínseca o scattering múltiple en el medio circumpulsar. \textit{Fuente: Elaboración propia}.}
+    \label{fig:slice036_multiple_detections}
+\end{figure}
 
-\begin{itemize}
-    \item \textbf{Estrategia 1 - Expansión de rejilla DM}: Forzamiento de apertura morfológica del bow-tie mediante exploración sistemática con rangos DM ampliados y pasos más gruesos ($\gamma > 1$), permitiendo que modelos entrenados en bow-ties desarrollados recuperen sensibilidad en regímenes comprimidos
-    \item \textbf{Estrategia 2 - Fishing a DM$\approx$0 + validación DM-aware}: Detección primaria permisiva en DM mínima seguida de validación física rigurosa mediante: (i) ajuste de DM por maximización de SNR en sub-bandas, (ii) verificación de consistencia entre sub-bandas ($>$ umbral mínimo), y (iii) coherencia temporal entre chunks procesados independientemente
-    \item \textbf{Validación DM-aware multi-criterio}: Implementación de validador físico estricto que requiere dispersión medible ($\mathrm{DM}_{\mathrm{best-fit}} > \epsilon_{\mathrm{DM}}$), coherencia espectral, y consistencia temporal para discriminar señales astrofísicas genuinas de RFI residual
-    \item \textbf{Módulos de rejilla adaptativa}: Desarrollo de sistema que calcula dinámicamente parámetros de expansión ($\gamma$, $d_{\min}$) basados en características observacionales (frecuencia central, ancho de banda, resolución temporal)
-\end{itemize}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{figures/DRAFTS-HF-SNR/2017-04-03-12_47_05_0002_slice037.png}
+    \caption[Componentes temporales - Slice 037]{Continuación temporal en slice 037 (11.101-11.401s) con 6 componentes adicionales del mismo pulso. Mantiene consistencia en DM=46.9 pc cm$^{-3}$ y clasificación perfecta. SNR candidato alcanza 8.3$\sigma$ con ancho temporal extendido ~30.7 ms, considerablemente mayor que pulsos típicos de magnetares. La secuencia completa (13 componentes en ~0.6s) corresponde a un pulso único con estructura temporal excepcionalmente compleja, evidenciando capacidad del sistema para resolver morfologías temporales finas. \textit{Fuente: Elaboración propia}.}
+    \label{fig:slice037_multiple_detections}
+\end{figure}
 
-Esta línea se encuentra actualmente en implementación en rama dedicada del repositorio DRAFTS++ en GitHub. Aunque no se reportan resultados experimentales completos en esta memoria, se especifica el plan de evaluación y trazabilidad de artefactos para su futura integración y comparación directa con Líneas 1-2, estableciendo métricas de rendimiento comparables (recall, precision, F1) bajo condiciones experimentales controladas.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figures/DRAFTS-HF-SNR/Pulso_waton.png}
+    \caption[Análisis polarimétrico independiente]{Análisis polarimétrico del pulso principal confirmando naturaleza astrofísica. Panel superior: perfiles SNR temporal mostrando polarización lineal dominante (línea roja, ~13-14$\sigma$) sobre circular (línea azul, ~4-5$\sigma$). Panel inferior: espectro dinámico revelando emisión de banda ancha uniforme en 85.25-87.00 GHz. La asimetría polarimétrica es consistente con emisión de púlsar genuina en regímenes de alta frecuencia. \textit{Fuente: Elaboración propia}.}
+    \label{fig:pulso_polarimetrico}
+\end{figure}
+
+% \subsubsection{Línea 3: Validación de Representaciones 2D Alternativas para Generación Artificial de Firmas Discriminativas}
+
+% Esta línea explora y valida representaciones 2D alternativas diseñadas para compensar la pérdida de contraste del patrón DM-tiempo en alta frecuencia, mediante la generación artificial de firmas visuales discriminativas que permiten a detectores tipo CNN mantener separabilidad frente a RFI en regímenes donde el bow-tie es irresoluble. Las estrategias propuestas incluyen:
+
+% \begin{itemize}
+%     \item \textbf{Espectrogramas polarimétricos multicanal (Stokes IQUV)}: Aprovechamiento de polarización extrema típica de FRBs (>50\%) versus RFI terrestre no polarizada para crear firmas multicanal coherentes
+%     \item \textbf{Mapas tiempo-ancho de pulso (multi-escala temporal)}: Exploración de respuesta de señal a diferentes ventanas de integración, generando patrones tipo "triángulo invertido" característicos de pulsos astrofísicos
+%     \item \textbf{Mapas tiempo-RM (rotación Faraday)}: Detección de pulsos con rotación Faraday elevada (entornos magnetizados cósmicos) distinguibles de RFI local cerca de RM=0
+%     \item \textbf{Mapas de coherencia espectral}: Medición de extensión en frecuencia mediante autocorrelación espectral, distinguiendo emisiones broadband astrofísicas de RFI narrowband
+%     \item \textbf{Combinación multi-representación}: Concatenación de representaciones para generar "bow-tie artificial" en espacio de características de alta dimensión
+% \end{itemize}
+
+% Esta línea se encuentra actualmente en implementación en rama separada del repositorio DRAFTS++ en GitHub. A la fecha no se incluyen resultados cuantitativos completos; se deja planteado el protocolo de evaluación para trabajo futuro con métricas de precisión/recobrado sobre banco de datos polarimétricos con ground truth curado por validación científica independiente.
+
+% \subsubsection{Línea 4: Validación de Estrategias Avanzadas de Zhang para Recuperación de Morfología Dispersiva y Fishing DM-Aware (PROBABLEMENTE LO ELIMINE)}
+
+% Esta línea valida dos estrategias complementarias propuestas por Yong-Kun Zhang (autor original de DRAFTS), diseñadas específicamente para abordar la compresión dispersiva en alta frecuencia mediante enfoques que preservan la filosofía DM-centrada del pipeline original. Las estrategias evaluadas son:
+
+% \begin{itemize}
+%     \item \textbf{Estrategia 1 - Expansión de rejilla DM}: Forzamiento de apertura morfológica del bow-tie mediante exploración sistemática con rangos DM ampliados y pasos más gruesos ($\gamma > 1$), permitiendo que modelos entrenados en bow-ties desarrollados recuperen sensibilidad en regímenes comprimidos
+%     \item \textbf{Estrategia 2 - Fishing a DM$\approx$0 + validación DM-aware}: Detección primaria permisiva en DM mínima seguida de validación física rigurosa mediante: (i) ajuste de DM por maximización de SNR en sub-bandas, (ii) verificación de consistencia entre sub-bandas ($>$ umbral mínimo), y (iii) coherencia temporal entre chunks procesados independientemente
+%     \item \textbf{Validación DM-aware multi-criterio}: Implementación de validador físico estricto que requiere dispersión medible ($\mathrm{DM}_{\mathrm{best-fit}} > \epsilon_{\mathrm{DM}}$), coherencia espectral, y consistencia temporal para discriminar señales astrofísicas genuinas de RFI residual
+%     \item \textbf{Módulos de rejilla adaptativa}: Desarrollo de sistema que calcula dinámicamente parámetros de expansión ($\gamma$, $d_{\min}$) basados en características observacionales (frecuencia central, ancho de banda, resolución temporal)
+% \end{itemize}
+
+% Esta línea se encuentra actualmente en implementación en rama dedicada del repositorio DRAFTS++ en GitHub. Aunque no se reportan resultados experimentales completos en esta memoria, se especifica el plan de evaluación y trazabilidad de artefactos para su futura integración y comparación directa con Líneas 1-2, estableciendo métricas de rendimiento comparables (recall, precision, F1) bajo condiciones experimentales controladas.
