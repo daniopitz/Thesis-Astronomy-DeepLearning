@@ -42,29 +42,44 @@ Esto ha motivado la exploración de enfoques más sofisticados, en particular ba
 En años recientes, la comunidad ha adoptado técnicas de \textit{machine learning} y \textit{deep learning} para abordar las deficiencias antes mencionadas. Existen dos estrategias principales: (1) aplicar modelos de aprendizaje para \textbf{clasificar candidatos} generados por los métodos tradicionales (filtrado de falsos), y (2) desarrollar pipelines capaces de \textbf{detectar FRBs directamente} en los datos crudos o ligeramente procesados, reduciendo la dependencia en las etapas manuales de los algoritmos clásicos.
 \textbf{Clasificación de candidatos (post-búsqueda):} Reconociendo que los buscadores clásicos producen una sobreabundancia de candidatos espurios, varios trabajos implementaron clasificadores automáticos (basados en \textit{machine learning supervisado}) para discernir entre \textit{verdaderos FRBs} y \textit{falsos positivos} entre los candidatos detectados.
 
-Connor \& van Leeuwen (2018) introdujeron uno de los primeros enfoques de este tipo, entrenando una red neuronal convolucional para asignar a cada candidato una probabilidad de ser una señal astrofísica real. De modo similar, Agarwal \textit{et al}. (2020) desarrollaron el sistema \textbf{FETCH} (\textit{Fast Extragalactic Transient Candidate Hunter}), que consiste en una serie de modelos de deep learning (redes neuronales profundas) entrenados con ejemplos de FRBs simulados y datos reales de RFI.
+Connor \& van Leeuwen (2018) introdujeron uno de los primeros enfoques de este tipo, entrenando una red neuronal convolucional para asignar a cada candidato una probabilidad de ser una señal astrofísica real.
+
+No obstante, es importante notar que este enfoque \textit{no soluciona} otros problemas de los algoritmos clásicos: la búsqueda sigue pudiendo ser incompleta (puede no detectar señales muy débiles o con formas inusuales), y sigue existiendo redundancia en la detección inicial. En otras palabras, la clasificación automática optimiza la \textit{etapa final de verificación}, pero no reinventa el proceso de búsqueda en sí.
+
+\subsubsection{El sistema FETCH: clasificación automática de candidatos}
+
+Agarwal \textit{et al}. (2020) desarrollaron el sistema \textbf{FETCH} (\textit{Fast Extragalactic Transient Candidate Hunter}), que consiste en una serie de modelos de deep learning (redes neuronales profundas) entrenados con ejemplos de FRBs simulados y datos reales de RFI.
 
 FETCH logra \textbf{precisiones y exhaustividades mayores al 99.5\%} en la clasificación de candidatos en sus pruebas, filtrando casi completamente los falsos positivos generados por pipelines tradicionales \cite{Agarwal_2020}. Estos clasificadores suelen operar sobre \textit{imágenes} o \textit{plantillas} del candidato: por ejemplo, usan la imagen tiempo vs. frecuencia dedispersada (``waterfall'') y/o la serie de S/N vs. DM del evento como entrada para la red neuronal \cite{Agarwal_2020}.
 
 Al aprender las características morfológicas típicas de un FRB real (p. ej. dispersión con cierta curva característica, ancho temporal acotado, emisión amplia en frecuencia, etc.) frente a artefactos de RFI (p. ej. señales confinadas en una frecuencia estrecha, o pulsos no dispersos), estos métodos han reducido sustancialmente la carga de inspección manual.
-
-No obstante, es importante notar que este enfoque \textit{no soluciona} otros problemas de los algoritmos clásicos: la búsqueda sigue pudiendo ser incompleta (puede no detectar señales muy débiles o con formas inusuales), y sigue existiendo redundancia en la detección inicial. En otras palabras, la clasificación automática optimiza la \textit{etapa final de verificación}, pero no reinventa el proceso de búsqueda en sí.
 \textbf{Detección directa con redes neuronales:} La segunda dirección innovadora ha sido intentar que redes neuronales profundas \textit{reemplacen parcial o totalmente las etapas tradicionales} de búsqueda de pulsos. En vez de generar candidatos mediante dedispersión exhaustiva y umbral de S/N, se entrena un modelo para que analice directamente los datos dinámicos (tiempo-frecuencia) y \textit{detecte la presencia de un FRB}.
 
 Un ejemplo pionero fue el trabajo de Zhang \textit{et al}. (2018), quienes aplicaron una CNN (red convolucional) a las observaciones crudas de FRB121102 en banda C (4--8 GHz), encontrando decenas de pulsos adicionales que los algoritmos convencionales no habían marcado. En ese estudio, la red aprendió a identificar las características ``parabólicas'' que deja la dispersión de un FRB en la matriz tiempo-frecuencia, y logró mayor sensibilidad y menor tasa de falsos que un algoritmo de dedispersión de fuerza bruta en el mismo dataset \cite{Gajjar2018}.
+
+\subsubsection{Otros pipelines modernos: DDSS}
 
 Trabajos más recientes, como Liu \textit{et al}. (2022), han llevado esta idea a pipelines operativos: estos autores implementaron una red neuronal profunda entrenada con \textit{FRBs simulados} inmersos en ruido real, capaz de escanear datos de un radiotelescopio (26-m de Nanshan) \textbf{sin pasar por la dedispersión por rejilla}.
 
 Su pipeline, denominado DDSS (\textit{Dispersed Dynamic Spectrum Search}), detectó exitosamente ráfagas del repetidor FRB 20201124A en banda L, mostrando una \textbf{precisión >99\%} en la identificación de pulsos individuales y destacando su sensibilidad para captar incluso señales débiles por encima del ruido \cite{Liu_2022}.
 
+\subsubsection{Ventajas y desafíos de los métodos de deep learning}
+
 En principio, al eliminar la necesidad de probar multitud de DM y usar filtros de ancho, estos métodos de detección con \textit{deep learning} pueden ser mucho más \textbf{rápidos} y tratar directamente el problema como uno de reconocimiento de patrones en imágenes (2D), aprovechando los avances en \textit{computer vision}.
 
-Sin embargo, también presentan desafíos: (i) las \textit{señales débiles y difusas} (con S/N bajo, o muy ensanchadas temporalmente) pueden pasar inadvertidas para una red entrenada principalmente con ejemplos más brillantes, pues en la imagen de entrada se ven muy poco contrastadas \cite{zhang2024drafts}.
+Sin embargo, también presentan desafíos importantes:
+
+\textbf{Desafíos técnicos:} (i) las \textit{señales débiles y difusas} (con S/N bajo, o muy ensanchadas temporalmente) pueden pasar inadvertidas para una red entrenada principalmente con ejemplos más brillantes, pues en la imagen de entrada se ven muy poco contrastadas \cite{zhang2024drafts}.
 
 (ii) La diversidad de curvaturas de dispersión: cada FRB tiene una DM distinta, lo que significa que la pendiente de su traza tiempo-frecuencia varía; una red que analice una ventana de datos limitada podría ``perder'' eventos cuyo arco de dispersión no quepa enteramente en dicha ventana o tenga geometría distinta a la aprendida.
 
 (iii) Al detectar directamente en datos no dedispersados, típicamente estos métodos sólo entregan la \textit{ubicación temporal} del burst, pero \textit{no} estiman automáticamente su DM óptima (que es crucial para caracterizar el evento). En consecuencia, algunos investigadores han optado por enfoques híbridos donde la red neuronal se integra con cierta dedispersión previa o posterior.
+
+\subsubsection{El pipeline DRAFTS: detección y clasificación integradas}
+
 Un enfoque muy exitoso dentro de esta categoría es el pipeline \textbf{DRAFTS} (``\textit{Deep Learning--based RAdio Fast Transient Search}'') propuesto por Zhang \textit{et al}. (2024). Este sistema combina dos etapas basadas en \textit{deep learning} para lograr tanto la detección como la confirmación de FRBs en tiempo casi real.
+
+\subsubsection{Arquitectura del sistema DRAFTS}
 
 En DRAFTS, primero se aplica un modelo de \textbf{detección de objetos} en la imagen de datos dedispersados para varios DM, identificando regiones rectangulares donde podría haber una señal (similar a cómo se detectan rostros u objetos en una foto) -- en esencia, localiza el tiempo de llegada y DM de una posible ráfaga. Luego, cada recorte candidato es alimentado a un modelo \textbf{clasificador binario} que decide si corresponde a un FRB verdadero o a ruido/RFI.
 
@@ -74,7 +89,10 @@ La etapa 2 emplea una red \textbf{ResNet} \cite{He_2015_ResNet} (una ResNet-18 e
 
 En la práctica, DRAFTS realiza también la \textbf{dedispersión} de forma acelerada: utiliza GPU para computar de manera paralela las sumas dedispersadas en un rango amplio de DM en fragmentos de datos grandes \cite{zhang2024drafts}. Gracias a esto, el pipeline completo puede examinar datos voluminosos con rapidez.
 \textit{Figura 1.} Esquema simplificado del flujo de procesamiento en DRAFTS++ (versión extendida de DRAFTS). El pipeline realiza la dedispersión de la señal en GPU y luego aplica un detector de objetos basado en CenterNet para localizar ``cajas'' de posibles FRBs en la matriz tiempo--DM dedispersada. Cada detección es recortada y evaluada por un clasificador ResNet para determinar si es un FRB real (paso True) o un falso positivo (paso False). Finalmente, los eventos confirmados se guardan y generan sus productos (estadísticas, gráficas). \textit{Fuente: adaptado de Zhang} et al\textit{., 2024.}
-\textbf{Rendimiento de DRAFTS y comparación:} Los resultados reportados para este pipeline muestran mejoras notables frente a los métodos tradicionales. En pruebas con datos simulados con inyecciones de pulsos, la fase de detección con CenterNet logró una \textit{tasa de recuperación} (recall) de \textasciitilde{}96--97\% con una tasa de falsas detecciones muy baja (\textasciitilde{}20--23 falsos en total), superando ampliamente el recall de \textasciitilde{}85\% de PRESTO en condiciones equivalentes \cite{zhang2024drafts}.
+
+\subsubsection{Rendimiento y casos de estudio de DRAFTS}
+
+Los resultados reportados para este pipeline muestran mejoras notables frente a los métodos tradicionales. En pruebas con datos simulados con inyecciones de pulsos, la fase de detección con CenterNet logró una \textit{tasa de recuperación} (recall) de \textasciitilde{}96--97\% con una tasa de falsas detecciones muy baja (\textasciitilde{}20--23 falsos en total), superando ampliamente el recall de \textasciitilde{}85\% de PRESTO en condiciones equivalentes \cite{zhang2024drafts}.
 
 Además, el procesamiento es más eficiente: analizar un segmento de \textasciitilde{}6 segundos de datos tomó \textbf{\textasciitilde{}4--5 segundos} con DRAFTS (en GPU con modelos ResNet-18), comparado a \textbf{\textasciitilde{}120 segundos} usando PRESTO sobre la misma ventana \cite{zhang2024drafts}. Esto sugiere que el enfoque de \textit{deep learning} no sólo mantiene o mejora la sensibilidad, sino que también acelera la búsqueda.
 
@@ -87,19 +105,16 @@ Este experimento demuestra cómo los nuevos pipelines basados en aprendizaje pro
 Cabe mencionar que otras aproximaciones \textit{anchor-based} (e.g. usando algoritmos de la familia YOLO o RCNN) también podrían aplicarse a la detección de FRBs, pero DRAFTS optó por CenterNet por su robustez en detección de objetos pequeños y numerosos en imágenes \cite{zhou2019objects}.
 
 En general, la comunidad ve con optimismo la incorporación de \textbf{redes neuronales entrenadas} en la tubería de análisis: no sólo para detección/clasificación, sino también para tareas como sustracción de RFI (ver siguiente sección) y incluso estimación de parámetros físicos.
-En resumen, las técnicas modernas basadas en \textit{deep learning} están logrando reducir drásticamente los falsos positivos, automatizar la selección de eventos astrofísicos y aumentar la sensibilidad de detección. La combinación de detectores de patrones 2D y clasificadores de alta precisión permite aspirar a pipelines de FRB \textbf{totalmente autónomos}, capaces de procesar en tiempo real los flujos masivos de datos de instrumentos nuevos (como CHIME, ASKAP, MeerKAT, FAST) y de activar alertas inmediatas para seguimiento multi-frecuencia.
+
+\subsubsection{Resumen y perspectivas futuras}
+
+Las técnicas modernas basadas en \textit{deep learning} están logrando reducir drásticamente los falsos positivos, automatizar la selección de eventos astrofísicos y aumentar la sensibilidad de detección. La combinación de detectores de patrones 2D y clasificadores de alta precisión permite aspirar a pipelines de FRB \textbf{totalmente autónomos}, capaces de procesar en tiempo real los flujos masivos de datos de instrumentos nuevos (como CHIME, ASKAP, MeerKAT, FAST) y de activar alertas inmediatas para seguimiento multi-frecuencia.
 
 No obstante, es importante continuar evaluando estos sistemas en distintos entornos observacionales, asegurando que generalicen bien y que se comprendan sus sesgos (por ejemplo, evitar que una red \textit{sobre-entrenada} descarte FRBs reales inusuales por no parecerse a los del conjunto de entrenamiento).
 
 A medida que crece el volumen de datos y la necesidad de rapidez (p. ej. para capturar contrapartes ópticas o de rayos X de un FRB en tiempo real), estos avances en pipelines inteligentes serán cruciales.
 
-\subsubsection{Revisión sistemática de pipelines modernos de detección de FRBs}
-
-Los Fast Radio Bursts (FRBs) son impulsos de radio de duración milimétrica con origen extragaláctico, capaces de sondear el contenido bariónico del universo mediante su medida de dispersión (DM). La detección oportuna y localización precisa exigen software de muy baja latencia y alta eficiencia, capaz de operar en tiempo real con grandes volúmenes de datos y entornos con fuerte interferencia de radiofrecuencia (RFI). Este informe sintetiza y reescribe, en español, el contenido central del artículo de revisión de Rajwade \& van Leeuwen (2024), manteniendo su estructura y énfasis técnicos \cite{Rajwade2024}.
-
-Como motivación científica, las ráfagas localizadas permiten estimar el contenido de bariones a partir de la DM integrada a lo largo de la línea de visión, aportando evidencia independiente sobre los bariones ``faltantes'' en el medio intergaláctico \cite{Macquart2020}.
-
-\paragraph{Pasos clave de un pipeline de búsqueda de FRBs}
+\subsubsection{Componentes transversales de pipelines modernos}
 
 De extremo a extremo, los pipelines modernos implementan una secuencia que incluye: mitigación de RFI, dedispersión, filtrado por coincidencia (matched filtering), selección y clasificación de candidatos, y, cuando corresponde, buffering de voltajes, disparo de alertas y seguimiento multi-longitud de onda. A continuación se describen los componentes y técnicas tal como se sistematizan en la revisión base.
 
@@ -115,14 +130,15 @@ Para mejorar sensibilidad sin costos prohibitivos, es habitual un esquema semi-c
 
 \textbf{Buffering, triggering y alertas:} Para maximizar el retorno científico, muchos sistemas almacenan de forma circular datos de voltaje de alta resolución. Una detección robusta dispara el volcado de esa ventana al disco y el envío de alertas estandarizadas (VOEvent) a la comunidad para seguimiento rápido y localización interferométrica sub-arco-segundo \cite{Rajwade2024,Petroff2017}.
 
-\paragraph{Búsqueda en la era SKAO/ngVLA: ampliar el espacio de parámetros y acelerar algoritmos}
+\subsubsection{Perspectivas futuras: SKAO/ngVLA y algoritmos avanzados}
 
 La próxima generación de instrumentos (p. ej., SKA, ngVLA, DSA-2000, CHORD) incrementará exponencialmente los datos y exigirá algoritmos más rápidos y generalistas. Se discuten extensiones hacia ráfagas ultra-estrechas y ultra-anchas (mitigando sesgos de selección), así como transformadas de Radon/Hough aplicadas al plano transformado (t, 1/$\nu^2$) que convierten la curvatura de dispersión en líneas y facilitan la detección robusta a RFI. Se esbozan, además, ideas de cómputo cuántico para operaciones intrínsecamente paralelas (direcciones, DMs, anchos) con colapsos binarios (detección/no detección) \cite{Rajwade2024}.
 
-\paragraph{Conclusiones sobre pipelines modernos}
-
 Los pipelines modernos para FRBs combinan mitigación de RFI, dedispersión optimizada, matched filtering y clasificación automática para operar en tiempo real con alta sensibilidad y bajo falso positivo. La revisión de Rajwade \& van Leeuwen (2024) sintetiza buenas prácticas y rutas futuras: ampliar el espacio de búsqueda, adoptar algoritmos más eficientes (FDMT/FDD) y estandarizar disparos de seguimiento (VOEvent). A la par, los resultados cosmológicos ---como el censo bariónico con FRBs localizados--- refuerzan el valor de estos sistemas en la astrofísica de precisión \cite{Rajwade2024,Macquart2020}.
+
 \subsection{Detecciones de FRBs a frecuencias altas (> 1 GHz)}
+
+Además de los avances en algoritmos de detección, otro aspecto crucial del estado del arte en FRBs es la exploración de nuevas ventanas de frecuencia. Mientras que los métodos tradicionales y modernos han optimizado la detección en las bandas convencionales, la comunidad científica ha expandido significativamente el rango de frecuencias observadas, abriendo nuevas posibilidades para el estudio de estos fenómenos.
 Históricamente, la mayoría de FRBs se han descubierto en \textbf{frecuencias relativamente bajas}, entre \textasciitilde{}400 MHz y 1.4 GHz, debido a que muchos radiotelescopios (Parkes, Arecibo, CHIME, UTMOST, ASKAP, etc.) operan en esas bandas y a que la emisión de FRBs típicamente presenta espectros decrecientes con la frecuencia (análogos a los púlsares, que suelen tener índices espectrales negativos).
 
 Sin embargo, en años recientes ha habido un creciente interés por explorar \textbf{frecuencias más altas} --de varios GHz hasta el rango milimétrico-- por varias razones: (1) a frecuencias altas la \textbf{dispersión y el scattering} (dispersión multi-caminos) son menores, lo que podría permitir detectar pulsos que a bajas frecuencias quedan ensanchados o borrados; (2) la posibilidad de que ciertas fuentes de FRB emitan también a frecuencias milimétricas (lo que ofrecería nueva información sobre los procesos emisores y los entornos extremos donde se producen).
@@ -165,7 +181,10 @@ En conclusión, el ``horizonte de frecuencias'' de los FRBs se ha ido expandiend
 - En \textbf{4--8 GHz}, sólo unos pocos repetidores han mostrado ráfagas (notablemente FRB121102) \cite{Gajjar2018}, pero esto podría deberse a que pocos telescopios han buscado extensamente en esa banda --una excepción es el experimento de vigilancia continua Breakthrough Listen en GBT.
 
 - En \textbf{frecuencias milimétricas}, aún no hay FRBs detectados, pero los esfuerzos de instrumentos como ALMA abren una posibilidad real de conseguir las primeras detecciones en los próximos años, lo que sería revolucionario (confirmaría que la emisión de FRBs puede extenderse a decenas de GHz y permitiría estudiar sus pulsos sin efectos dispersivos) \cite{veracasanova2025}.
-\subsection{Mitigación de RFI, de-dispersión y estrategias de clasificación/localización automática}
+
+\subsection{Técnicas avanzadas de procesamiento y localización}
+
+Complementando los avances en algoritmos de detección y exploración de frecuencias, el desarrollo de técnicas especializadas de procesamiento ha sido fundamental para el éxito de los pipelines modernos. Estas técnicas transversales abordan desafíos específicos que surgen en el procesamiento de datos de FRBs, desde la mitigación de interferencia hasta la localización precisa de eventos.
 Además de los algoritmos de detección en sí, el éxito de un pipeline de FRBs depende de varias técnicas transversales: \textbf{cómo se maneja la RFI}, cómo se optimiza la \textbf{dedispersión}, cómo se \textbf{clasifican} automáticamente los candidatos y, en sistemas de múltiples telescopios, cómo se \textbf{localizan} las fuentes en el cielo. A continuación revisamos avances recientes en estos aspectos:
 \begin{enumerate}
 \item \textbf{Mitigación de RFI:} La RFI es uno de los mayores obstáculos en radioastronomía, pues señales humanas (telecomunicaciones, satélites, radares, etc.) pueden imitar o enmascarar pulsos astronómicos. Los métodos tradicionales usan técnicas estadístico-determinísticas: por ejemplo, \textbf{SumThreshold} y \textbf{Median filtering} son algoritmos implementados en software como \textit{PRESTO} y \textit{SIGPROC} que analizan la estadística de intensidad en cada canal de frecuencia y en ventanas de tiempo para identificar outliers (picos inusuales) y crear máscaras de datos malos.
