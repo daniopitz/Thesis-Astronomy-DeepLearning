@@ -10,234 +10,144 @@
 
 \subsection{Introducción a los Fast Radio Bursts}
 
-\subsubsection{Descubrimiento y Primeras Detecciones}
+\subsubsection{Descubrimiento y Naturaleza de los FRBs}
 
-Los Fast Radio Bursts (FRBs), o estallidos rápidos de radio, son pulsos de radio transitorios de duración brevísima (del orden de milisegundos) y extremadamente luminosos en comparación con fuentes galácticas conocidas. Desde el descubrimiento del primer FRB por Lorimer y colaboradores en 2007, identificado en datos archivados del radiotelescopio de Parkes, estos fenómenos han sido objeto de intenso estudio. El pulso detectado por Lorimer tenía un tiempo de dispersión inusualmente alto, lo que sugiere que su origen estaba a distancias cosmológicas más allá de nuestra galaxia \citep{Lorimer2007}. Posteriores detecciones de FRBs reforzaron su naturaleza extragaláctica al presentar medidas de dispersión (DM, por sus siglas en inglés) mucho mayores que las esperables por la Vía Láctea \citep{Thornton2013a}. La DM caracteriza la densidad de electrones libres a lo largo de la línea de visión y causa un retardo de tiempo dependiente de la frecuencia $\nu$ de la señal: los pulsos de radio más bajos en frecuencia llegan más tarde que los de mayor frecuencia, siguiendo una relación aproximada $t(\nu)\propto \nu^{-2}$. Esta dependencia impone una curvatura característica $\nu^{-2}$ en los perfiles de frecuencia-tiempo de los FRBs, distintiva de la dispersión en plasma interestelar \citep{LorimerKramer2004}. La Figura~\ref{fig:lorimer_burst} ilustra este fenómeno en el FRB original.
+Los Fast Radio Bursts (FRBs) son pulsos de radio transitorios de duración milisegundo y extremadamente luminosos, detectados por primera vez en 2007 por Lorimer et al. en datos del radiotelescopio de Parkes \citep{Lorimer2007}. Su medida de dispersión (DM) anómalamente alta reveló un origen extragaláctico a distancias cosmológicas \citep{Thornton2013a}. La firma característica de los FRBs es la dispersión en plasma interestelar: los pulsos de baja frecuencia arriban más tarde que los de alta frecuencia siguiendo $t(\nu)\propto \nu^{-2}$, generando una curvatura distintiva en los espectrogramas frecuencia-tiempo (Figura~\ref{fig:lorimer_burst}).
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.8\textwidth]{Marco_conceptual/20140512_Lorimer-Burst.png}
-\caption{``Lorimer Burst'' (FRB 010724). Espectrograma tiempo--frecuencia del primer FRB reportado: se aprecia el barrido dispersivo con dependencia $\sim\nu^{-2}$ y, arriba a la derecha, el perfil temporal integrado tras dedispersión. La banda brillante que desciende de izquierda a derecha muestra cómo las componentes de mayor frecuencia ($\sim$1.5 GHz) arriban antes que las de menor frecuencia ($\sim$1.2 GHz), característica distintiva de la dispersión en plasma interestelar. El panel insertado muestra el pulso comprimido de $\sim$5 ms de duración con alta relación señal-ruido. Reproducido de \citet{Lorimer2007}; imagen divulgativa vía The Planetary Society.}
+\caption{Espectrograma del ``Lorimer Burst'' (FRB 010724), primer FRB reportado. Se observa el barrido dispersivo característico con dependencia $\sim\nu^{-2}$: frecuencias altas ($\sim$1.5 GHz) arriban antes que bajas ($\sim$1.2 GHz). Panel insertado: pulso dedispersado de $\sim$5 ms. Adaptado de \citet{Lorimer2007}.}
 \label{fig:lorimer_burst}
 \end{figure}
 
-\subsubsection{Propiedades Energéticas y Distancias Cosmológicas}
+\subsubsection{Propiedades Energéticas y Poblaciones}
 
-Cada nuevo FRB descubierto trae información tanto del medio intergaláctico atravesado (a través de la DM y de la dispersión) como del entorno local del progenitor \citep{Masui2015}. Hasta mediados de la década de 2020 se han detectado ya cientos de FRBs publicados --e incluso miles incluyendo los catálogos más recientes-- que confirman que se trata de eventos a distancias cosmológicas con energías isotrópicas típicas de $10^{38}$--$10^{40}$ J (equivalentes a $10^{31}$--$10^{33}$ erg), concentradas en unos pocos milisegundos \citep{Petroff2019,Bochenek2020}. Esta enorme energía implica fuentes astrofísicas extremas. 
+Establecida la firma dispersiva característica de los FRBs, su naturaleza física plantea interrogantes fundamentales sobre los progenitores. Los FRBs se originan a distancias cosmológicas con energías isotrópicas de $10^{38}$--$10^{40}$ J concentradas en milisegundos \citep{Petroff2019,Bochenek2020}, implicando fuentes astrofísicas extremas. Se han catalogado cientos de eventos, incluyendo repetidores (múltiples ráfagas de la misma fuente) y aparentes eventos únicos. Los repetidores descartaron modelos cataclísmicos y favorecen objetos persistentes como estrellas de neutrones altamente magnetizadas (magnetars) \citep{Spitler2016,Margalit2018}.
 
-\subsubsection{Repetidores vs. Eventos Únicos y Modelos de Progenitores}
+\subsubsection{Motivación para Observaciones en Alta Frecuencia}
 
-Sin embargo, la naturaleza exacta de los FRBs permaneció elusiva durante años: inicialmente se propusieron modelos desde colisiones cataclísmicas (por ejemplo, la fusión de estrellas de neutrones) hasta emisiones coherentes de objetos compactos aislados \citep{Lorimer2007,Platts2019}. La posterior detección de FRBs repetidores (es decir, que emiten múltiples ráfagas no destructivas) descartó ciertos escenarios de destrucción única y apuntaló modelos con estrellas de neutrones jóvenes altamente magnetizadas (magnetars) como posibles fuentes \citep{Spitler2016,Margalit2018}.
-
-\subsubsection{Observaciones en Diferentes Bandas de Frecuencia}
-
-Dada la gran distancia de origen, todos los FRBs conocidos hasta la fecha se han observado a longitudes de onda de radio centimétricas y decimétricas, donde los radiotelescopios ofrecen alta sensibilidad \citep{Manchester1977}. A estas frecuencias relativamente bajas, los FRBs exhiben sus mayores luminosidades, pero también sufren en gran medida los efectos de propagación como la dispersión y el ensanchamiento por scattering (dispersión multi-trayectoria) en plasma turbulento. La observación en frecuencias más altas, en rango milimétrico (mm), podría mitigar el scattering (que escala fuertemente con $\nu^{-4}$), permitiendo detectar pulsos más intrínsecamente breves. No obstante, a mayor frecuencia también disminuye típicamente la potencia de emisión de estos transitorios y el campo de visión de los telescopios, planteando nuevos desafíos técnicos. En las secciones siguientes se abordan los fundamentos físicos y fenomenológicos de los FRBs, casos emblemáticos de fuentes repetidoras, la posible conexión con magnetars (incluyendo el caso del magnetar galáctico SGR 1935+2154), las oportunidades y retos de su detección en bandas de alta frecuencia (hasta ondas milimétricas), los métodos clásicos de búsqueda basados en dedispersión de pulsos, y las soluciones modernas de aprendizaje automático para la clasificación automática de candidatos.
+Comprendiendo ya la naturaleza energética de los FRBs y la dicotomía repetidores/únicos, surge naturalmente la pregunta sobre estrategias observacionales óptimas. Históricamente, los FRBs se han observado en bandas centimétricas (0.1--10 GHz) donde exhiben mayor luminosidad pero sufren fuertemente dispersión y scattering ($\propto \nu^{-4}$). Las observaciones milimétricas (30--300 GHz) mitigan estos efectos, permitiendo detectar pulsos intrínsecamente breves, aunque presentan desafíos de sensibilidad y campos de visión reducidos. Las secciones siguientes abordan: fundamentos físicos de los FRBs, casos emblemáticos de repetidores, conexión con magnetars (incluyendo SGR 1935+2154), detección en alta frecuencia, métodos tradicionales de búsqueda, y soluciones modernas de aprendizaje automático.
 
 \subsection{Fundamentos Físicos y Fenomenología Observacional de los FRBs}
+
+Para comprender los desafíos de detección que motivan esta tesis, es esencial caracterizar en detalle la fenomenología observacional de los FRBs. Las siguientes subsecciones describen las propiedades físicas clave que determinan tanto las estrategias de búsqueda tradicionales como las adaptaciones necesarias para alta frecuencia.
 
 \subsubsection{Dispersión en Plasma y Medida de DM}
 
 Un FRB típico se manifiesta como un pulso único de radio de duración brevísima ($\sim$1--10 ms) que sobresale muy significativamente por encima del ruido de fondo. En el dominio tiempo-frecuencia, la señal presenta la firma de la dispersión en plasma: las componentes de menor frecuencia arriban con mayor retraso temporal respecto a las de mayor frecuencia, según la ley $\Delta t \propto \text{DM} \cdot \nu^{-2}$. Esta ley implica que, cuando se observa en un ancho de banda amplio, el pulso aparece como un trazo inclinado o curvo en el diagrama de frecuencia vs. tiempo, donde las bajas frecuencias se retrasan más \citep{CordesMcLaughlin2003}. Al corregir este retraso mediante un proceso de dedispersión para un cierto valor de DM, las componentes de frecuencia se alinean en el tiempo revelando el pulso comprimido.
 
 
-La medida de dispersión (DM) es una magnitud central en el estudio de FRBs. Se define como la integral de la densidad de electrones libres $n_e$ a lo largo de la línea de visión hasta la fuente: ${\rm DM} = \int_0^D n_e\, dl$, típicamente expresada en unidades de pc cm$^{-3}$. Dado que las señales de radio sufren un retraso relativo $\Delta t \approx 4.15\,{\rm ms} \times ({\rm DM}/{\rm pc\,cm^{-3}}) \times[(\nu_{\rm baja}/{\rm GHz})^{-2} - (\nu_{\rm alta}/{\rm GHz})^{-2}]$ \citep{LorimerKramer2004}, una DM anómalamente alta es evidencia de un origen extragaláctico o cosmológico. Los FRBs descubiertos hasta ahora exhiben DM de cientos hasta miles de pc cm$^{-3}$, excediendo por mucho el contenido electrónico de la Vía Láctea en sus direcciones \citep{Petroff2019}. Por ejemplo, el FRB inicial de Lorimer tenía DM $\sim375$ pc cm$^{-3}$, varias veces mayor que la contribución galáctica esperada en su coordenada, implicando una distancia de orden gigapársec si el exceso de DM proviene del medio intergaláctico \citep{Lorimer2007}. La DM se utiliza entonces como un indicador de distancia cosmológica: aunque existe dispersión en la relación DM--$z$ por la distribución inhomogénea del medio intergaláctico, a primera aproximación DMs del orden $10^3$ pc cm$^{-3}$ sugieren orígenes a redshifts $z\sim0.5$--1 \citep{Inoue2004,Tendulkar2017}.
+Más allá de la fenomenología cualitativa, la DM proporciona información cuantitativa crucial. La medida de dispersión (DM) es una magnitud central en el estudio de FRBs. Se define como la integral de la densidad de electrones libres $n_e$ a lo largo de la línea de visión hasta la fuente: ${\rm DM} = \int_0^D n_e\, dl$, típicamente expresada en unidades de pc cm$^{-3}$. Dado que las señales de radio sufren un retraso relativo $\Delta t \approx 4.15\,{\rm ms} \times ({\rm DM}/{\rm pc\,cm^{-3}}) \times[(\nu_{\rm baja}/{\rm GHz})^{-2} - (\nu_{\rm alta}/{\rm GHz})^{-2}]$ \citep{LorimerKramer2004}, una DM anómalamente alta es evidencia de un origen extragaláctico o cosmológico. Los FRBs descubiertos hasta ahora exhiben DM de cientos hasta miles de pc cm$^{-3}$, excediendo por mucho el contenido electrónico de la Vía Láctea en sus direcciones \citep{Petroff2019}. Por ejemplo, el FRB inicial de Lorimer tenía DM $\sim375$ pc cm$^{-3}$, varias veces mayor que la contribución galáctica esperada en su coordenada, implicando una distancia de orden gigapársec si el exceso de DM proviene del medio intergaláctico \citep{Lorimer2007}. La DM se utiliza entonces como un indicador de distancia cosmológica: aunque existe dispersión en la relación DM--$z$ por la distribución inhomogénea del medio intergaláctico, a primera aproximación DMs del orden $10^3$ pc cm$^{-3}$ sugieren orígenes a redshifts $z\sim0.5$--1 \citep{Inoue2004,Tendulkar2017}.
 
 \subsubsection{Scattering y Ensanchamiento Temporal}
 
-Además de la dispersión, los FRBs a menudo exhiben ensanchamiento temporal por scattering multipath en el plasma, visible como una cola exponencial en el pulso dedispersado, más pronunciada a frecuencias bajas. Este efecto, causado por la difusión angular en plasmas turbulentos, atenúa la detectabilidad de pulsos breves y puede variar de microsegundos a decenas de milisegundos dependiendo de la frecuencia y la línea de visión \citep{Cordes2016}. A frecuencias de unos pocos GHz, varios FRBs muestran anchuras de pulso intrínsecas del orden de cientos de microsegundos o menos una vez corregido el scattering (e.g., FRB 121102; \citet{Hardy2017,Michilli2018}). Se ha observado una clara dependencia con la frecuencia: los pulsos tienden a ser más breves en altas frecuencias, tanto por la reducción del scattering como posiblemente por un ancho intrínseco menor \citep{Gajjar2018a,Nimmo2021}. Por ejemplo, ráfagas de FRB 121102 detectadas a 4--8 GHz tenían anchos de $\sim30$--100 $\mu$s, mucho menores que las de 1.4 GHz que típicamente son de varios milisegundos \citep{Gajjar2018a,Hessels2019}.
+Además de la dispersión, los FRBs exhiben ensanchamiento temporal por scattering multipath en plasma turbulento, más pronunciado a bajas frecuencias ($\tau_{\rm sc} \propto \nu^{-4}$) \citep{Cordes2016}. A frecuencias altas, los pulsos son significativamente más breves: FRB 121102 mostró anchos de $\sim30$--100 $\mu$s a 4--8 GHz versus varios milisegundos a 1.4 GHz \citep{Gajjar2018a,Hessels2019,Nimmo2021}, motivando observaciones en bandas milimétricas para captar morfologías intrínsecas.
 
 \subsubsection{Polarización y Rotación Faraday}
 
-Otro aspecto observacional clave es la polarización de la emisión. Muchos FRBs muestran altos grados de polarización lineal, cercanos al 100\% en algunos casos, acompañados de medidas de rotación (RM) extremadamente grandes, lo que indica campos magnéticos intensos y plasmas denso-ionizados en las cercanías de la fuente. El caso emblemático es FRB 121102, cuyo RM fue medido en $\sim$+$1.4\times10^5$ rad m$^{-2}$ (en el marco de la fuente) --el mayor jamás registrado para una fuente astronómica extragaláctica-- y varió ligeramente con el tiempo \citep{Michilli2018}. Este valor sugiere que el FRB reside en un entorno magnetizado extremo, posiblemente un plasma denso cercano a un agujero negro o resto de supernova joven. La fuerte polarización lineal, combinada con RMs grandes, apoya la conexión con magnetars u otros objetos de campos ultraintensos \citep{Masui2015,Michilli2018}. De hecho, casi todos los FRBs con buena detección polarimétrica presentan polarización lineal significativa y, en algunos casos, componentes de polarización circular moderada, indicando que la emisión es coherente y se produce en presencia de campos ordenados.
+Complementando las firmas de dispersión y scattering, la polarización proporciona pistas cruciales sobre los entornos de los progenitores. Muchos FRBs exhiben alta polarización lineal ($\sim100\%$) y medidas de rotación Faraday (RM) extremas, indicando campos magnéticos intensos en entornos densos. FRB 121102 registró RM $\sim1.4\times10^5$ rad m$^{-2}$, el mayor para una fuente extragaláctica \citep{Michilli2018}, sugiriendo proximidad a magnetars o restos de supernova. Esta firma polarimétrica apoya la conexión con objetos de campos ultraintensos y proporciona un criterio de validación crucial para detectores automáticos en alta frecuencia.
 
 \subsubsection{Morfología Espectro-Temporal y Sub-pulsos}
 
-Más allá de estos rasgos generales, los FRBs muestran una morfología espectro-temporal variada. Algunas ráfagas constan de uno solo pulso amplio en banda, mientras otras exhiben sub-pulsos múltiples que suelen derivar en frecuencia --un fenómeno coloquialmente llamado ``efecto trombón triste''-- donde sub-estallidos sucesivos aparecen a frecuencias menores con retrasos crecientes \citep{Hessels2019}. Este drift en frecuencia se ha observado sobre todo en FRBs repetidores, comenzando con FRB 121102 \citep{Gajjar2018b} y posteriormente en varias fuentes repetitivas \citep{CHIME_FRB_Collaboration_2020,Josephy2019}. Por el contrario, la mayoría de FRBs de evento único descubiertos con ASKAP muestran espectros puntuales e irregularmente modulados, concentrando la energía en rangos de frecuencia estrechos (pocos cientos de MHz) con poco o nulo drift apreciable \citep{Shannon2018,Cho2020}. Esta diferencia llevó a sugerir arquetipos morfológicos distintos para FRBs repetidores vs. no repetidores \citep{Pleunis2021}. Sin embargo, las comparaciones deben tomarse con cautela, ya que cada radiotelescopio y cada algoritmo de detección introducen sesgos; estudios recientes con muestras homogéneas (como el catálogo de CHIME) aún evalúan estadísticamente estas diferencias \citep{Fonseca2020,Pleunis2021}. La Figura~\ref{fig:morfologias_frb} ilustra los cuatro arquetipos morfológicos principales identificados por CHIME/FRB.
+Los FRBs exhiben morfología espectro-temporal diversa: desde pulsos simples de banda ancha hasta complejos sub-pulsos con deriva en frecuencia (``efecto trombón triste''), donde componentes sucesivas aparecen a frecuencias decrecientes \citep{Hessels2019,Pleunis2021}. La Figura~\ref{fig:morfologias_frb} ilustra cuatro arquetipos morfológicos generales identificados por CHIME/FRB, relevantes para el diseño de detectores automáticos que deben generalizar sobre esta variabilidad. El drift es particularmente característico de repetidores como FRB 121102 \citep{Gajjar2018b}, mientras que eventos aparentemente únicos tienden a mostrar espectros más estrechos.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.92\textwidth]{Marco_conceptual/morfologias.jpg}
-\caption{Cuatro arquetipos observados de morfología de FRBs detectados por CHIME/FRB en el rango 400--800 MHz. Panel 1: banda ancha simple (``simple broadband''), con emisión intensa distribuida en un amplio rango de frecuencias. Panel 2: banda estrecha simple (``simple narrowband''), con emisión concentrada en un rango limitado de frecuencias. Panel 3: temporalmente compleja (``temporally complex''), mostrando múltiples componentes dispersas en tiempo y frecuencia. Panel 4: deriva descendente (``downward drifting''), exhibiendo el característico ``efecto trombón triste'' donde sub-pulsos sucesivos aparecen a frecuencias decrecientes. Cada panel muestra el espectro dinámico (abajo) y el perfil temporal integrado (arriba). Las líneas horizontales blancas corresponden a canales enmascarados por RFI. Crédito: \citet{Pleunis2021}.}
+\caption{Cuatro arquetipos morfológicos de FRBs (CHIME/FRB, 400--800 MHz): (1) banda ancha simple, (2) banda estrecha simple, (3) temporalmente compleja, y (4) deriva descendente (``efecto trombón triste''). Cada panel muestra espectro dinámico (abajo) y perfil temporal (arriba). Crédito: \citet{Pleunis2021}.}
 \label{fig:morfologias_frb}
 \end{figure}
 
-Un ejemplo detallado de esta complejidad morfológica se observa en FRB 121102, cuyas múltiples ráfagas revelan patrones intrincados de deriva en frecuencia y sub-estructuras temporales, como se ilustra en la Figura~\ref{fig:frb121102_waterfall}.
+Para ilustrar concretamente esta diversidad morfológica, un ejemplo detallado se observa en FRB 121102, cuyas múltiples ráfagas revelan patrones intrincados de deriva en frecuencia y sub-estructuras temporales, como se ilustra en la Figura~\ref{fig:frb121102_waterfall}.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.95\textwidth]{Marco_conceptual/waterfall-FRB121102.jpg}
-\caption{Espectros dinámicos de 18 ráfagas del repetidor FRB 121102 dedispersadas a DM = 560.5 pc cm$^{-3}$. El panel superior de cada subgráfico muestra el perfil temporal integrado, mientras que el panel principal presenta el espectro dinámico frecuencia--tiempo. Las observaciones abarcan tres campañas: serie AO (Arecibo, 1.2--1.7 GHz), serie GB (Green Bank, 1.7--2.3 GHz) y GB-BL (Green Bank Breakthrough Listen, 4--8 GHz). Se aprecia claramente la deriva descendente de sub-pulsos (``downward drift'') característica de este repetidor, donde componentes sucesivas de cada ráfaga descienden sistemáticamente en frecuencia con el tiempo --el ``efecto trombón triste''--. Las marcas rojas horizontales indican canales de frecuencia enmascarados por interferencia de radiofrecuencia (RFI). Nótese la variabilidad morfológica entre ráfagas: algunas presentan un solo pulso amplio (AO-01, AO-10), mientras otras exhiben múltiples sub-pulsos nítidos y separados (AO-06, AO-11, GB-01, GB-02). A frecuencias más altas (GB-BL, 4--8 GHz), los pulsos son significativamente más breves ($\sim$30--100 $\mu$s), ilustrando la reducción del scattering con la frecuencia. Esta figura constituye un excelente ejemplo de la complejidad tiempo--frecuencia intrínseca de los FRBs repetidores. Adaptado de \citet{Hessels2019}, Fig. 1.}
+\caption{Espectros dinámicos de 18 ráfagas de FRB 121102 (DM = 560.5 pc cm$^{-3}$) en tres campañas: Arecibo (1.2--1.7 GHz), Green Bank (1.7--2.3 GHz), y GB-BL (4--8 GHz). Se observa deriva descendente característica (``efecto trombón triste'') y variabilidad morfológica entre ráfagas. A frecuencias más altas (4--8 GHz), los pulsos son más breves ($\sim$30--100 $\mu$s), demostrando reducción del scattering. Adaptado de \citet{Hessels2019}.}
 \label{fig:frb121102_waterfall}
 \end{figure}
 
 \subsubsection{Incompletitud en Detección y Ráfagas Atípicas}
 
-Un desafío importante es que los métodos tradicionales de búsqueda pueden estar dejando escapar ráfagas atípicas. Por ejemplo, \citet{Gourdji2019} analizaron pulsos débiles de FRB 121102 y hallaron que muchos eran estrechos en banda ($\sim$200 MHz de ancho efectivo a 1.4 GHz), lo cual reduce su visibilidad en búsquedas de amplio ancho de banda con dedispersión incoherente. Esto sugiere que los FRBs con espectros inusualmente limitados o estructuras complejas podrían no activarse en los algoritmos estándar, subestimando la tasa real de detección \citep{Gourdji2019}. En resumen, la fenomenología observacional de los FRBs es rica: desde pulsos únicos hasta trenes de sub-pulsos modulados, con anchos de microsegundos a milisegundos, dispersados y a veces fuertemente polarizados. Estas propiedades proporcionan pistas cruciales sobre la naturaleza de sus progenitores y entornos, como se discutirá en las próximas secciones.
+Esta diversidad morfológica plantea un desafío crítico para la detección: los métodos tradicionales pueden perder ráfagas atípicas. Pulsos estrechos en banda ($\sim$200 MHz) o morfologías complejas escapan a algoritmos estándar, subestimando tasas de detección \citep{Gourdji2019}. Esta incompletitud motiva enfoques de aprendizaje profundo para detección directa, tema central de esta tesis. La fenomenología observacional descrita --diversidad morfológica, dispersión, polarización-- proporciona pistas sobre progenitores y desafía el diseño de detectores automáticos robustos.
 
 \subsection{Casos Históricos y FRBs Repetidores Notables}
 
+Habiendo establecido las propiedades físicas generales de los FRBs, examinamos ahora casos emblemáticos que han transformado nuestra comprensión del fenómeno y que sirven como casos de validación para pipelines automáticos de detección.
+
 \subsubsection{FRB 121102: El Primer Repetidor}
 
-Tras los primeros FRBs aislados, el hallazgo revolucionario vino en 2016 con la identificación del primer FRB repetidor, FRB 121102, por Spitler y colaboradores. FRB 121102 (también catalogado como FRB20121102A) fue inicialmente descubierto como un solo evento en 2014 con Arecibo \citep{Spitler2014}, pero un programa de seguimiento reveló múltiples estallidos recurrentes desde la misma coordenada en años posteriores \citep{Spitler2016}. Esta fuente, ubicada en la constelación de Auriga, se ha convertido en la más estudiada de los FRBs gracias a sus frecuentes repeticiones. Su importancia radica en que demostró que al menos algunos FRBs provienen de objetos persistentes y no de eventos catastróficos de un solo uso (como explosiones destructivas), apoyando escenarios de remanentes activos (como estrellas de neutrones jóvenes).
+El descubrimiento de FRB 121102 como primer repetidor \citep{Spitler2016} demostró que al menos algunos FRBs provienen de objetos persistentes y no de eventos catastróficos destructivos. Localizado en una galaxia enana a $z\approx0.19$ con región HII de formación estelar \citep{Chatterjee2017,Tendulkar2017}, se ha convertido en el FRB más estudiado con cientos de pulsos detectados entre 0.6--8 GHz. Sus características extraordinarias incluyen: altísima RM ($\sim1.4\times10^5$ rad m$^{-2}$), morfología compleja con deriva de sub-pulsos, y pulsos progresivamente más breves a altas frecuencias ($\sim30$--100 $\mu$s a 4--8 GHz) \citep{Gajjar2018a,Hessels2019}. FRB 121102 es un caso de validación crítico para esta tesis (Componente 1).
 
-FRB 121102 presentó varias características extraordinarias. Además de su ya mencionada altísima RM \citep{Michilli2018} que implicaba un entorno magnetizado intenso, fue el primer FRB precisamente localizado en el cielo: mediante observaciones interferométricas con el Very Large Array se logró asociarlo a una diminuta galaxia enana de bajo metalicidad a $z\approx0.19$ \citep{Chatterjee2017,Tendulkar2017}. En dicha galaxia, FRB 121102 reside coincidente con una región HII de intensa formación estelar, y se identificó además una fuente de radio persistente de bajo brillo en las cercanías \citep{Chatterjee2017}. Todo ello sugiere que el FRB podría originarse en un objeto compacto (p.ej. un magnetar joven o un pulsar nebular) alojado en un entorno denso (quizá el remanente de una supernova o cerca de un agujero negro). Este cuadro pionero transformó el campo: FRB 121102 pasó a ser un laboratorio único para estudiar la variabilidad y espectro de los FRBs. Se han detectado ya cientos de pulsos de esta fuente a lo largo de múltiples campañas, abarcando frecuencias desde $\sim$600 MHz hasta 8 GHz. Notablemente, \citet{Gajjar2018a} reportaron más de una docena de ráfagas en solo 30 minutos de observación con el telescopio de Green Bank a 4--8 GHz, y mostraron que a dichas altas frecuencias los pulsos de FRB 121102 tienden a ser más breves y con subestructuras espectrales definidas. También \citet{Hessels2019} encontraron una compleja estructura tiempo-frecuencia con deriva sistemática de sub-pulsos, lo cual incluso planteó la posibilidad de usar la morfología como criterio para distinguir FRBs repetidores de no repetidores.
+\subsubsection{FRB 180916 y Periodicidad}
 
-\subsubsection{FRB 180916: Periodicidad de 16 Días}
+Más allá de las ráfagas múltiples, algunos repetidores exhiben periodicidad en su actividad. FRB 180916 (CHIME/FRB) reveló periodicidad de $\sim16.35$ días, la primera evidencia de ciclos de actividad en FRBs \citep{CHIME_FRB_Collaboration_2020}. Indicios tentativos de periodicidad $\sim161$ días también se reportaron para FRB 121102 \citep{Rajwade2020,cruces2020frb121102}. Estas modulaciones temporales sugieren sistemas binarios o precesión de magnetars, y son relevantes para estrategias de observación dirigida.
 
-Otro descubrimiento trascendental fue el de FRB 180916.J0158+65 (también designado 20180916B), el segundo repetidor confirmado inicialmente anunciado por el experimento canadiense CHIME/FRB \citep{CHIME_FRB_Collaboration_2020}. Este FRB, de DM $\sim348$ pc cm$^{-3}$, es particularmente notable porque CHIME posteriormente detectó en él un comportamiento periódico en su actividad: ráfagas recurrentes agrupadas en ventanas de unos pocos días, repitiéndose cada $\sim16.35$ días \citep{CHIME_FRB_Collaboration_2020}. Fue la primera evidencia de periodicidad en los FRBs, publicada en 2020, y generó enorme interés ya que sugiere modulación por un ciclo astronómico. El origen de dicha periodicidad aún se debate; modelos propuestos incluyen un sistema binario donde el FRB (posiblemente un magnetar) orbita una estrella masiva y solo es observable en parte de la órbita \citep{Lyutikov2020}, o un magnetar aislado con precesión del eje de emisión produciendo intervalos de actividad \citep{Levin2020}. 
+\subsubsection{Propiedades Distintivas de Repetidores}
 
-\subsubsection{Ciclos de Actividad y Periodicidad en Repetidores}
-
-En cualquier caso, FRB 180916 mostró que no todos los repetidores son aleatorios: algunos pueden tener ciclos de actividad. Hasta ahora, este FRB de 16 días es el ejemplo más firme, aunque hay indicios tentativos de periodicidades más largas en otros casos. Precisamente, \citet{Rajwade2020} analizaron 5 años de datos de FRB 121102 (el primer repetidor) y sugirieron una posible modulación periódica de $\sim161$ días en sus épocas activas, con una ventana activa de $\sim54$ días seguida de $\sim107$ días ``apagado''. Este resultado fue anunciado con cautela debido a la limitada muestra de pulsos y a largos periodos sin detección, y estudios posteriores con más detecciones \citep{cruces2020frb121102} han refinado o cuestionado ese valor. No obstante, la posibilidad de que los FRBs repetidores tengan escalas de actividad cíclica sugiere que podrían ser objetos en sistemas binarios o con precesión periódica, aportando una pieza más al rompecabezas de su origen.
-
-\subsubsection{Propiedades Distintivas de FRBs Repetidores}
-
-A la fecha, se han confirmado observacionalmente varias decenas de FRBs repetidores \citep{Fonseca2020,CHIME2021}. La gran mayoría de FRBs descubiertos ($\approx95\%$) siguen siendo eventos no repetidos en las observaciones hasta ahora \citep{Petroff_2022}. No está claro si los FRBs de una sola aparición forman una clase distinta (por ejemplo, explosiones catastróficas que destruyen la fuente) o si simplemente sus repeticiones son muy raras o difíciles de detectar. Los repetidores bien estudiados, como FRB 121102 y FRB 180916, comparten algunas propiedades: tienden a tener múltiples componentes tiempo-frecuencia (sub-pulsos con drift), espectros más estrechos y, en promedio, anchos de pulso algo mayores que los FRBs uno-a-uno detectados con instrumental equivalente \citep{Fonseca2020,Pleunis2021}. Adicionalmente, algunos repetidores muestran cambios en sus propiedades entre distintas épocas: por ejemplo, FRB 121102 exhibió variaciones en DM y RM sutiles a lo largo de años, indicando cambios en el plasma circundante \citep{cruces2020frb121102}, y FRB 180916 mostró que sus ráfagas a 400 MHz (CHIME) y a 1.4 GHz (otras antenas) ocurrían en distintas fases del ciclo de 16 días, sugiriendo que las emisiones de baja y alta frecuencia podrían activarse en momentos diferentes dentro del periodo \citep{PastorMarazuela2021}. Todos estos hallazgos apuntan a escenarios de progenitores dinámicos --posiblemente estrellas de neutrones jóvenes con un entorno local en evolución, o interacciones binarias--. La siguiente sección profundiza en el modelo actualmente más favorecido de progenitor: los magnetars o magnetares, vinculado fuertemente a raíz de un descubrimiento notable en nuestra propia Galaxia.
+Generalizando más allá de estos casos individuales, se han confirmado decenas de repetidores, aunque $\approx95\%$ de FRBs descubiertos permanecen como eventos únicos \citep{Petroff_2022}. Los repetidores tienden a exhibir: múltiples sub-pulsos con drift, espectros más estrechos, y variaciones temporales en DM/RM indicando evolución del plasma circundante \citep{Fonseca2020,Pleunis2021,cruces2020frb121102}. Estas propiedades apuntan a progenitores dinámicos --posiblemente magnetars jóvenes-- cuya identificación se aborda en la siguiente sección.
 
 \subsection{Magnetars y su Vínculo con los FRBs}
 
-\subsubsection{Características de los Magnetars}
+\subsubsection{Magnetars como Progenitores: Evidencia de SGR 1935+2154}
 
-Los magnetars son un subtipo de estrellas de neutrones con campos magnéticos extraordinariamente intensos ($\geq10^{14}$ Gauss en superficie). Estas estrellas pueden liberar abruptamente su energía magnética en forma de poderosos destellos de rayos X/gamma y en emisiones de radio coherentes. Desde hace algunos años se ha propuesto que los magnetars jóvenes podrían ser los progenitores de muchos FRBs extragalácticos \citep{PopovPostnov2010,Lyutikov2017}. Diversas evidencias sostienen esta conexión: (i) los FRBs requieren altas energías en intervalos brevísimos, coherentes con erupciones magnetares; (ii) su localización en galaxias con intensa formación estelar sugiere objetos jóvenes \citep{Tendulkar2017,Bochenek2020}; (iii) las altas RMs medidas, como en FRB 121102, apuntan a entornos como los vientos magnetizados de un magnetar o su remanente de supernova \citep{Michilli2018}. 
+Los magnetars son estrellas de neutrones con campos magnéticos extraordinariamente intensos ($\geq10^{14}$ G) capaces de liberar energía magnética en destellos de rayos X/gamma y emisiones de radio coherentes. Diversas evidencias sostienen su conexión con FRBs: (i) requerimientos energéticos compatibles, (ii) localización en regiones de formación estelar sugiriendo objetos jóvenes \citep{Tendulkar2017,Bochenek2020}, y (iii) altas RMs indicando entornos magnetizados extremos \citep{Michilli2018,PopovPostnov2010,Lyutikov2017}.
 
-\subsubsection{SGR 1935+2154: El FRB Galáctico}
-
-Pero la prueba más contundente surgió el 28 de abril de 2020, cuando por primera vez se detectó una ráfaga de radio en nuestra Galaxia con propiedades análogas a un FRB: el magnetar SGR 1935+2154 emitió un pulso doble de $\sim$ms de duración con una fluencia colosal de $\sim1.5 \times 10^6$ Jy$\cdot$ms \citep{Bochenek2020}. Este evento, designado como FRB 200428 en el contexto extragaláctico, fue captado independientemente por dos experimentos: STARE2 en microondas \citep{Bochenek2020} y CHIME/FRB en 400--800 MHz \citep{CHIME_SGR2020}. La energía isotrópica equivalente liberada (asumiendo la distancia de 9 kpc del magnetar) fue del orden de $10^{34}$ J, unas $10^3$--$10^4$ veces mayor que cualquier pulso de radio galáctico conocido, aunque aún aproximadamente 30--40 veces más débil que el FRB extragaláctico menos energético registrado \citep{Bochenek2020}. Esto coloca al evento de SGR 1935 en el rango intermedio entre la población de ráfagas de magnetar galácticas y los FRBs cosmológicos, fortaleciendo la idea de continuidad física entre ambos fenómenos. Además, de forma crucial, la ráfaga de radio coincidió con un estallido de rayos X prácticamente simultáneo detectado por satélites \citep{Mereghetti2020,Li2021}, lo que concuerda con modelos en los que una reconexión o erupción en la magnetosfera del magnetar genera tanto un pulso de radio coherente (p.ej. mediante un mecanismo de máser de plasma) como un pulso de alta energía. La Figura~\ref{fig:sgr1935_radio_xray} muestra la extraordinaria coincidencia temporal entre las emisiones de radio y rayos X de este evento histórico.
+La prueba definitiva llegó el 28 de abril de 2020: el magnetar galáctico SGR 1935+2154 emitió un pulso tipo-FRB de fluencia $\sim1.5 \times 10^6$ Jy$\cdot$ms, detectado por STARE2 y CHIME/FRB \citep{Bochenek2020,CHIME_SGR2020}. Con energía $\sim10^{34}$ J (distancia 9 kpc), este evento (FRB 200428) se ubica entre ráfagas típicas de magnetar y FRBs cosmológicos, estableciendo continuidad física entre ambos. Crucialmente, el pulso de radio coincidió con un estallido de rayos X simultáneo (Figura~\ref{fig:sgr1935_radio_xray}), confirmando que reconexión magnetosférica puede generar emisión multi-longitud de onda \citep{Mereghetti2020,Li2021}.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.85\textwidth]{Marco_conceptual/FRB-magnetar.png}
-\caption{Coincidencia radio--rayos X del evento FRB 200428 de SGR 1935+2154 (28 de abril de 2020). La curva azul con barras de error muestra el perfil temporal del estallido en rayos X duros detectado por el observatorio espacial INTEGRAL, con un pico principal de $\sim$23 cuentas ms$^{-1}$ a t$\approx$0.46 s y un segundo pico de $\sim$15 cuentas ms$^{-1}$ a t$\approx$0.49 s. Las dos líneas rojas verticales indican los tiempos de llegada (tras dedispersión) de los dos picos de radio medidos independientemente por CHIME/FRB a 400--800 MHz: el primer pico de radio ($\sim$0.42 s) precede ligeramente al máximo de rayos X, mientras que el segundo pico de radio ($\sim$0.45 s) coincide con la fase ascendente del pulso principal de rayos X. Esta correlación temporal multi-longitud de onda (radio + rayos X) estableció de forma definitiva el vínculo entre magnetars galácticos y FRBs extragalácticos, demostrando que un mismo proceso físico (posiblemente reconexión magnetosférica) puede generar simultáneamente emisión coherente de radio y radiación de alta energía. Tiempo de referencia: 2020-04-28 14:34:24 UTC. Adaptado de \citet{Mereghetti2020}; datos de radio de \citet{CHIME_SGR2020,Bochenek2020}.}
+\caption{Coincidencia radio--rayos X del evento FRB 200428 de SGR 1935+2154 (28 abril 2020). Perfil temporal de rayos X (curva azul, INTEGRAL) con dos picos principales. Líneas rojas verticales: tiempos de arribo de pulsos de radio (CHIME/FRB, 400--800 MHz). Esta correlación temporal multi-longitud de onda estableció definitivamente el vínculo magnetar-FRB. Adaptado de \citet{Mereghetti2020,CHIME_SGR2020,Bochenek2020}.}
 \label{fig:sgr1935_radio_xray}
 \end{figure}
 
-\subsubsection{Implicaciones para el Origen de FRBs}
+\subsubsection{Implicaciones y Emisión en Alta Frecuencia}
 
-La implicación de este descubrimiento es que magnetars activos pueden explicar al menos parte de la población de FRBs. Un magnetar joven (edad $\sim10^2$--$10^4$ años) en nuestra Galaxia emitiendo una erupción inusualmente poderosa se vería desde otras galaxias como un FRB típico \citep{Bochenek2020}. Cabe destacar que FRB 200428 (SGR 1935+2154) presentó dos picos sub-milisegundos separados por $\sim30$ ms y con drifts espectrales opuestos en banda, muy parecidos a sub-pulsos de FRBs repetidores \citep{Zhang2020}, reforzando la analogía. Tras este hallazgo, otros magnetars galácticos han sido seguidos atentamente en busca de emisiones FRB, aunque sin detecciones comparables hasta ahora.
+El evento de SGR 1935+2154 tiene implicaciones profundas tanto para la comprensión de progenitores como para estrategias observacionales. Este descubrimiento establece que magnetars jóvenes ($\sim10^2$--$10^4$ años) pueden explicar al menos parte de los FRBs: una erupción magnetar vista desde otra galaxia aparecería como FRB típico \citep{Bochenek2020}. FRB 200428 presentó morfología similar a repetidores (dos picos separados $\sim30$ ms con drifts espectrales) \citep{Zhang2020}, reforzando la analogía.
 
-\subsubsection{PSR J1745-2900: Emisión en Banda Milimétrica}
+Crucialmente para esta tesis, los magnetars emiten en bandas milimétricas. \citet{veracasanova2025} detectaron 8 pulsos del magnetar galáctico PSR J1745--2900 con ALMA a $\sim86$ GHz (Banda 3), la primera observación de ráfagas de magnetar en régimen mm. Las energías ($\sim10^{29}$ erg) siguieron ley de potencia con exponente $-2.4$, consistente con magnetars en cm y FRBs repetitivos, sugiriendo continuidad de mecanismos de emisión a través de décadas de frecuencia. Este resultado valida la viabilidad de observar FRBs extragalácticos en bandas milimétricas (Componente 2 de esta tesis).
 
-Los magnetars no solo pueden emitir en radio a frecuencias estándar ($\sim1$ GHz), sino potencialmente en bandas mucho más altas. De hecho, algunos magnetars galácticos se han detectado como radiosources persistentes de baja luminosidad. Un caso importante es el magnetar de nuestro centro galáctico, PSR J1745--2900, que orbita a unos pocos años luz del agujero negro central Sgr A*. Este magnetar mostró pulsos de radio tras su nacimiento en 2013, y estudios posteriores confirmaron su emisión hasta frecuencias milimétricas. Recientemente, \citet{veracasanova2025} reportaron la detección de pulsos altamente polarizados de PSR J1745--2900 usando ALMA a $\sim86$ GHz (longitud de onda $\sim3.5$ mm), representando la primera observación de ráfagas de un magnetar en el régimen mm. Se detectaron 8 pulsos individuales con energías en el rango de $10^{29}$ erg, y sorprendentemente, la distribución de energías siguió una ley de potencia con exponente $-2.4$ consistente con la observada tanto en magnetars a frecuencias cm como en FRBs repetitivos \citep{veracasanova2025}. Esto sugiere una continuidad en los mecanismos de emisión a lo largo de muchas décadas de frecuencia.
+Las ventajas de observar FRBs en mm incluyen: (i) scattering reducido ($\propto \nu^{-4}$) captando morfologías intrínsecas, y (ii) penetración en entornos densos opacos a bajas frecuencias \citep{Yang2020,Omand2022}. Los desafíos incluyen espectros típicamente decrecientes (índice $-1$ a $-3$) y campos de visión limitados. ALMA, operando en modo fasado (phased array) con diámetro efectivo $\sim84$ m y resolución temporal $\sim100$ $\mu$s, es el instrumento más sensible para búsquedas en bandas 3--6 (85--150 GHz). Los estudios piloto sugieren viabilidad de detectar decenas de púlsares y repetidores FRB durante fases activas \citep{veracasanova2025}. En suma, los magnetars proporcionan el nexo entre fenómenos locales y cosmológicos, motivando la extensión de detectores automáticos a alta frecuencia abordada en esta tesis.
 
-La detección de pulsos hasta $\sim300$ GHz (onda sub-mm) es un territorio aún inexplorado para los FRBs extragalácticos, pero los resultados con magnetars galácticos son prometedores. Si los FRBs son realmente magnetars, no hay una razón fundamental para que cesen de emitir en banda mm, salvo la decaída de la potencia con la frecuencia. Las ventajas de observar FRBs en alta frecuencia incluyen: (i) el scattering intergaláctico e interestelar es mucho menor a mm (permitiendo captar la forma intrínseca del pulso), y (ii) ciertos FRBs en entornos densos podrían ser opacos a bajas frecuencias pero visibles a frecuencias altas que penetran mejor \citep{Yang2020}. De hecho, se ha planteado que un FRB asociado a un magnetar en una región muy densa (como una supernova joven) podría ser indetectable por debajo de $\sim1$ GHz debido a plasmas con alta absorción libre-libre o dispersión, pero detectable en bandas mm una vez suficientemente brillante \citep{Omand2022}. Por otra parte, los desafíos son considerables: la emisión de sincrotrón coherente de magnetar/pulsar suele disminuir con la frecuencia (espectros de índice $-1$ a $-3$), por lo que las ráfagas en mm serían más débiles; además, los telescopios mm tienen campos de visión pequeños. No obstante, instrumental como el Atacama Large Millimeter/submillimeter Array (ALMA) en modo fasado (phased array) ha demostrado ser capaz de descubrir pulsos en mm. ALMA, al combinar 50+ antenas de 12 m, actúa como un único plato de diámetro efectivo $\sim84$ m, el más sensible en el rango mm. Con su alta resolución temporal (hasta $\sim100$ $\mu$s), ALMA puede buscar FRBs y pulsos de magnetar en bandas 3, 4, 6 (85--150 GHz) e incluso banda 1 (35--50 GHz) que próximamente entrará en operación con receptores dedicados.
+\subsection{Observación de FRBs en Alta Frecuencia: Oportunidades y Desafíos}
 
-Los estudios piloto sugieren que varias decenas de púlsares galácticos conocidos podrían ser detectados por ALMA en mm \citep{veracasanova2025}, y estiman que si se apunta ALMA hacia un FRB repetidor durante sus fases de alta actividad, se podrían registrar varios estallidos por hora si su espectro se extiende suficientemente en frecuencia. En suma, los magnetars proporcionan un nexo plausible entre fenómenos locales y cosmológicos. La asociación directa de SGR 1935+2154 con un FRB y la posibilidad de estudiar magnetars en rango milimétrico abren nuevas ventanas observacionales que pueden confirmar definitivamente el origen magnetar de los FRBs, o revelar la existencia de múltiples poblaciones de progenitores.
+La evidencia de emisión de magnetars en banda milimétrica motiva examinar las oportunidades y desafíos de extender las búsquedas de FRBs hacia el régimen milimétrico (30--300 GHz). Históricamente, los FRBs se han detectado en bandas centimétricas (100 MHz - 10 GHz) donde la emisión es intensa pero sufre fuertemente efectos de propagación. Esta sección integra las ventajas físicas de alta frecuencia, los desafíos algorítmicos que motivan el Componente 2 de esta tesis, y el estado actual del instrumental disponible.
 
-\subsection{Observación de FRBs en Alta Frecuencia (ondas milimétricas)}
+\subsubsection{Ventajas Físicas: Mitigación de Efectos de Propagación}
 
-La extensión de las búsquedas de FRBs hacia frecuencias milimétricas (30--300 GHz) representa tanto
-una oportunidad emocionante como un desafío técnico. Históricamente, casi todos los FRBs se han
-detectado en bandas de radio centimétricas (de 100 MHz a varios GHz) donde la emisión es más intensa
-y los radiotelescopios tienen gran área colectora. Sin embargo, hay motivaciones clave para explorar
-frecuencias más altas:
+Los retardos por dispersión ($\Delta t \propto \nu^{-2}$) y scattering ($\tau_{\rm sc} \propto \nu^{-4}$) decrecen drásticamente con la frecuencia. A frecuencias mm, un pulso sufre ensanchamiento miles de veces menor que a 1 GHz, permitiendo captar morfologías intrínsecas. En ALMA banda 3 (86 GHz, ancho 2 GHz), la demora por DM $\sim1770$ pc cm$^{-3}$ es apenas $\sim46$ $\mu$s, posibilitando integración directa en frecuencia sin dedispersión \citep{veracasanova2025}.
 
-\subsubsection{Mitigación de Dispersión y Scattering}
+Adicionalmente, altas frecuencias penetran entornos densos (restos de supernova, vientos nebulares) opacos a bajas frecuencias, abriendo la posibilidad de detectar FRBs ``oscuros'' invisibles para CHIME o Parkes \citep{Yang2020,Omand2022,Hilmarsson2022}.
 
-La mitigación de la dispersión y scattering: Como se indicó, los retardos por dispersión decrecen
-fuertemente con la frecuencia ($\Delta t \propto \nu^{-2}$), y la dispersión multi-trayectoria
-(scattering) aún más abruptamente ($\tau_{\rm sc} \propto \nu^{-4}$ típicamente). A frecuencias
-mm, un pulso atravesando un mismo plasma sufre un ensanchamiento temporal miles de veces
-menor que a 1 GHz. Esto significa que FRBs muy distantes o en entornos densos, cuyos pulsos
-en banda L (1.4 GHz) estarían ensanchados por scattering a decenas de ms y casi irreconocibles,
-podrían manifestarse nítidamente a 100 GHz con anchuras intrínsecas de solo $\mu$s o ms. Además,
-el barrido de dispersión dentro del ancho de banda de recepción es mínimo. Por ejemplo, en
-ALMA banda 3 (centro $\sim86$ GHz, ancho 2 GHz), la demora entre el extremo inferior y superior de
-banda para un FRB con DM $\sim1770$ pc cm$^{-3}$ (como FRB 121102) es de apenas $\sim46$ $\mu$s
-. En tales condiciones, ni siquiera es necesario dedispersar en tiempo real para detectar
-el pulso; en la búsqueda de pulsos del magnetar galáctico con ALMA, se fijó la DM conocida y se
-sumaron las frecuencias sin pérdida significativa de S/N \citep{veracasanova2025}. La
-contrapartida es que con un retardo tan reducido, la característica curva $\nu^{-2}$ deja de ser
-evidente en un solo espectro dinámico estrecho, eliminando una de las firmas clásicas para
-distinguir un pulso astrofísico de un espurio de RFI. En ALMA, por ejemplo, al no haber una
-deriva detectable en frecuencia dentro de la banda, la confirmación de pulso requirió apoyarse
-en la alta polarización intrínseca y en la coincidencia con la fase de pulsar esperada (en el caso
-del magnetar PSR J1745--2900). Para FRBs extragalácticos, esto implicaría que detectar
-un FRB a mm sin conocimiento previo de su DM sería difícil, ya que la ``huella'' de dispersión en
-una pequeña banda mm sería casi imperceptible. Por tanto, las búsquedas mm podrían
-necesitar ya conocer la DM (p. ej., apuntar a una fuente repetidora previamente caracterizada en
-cm) o cubrir un ancho de banda muy grande para captar alguna curvatura.
+\subsubsection{Desafíos: Sensibilidad, Firma Dispersiva y Morfología}
 
-\subsubsection{Entornos Densos y Opacidad}
+Sin embargo, las ventajas vienen acompañadas de desafíos significativos. Primero, los espectros típicamente decrecientes (índice $\alpha \approx -1$ a $-3$, flux $\propto \nu^\alpha$) implican que pulsos a 100 GHz podrían ser 1--2 órdenes de magnitud más débiles que a 1 GHz \citep{Jankowski2017}. Un FRB de 1 Jy$\cdot$ms a 1.4 GHz tendría solo $\sim0.1$ Jy$\cdot$ms a 90 GHz.
 
-Entornos densos y opacidad: Algunos modelos proponen que ciertos FRBs jóvenes residen en
-entornos densos (como restos de supernova o vientos nebulares) que podrían absorber o
-dispersar completamente la emisión de radio por debajo de una frecuencia de corte, pero dejar
-pasar componentes de mayor frecuencia. Observar en mm abriría la posibilidad de detectar
-FRBs ``oscuros'' a bajas frecuencias. Un caso ilustrativo es el FRB repetidor 20201124A, cuya
-densa región de plasma observada sugiere que podría atenuar fuertemente su propia emisión
-de baja frecuencia \citep{Hilmarsson2022}. En general, las ondas mm atraviesan columnas de
-plasma con mucha menos atenuación libre-libre que ondas de 20--50 cm. Por ello, telescopios
-como ALMA podrían eventualmente descubrir FRBs en galaxias muy activas o entornos que
-resulten invisibles para instrumentos como CHIME o Parkes.
+Segundo, y crítico para algoritmos de detección, la firma dispersiva se comprime drásticamente: la curva $\nu^{-2}$ se vuelve casi imperceptible, eliminando el indicador clave para distinguir FRBs de RFI. Para FRBs extragalácticos sin DM conocido, detectar en mm sin firma dispersiva clara requiere estrategias alternativas: (i) validación por polarización (FRBs muestran $>50\%$ polarización vs. RFI no polarizada \citep{veracasanova2025}), (ii) coherencia multi-antena en arrays interferométricos, o (iii) detecciones simultáneas multi-frecuencia.
 
-\subsubsection{Telescopios y Sensibilidad en Banda Milimétrica}
+Tercero, se desconoce la morfología temporal en mm. Pulsos podrían revelar microestructuras de $\mu$s-ns (ya medidas 3--4 $\mu$s en FRB 180916 a 600 MHz \citep{Nimmo2021}) o, inversamente, carecer de complejidades presentes a bajas frecuencias (drift, sub-pulsos múltiples).
 
-Telescopios y sensibilidad: El principal instrumento capaz de estas observaciones es ALMA.
-Operando en modo fasado, ALMA ha demostrado una sensibilidad incomparable en 3 mm: la
-detección de pulsos de $\sim1$ Jy con anchos de unos ms es factible con unas pocas decenas de
-milisegundos de integración (en comparación, una antena single-dish de 12 m tardaría minutos
-en alcanzar similar S/N). En la Tabla 1 de \citet{veracasanova2025} se comparan retardos de
-dispersión entre banda L (1.4 GHz) y bandas mm: para DM altas ($\sim2000$), Effelsberg a 1.3 GHz
-experimenta retardos de $\sim17.93$ s (!) entre 1.21--1.51 GHz, mientras ALMA a 86 GHz tendría solo
-46 $\mu$s. Esto ilustra cuán limpio es el régimen mm respecto a la dispersión. No obstante,
-ALMA y otros observatorios mm tienen campos de visión pequeños (de pocos minutos de arco a
-3 mm), por lo que no es práctico realizar barridos ciegos de grandes áreas del cielo como se
-hace a 1.4 GHz. En su lugar, la estrategia es apuntar a fuentes FRB conocidas (por ejemplo,
-repetidores con coordenadas catalogadas) durante sus fases activas. Telescopios como el IRAM
-30m o el futuro QTT en 110 GHz también podrían contribuir con detectores de pulsos.
+\subsubsection{Instrumental: ALMA y Capacidades Actuales}
 
-\subsubsection{Resultados Iniciales y Expectativas}
+ALMA, operando en modo fasado (diámetro efectivo $\sim84$ m, resolución $\sim100$ $\mu$s), es el instrumento más sensible en 3 mm, capaz de detectar pulsos de $\sim1$ Jy en decenas de ms. Sin embargo, campos de visión pequeños (pocos arcmin) hacen imprácticos barridos ciegos. La estrategia es apuntar a repetidores conocidos durante fases activas (ej. FRB 121102 en intervalos ``on'' $\sim160$ días, FRB 180916 cada 16 días).
 
-Resultados iniciales y expectativas: La detección de los 8 pulsos del magnetar galáctico con
-ALMA banda 3 prueba la eficacia del instrumento y la existencia de emisión pulsada a altas
-frecuencias \citep{veracasanova2025}. Extrapolando esos resultados, los autores estiman que
-más de 160 púlsares galácticos conocidos deberían ser visibles por ALMA en al menos una de
-sus bandas. En el caso de FRBs extragalácticos, la predicción es más incierta debido a sus
-desconocidos espectros de alta frecuencia. Si asumimos que un FRB repetidor mantiene un
-índice espectral similar al promedio de púlsares ($\alpha \sim -1.6$; \citet{Jankowski2017}) o de
-FRBs de ASKAP ($\sim -1.5$; \citet{Macquart2019}), una ráfaga de 1 Jy$\cdot$ms a 1.4 GHz tendría una
-fluencia de $\sim0.1$ Jy$\cdot$ms a 86 GHz. ALMA podría detectar eso marginalmente. Sin embargo,
-algunos FRBs repetidores han mostrado espectros más planos o invertidos en ciertas ráfagas
-\citep{Law2017,Gajjar2018a}, lo que abre la posibilidad de ráfagas relativamente fuertes
-en mm. Es revelador que durante la campaña de 2020 del repetidor FRB 180916, no se
-detectaron pulsos en simultáneo con el telescopio óptico FAST a 1250 MHz mientras sí se veían
-en CHIME a 600 MHz, insinuando un posible debilitamiento hacia frecuencias más altas \citep{Xu2021}. Por el contrario, FRB 121102 fue visible hasta 8 GHz. En conclusión, aunque todavía
-ningún FRB extragaláctico ha sido reportado en mm, los próximos años podrían cambiar esto.
-Programas de busca de FRBs con ALMA ya están en marcha, priorizando repetidores durante
-ventanas pronosticadas de actividad (por ejemplo, FRB 121102 en sus intervalos ``on'' sugeridos
-de $\sim160$ días, o FRB 180916 en su fase pico cada 16 días). La primera detección de un FRB en
-banda mm supondría un gran avance, confirmando la extensión de su espectro y permitiendo
-mediciones de DM sin degeneración con RM (ya que a altas frecuencias la rotación Faraday es
-casi imperceptible mientras la dispersión sigue presente).
+\subsubsection{Resultados Iniciales con ALMA}
 
-\subsubsection{Desafíos Técnicos y Validación de Señales}
+La detección de 8 pulsos del magnetar galáctico PSR J1745--2900 con ALMA banda 3 prueba la eficacia del instrumento y existencia de emisión pulsada en mm \citep{veracasanova2025}. Extrapolando, se estima que $>160$ púlsares galácticos serían visibles por ALMA. Para FRBs extragalácticos, asumiendo índices espectrales típicos ($\alpha \sim -1.5$ \citep{Jankowski2017,Macquart2019}), una ráfaga de 1 Jy$\cdot$ms a 1.4 GHz tendría $\sim0.1$ Jy$\cdot$ms a 86 GHz, marginalmente detectable. Aunque ningún FRB extragaláctico ha sido reportado en mm, programas de búsqueda están en marcha priorizando repetidores durante ventanas de actividad.
 
-Entre las dificultades únicas de las observaciones mm cabe mencionar: (a) la sensibilidad requerida
---los FRBs en mm podrían ser mucho más débiles, requiriendo integración muy rápida y muchos
-radiotelescopios en fase--; (b) la casi nula curvatura de dispersión dentro de bandas estrechas, haciendo
-difícil distinguir eventos astrofísicos de RFI sin otras pistas (como polarización o coincidencia temporal
-con telescopios de menor frecuencia); y (c) la posible variación de la morfología de la señal --si la
-emisión FRB proviene de pulsos coherentes de plasmas relativistas, sus propiedades espectrales
-podrían cambiar con la frecuencia, por ejemplo pulsos más cortos y espectralmente más simples en
-mm que en 600 MHz. La experiencia con pulsos de magnetar en ALMA sugiere que la polarización es un
-criterio útil para validación: en 86 GHz, todos los pulsos detectados de PSR J1745--2900 mostraron
-fracciones de polarización (lineal o circular) $>50\%$, claramente diferenciados del ruido o RFI \citep{veracasanova2025}. Asimismo, conocer de antemano la periodicidad de la fuente (si es un pulsar o
-magnetar) ayuda a descartar señales espurias. En el caso de FRBs cosmológicos, que no repiten de
-forma predecible, la confirmación tendría que venir de detecciones simultáneas multi-frecuencia: por
-ejemplo, un FRB visto por CHIME a 600 MHz y por ALMA a 100 GHz en el mismo instante, con la misma
-DM, sería evidencia incontrovertible de emisión broadband.
+\subsubsection{Limitaciones Instrumentales y Criterios de Validación}
 
-Las observaciones en alta frecuencia representan la frontera emergente en el estudio de
-FRBs. Si bien intrincadas, prometen grandes recompensas: podrían revelar FRBs escondidos,
-proporcionar pulsos libres de distorsión por plasma, y aportar restricciones severas a los modelos de
-emisión (por ejemplo, si se detecta un corte espectral). Telescopios de próxima generación como el
-Deep Space Network 70m (en banda Ka) o configuraciones de VLBI con antenas de plato grande a 20--
-50 GHz también contribuirán. De momento, ALMA, gracias a su sensibilidad sin precedentes, se perfila
-como pionero en la búsqueda de FRBs en el dominio milimétrico, ofreciendo la posibilidad tangible de
-explorar una ventana frecuencial hasta ahora inexplorada para estos misteriosos estallidos
-cósmicos.
+Las limitaciones prácticas incluyen: atenuación atmosférica, ruido térmico elevado, calibrado preciso multi-antena, y disponibilidad limitada de tiempo de telescopio. La experiencia con ALMA demuestra que validación requiere criterios alternativos: polarización (todos los pulsos del magnetar mostraron $>50\%$ polarización, claramente diferenciados de RFI \citep{veracasanova2025}), coherencia multi-antena, o detecciones simultáneas multi-frecuencia (ej. CHIME a 600 MHz + ALMA a 100 GHz con misma DM como evidencia incontrovertible).
+
+\medskip
+
+En suma, las observaciones en mm representan una frontera emergente prometedora: podrían revelar FRBs escondidos, proporcionar pulsos sin distorsión por plasma, y aportar restricciones severas a modelos de emisión. ALMA se perfila como pionero, ofreciendo la posibilidad de explorar esta ventana frecuencial inexplorada. Los desafíos identificados --compresión de firma dispersiva, sensibilidad reducida, morfología desconocida-- motivan las estrategias metodológicas adaptadas del Componente 2 de esta tesis.
 
 \subsection{Métodos Tradicionales de Búsqueda y Detección de FRBs}
+
+Para contextualizar las soluciones basadas en aprendizaje profundo que constituyen el núcleo de esta tesis, es esencial comprender primero los métodos tradicionales de detección que han dominado el campo y cuyas limitaciones motivan el desarrollo de nuevos enfoques.
 
 \subsubsection{Pipeline Clásico de Detección}
 
@@ -256,7 +166,7 @@ optimizados como la Transformada Dispersiva Rápida (FDMT; \citet{ZackayOfek2017
 explotan transformadas acumulativas. Herramientas populares como HEIMDALL \citep{Champion2016} realizan esta dedispersión de manera paralela en GPUs, permitiendo explorar miles de
 DM en tiempo real. Alternativamente, PRESTO \citep{Ransom2001} implementa dedispersión por subbandas de forma eficiente en CPU.
 
-\item \textbf{Filtrado por anchura de pulso:} Los pulsos pueden sufrir dispersión intrínseca o scattering,
+\item \textbf{Filtrado por anchura de pulso:} Una vez dedispersados los datos, el siguiente paso optimiza la detección para pulsos de diferentes anchos. Los pulsos pueden sufrir dispersión intrínseca o scattering,
 haciéndolos más anchos que la resolución nativa. Para maximizar la detección, se aplica una
 familia de filtros de suavizado (convolución con ventanas) a cada serie temporal dedispersada
 para distintas longitudes (p. ej., 1, 2, 4, 8, ..., 128 ms). Esto simula la integración de la señal en
@@ -268,14 +178,14 @@ sobre un umbral de S/N predefinido (típicamente 6$\sigma$--8$\sigma$). Cada vez
 umbral, se registra un candidato con sus parámetros: DM, tiempo de llegada, S/N y anchura
 (correspondiente al filtro óptimo).
 
-\item \textbf{Agrupamiento y coincidencias:} Dado que un pulso real suele generar múltiples detecciones
+\item \textbf{Agrupamiento y coincidencias:} La etapa de umbralización genera numerosas detecciones redundantes que deben consolidarse. Dado que un pulso real suele generar múltiples detecciones
 cercanas (por ejemplo, en DMs adyacentes o en anchos parecidos), los candidatos brutos se
 agrupan para evitar duplicados. Se agrupan por proximidad en tiempo y DM utilizando
 algoritmos de friends-of-friends o kNN en el espacio (t, DM) \citep{BurkeSpolaor2011}. Así,
 múltiples detecciones de un mismo evento colapsan a un único candidato representativo con la
 DM y anchura que dio máxima S/N.
 
-\item \textbf{Rechazo de interferencia (RFI):} En paralelo, se realizan filtros para descartar señales originadas
+\item \textbf{Rechazo de interferencia (RFI):} A pesar del agrupamiento, la mayoría de candidatos restantes son aún artefactos instrumentales o terrestres. En paralelo, se realizan filtros para descartar señales originadas
 por RFI terrestre. Un criterio común es eliminar detecciones con DM cerca de 0 pc cm$^{-3}$, ya
 que la RFI no astrofísica no presenta dispersión. También se aprovechan receptores multihaz: si
 el telescopio tiene varios haces apuntados adyacentes (como Parkes 13-beams, ASKAP 36-
@@ -288,67 +198,30 @@ para excluir canales saturados por RFI persistente y se vigila la banda cero de 
 para eliminar impulsos muy anchos.
 \end{enumerate}
 
-La Figura~\ref{fig:traditional_pipeline} presenta un esquema detallado de este pipeline tradicional, mostrando el flujo completo desde los datos crudos hasta la lista final de candidatos.
+Estos cinco pasos fundamentales constituyen el núcleo de prácticamente todos los sistemas de búsqueda de FRBs operativos hasta la fecha. La Figura~\ref{fig:traditional_pipeline} presenta un esquema detallado de este pipeline tradicional, mostrando el flujo completo desde los datos crudos hasta la lista final de candidatos.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.95\textwidth]{Marco_conceptual/PipelineClassic.png}
-\caption{Pipeline tradicional de detección de FRBs. Esquema de flujo típico desde datos crudos hasta la lista de candidatos astrofísicos: (1) preprocesamiento con mitigación de RFI y calibración, (2) dedispersión coherente o incoherente sobre una parrilla densa de medidas de dispersión (típicamente decenas de miles de valores de DM entre 0--5000 pc cm$^{-3}$), (3) búsqueda de pulsos mediante filtros tipo boxcar de diferentes anchuras para maximizar la S/N, (4) umbralización y detección de candidatos con S/N$>$6--8$\sigma$, y (5) clasificación e inspección final de candidatos. Esta figura, adaptada del sistema de búsqueda CRACO (CRAFT Coherent upgrade) de ASKAP/CRAFT, ilustra claramente el encadenamiento secuencial: RFI $\rightarrow$ dedispersión $\rightarrow$ búsqueda de pulsos $\rightarrow$ umbralado $\rightarrow$ agrupamiento de candidatos $\rightarrow$ clasificación/validación. En implementaciones modernas, esta última etapa puede incorporar clasificadores de machine learning (como FETCH) para automatizar la discriminación entre FRBs reales y falsos positivos. Adaptado de \citet{Wang2025CRACO}.}
+\caption{Pipeline tradicional de detección de FRBs. Flujo secuencial: (1) preprocesamiento/RFI, (2) dedispersión sobre parrilla DM (0--5000 pc cm$^{-3}$), (3) búsqueda de pulsos (filtros boxcar), (4) umbralización (S/N$>$6--8$\sigma$), y (5) clasificación/validación. Implementaciones modernas incorporan ML (ej. FETCH) en la etapa final. Adaptado de \citet{Wang2025CRACO}.}
 \label{fig:traditional_pipeline}
 \end{figure}
 
 \subsubsection{Inspección Visual y Confirmación}
 
-Después de estos pasos, lo que queda es una lista de candidatos de FRB astrofísicos potenciales.
-Históricamente, estos candidatos se sometían a inspección visual por un astrónomo para confirmar la
-morfología dispersada característica en el espectrograma y descartar falsos positivos residuales.
-Herramientas interactivas permiten visualizar cada candidato con su dinámica de frecuencia-tiempo, su
-curva de S/N vs DM (debe mostrar un pico marcado en la DM óptima) y su perfil temporal dedispersado \citep{Keane2018}. Si la señal exhibe una clara curva $\nu^{-2}$ y no hay indicios de RFI en otros haces o
-estaciones, se declara un FRB real.
+Tras el pipeline automático, el paso final tradicional era la validación humana. Históricamente, candidatos requerían inspección visual para confirmar morfología dispersada ($\nu^{-2}$) y descartar RFI residual \citep{Keane2018}. Este cuello de botella humano motiva la automatización mediante aprendizaje profundo abordada en las siguientes secciones.
 
 \subsubsection{Software y Herramientas}
 
-Entre los software de código abierto usados tradicionalmente destacan: HEIMDALL (para
-dedispersión rápida en GPU; originalmente desarrollado por B. Barsdell), PRESTO (con el módulo
-single\_pulse\_search.py para dedispersión en CPU; \citet{Ransom2001}), FDMT (implementado en la
-búsqueda bonsai para CHIME; \citet{Smith2018}) y otros paquetes como ARTS/AMBER (para
-Westerbork; \citet{Sclocco2016}) o AstroPulse. Cada colaboración de telescopio suele adaptar y
-optimizar su cadena: por ejemplo, ASKAP desarrolló su propio pipeline en GPU llamado FREDDA
-\citep{Bannister2017} y MeerKAT emplea el pipeline MeerFAST. Pese a las diferencias, todos
-comparten el esquema básico descrito.
-
-\subsubsection{Sensibilidad y Tasa de Falsas Alarmas}
-
-Un aspecto importante es la sensibilidad y tasa de falsas alarmas. Al manejar volúmenes de datos
-gigantes (un solo día de CHIME genera millones de candidatos de umbral 6$\sigma$), se debe calibrar
-cuidadosamente el umbral para balancear detecciones vs. tasa de falsas detecciones. Un umbral muy
-alto ($\geq10\sigma$) podría perder eventos débiles; uno bajo produce demasiados candidatos para inspeccionar.
-Además, la instrumentación introduce peculiaridades: tiempos muertos, variaciones de ruido, etc., que
-afectan la estadística. Hasta la fecha, se han realizado esfuerzos de comparación entre pipelines con
-inyecciones simuladas de FRBs para evaluar su rendimiento \citep{Petroff2018}. No existe aún un
-estándar unificado: cada sistema ha ajustado su propio nivel de confianza.
+Antes de examinar las limitaciones globales, es útil conocer las implementaciones concretas existentes. El pipeline descrito ha sido implementado en diversos paquetes de software optimizados para diferentes instrumentos. Software tradicional incluye HEIMDALL (GPU, dedispersión rápida), PRESTO (CPU, \citet{Ransom2001}), FDMT/bonsai (CHIME, \citet{Smith2018}), FREDDA (ASKAP, \citet{Bannister2017}), y MeerFAST (MeerKAT). Todos comparten el esquema básico: dedispersión exhaustiva, filtrado adaptado, y umbralización, con variantes de implementación específicas por instrumento.
 
 \subsubsection{Limitaciones de los Métodos Tradicionales}
 
-A pesar de estas diferencias, los métodos tradicionales han tenido éxito descubriendo la mayoría de los
-$\sim$600 FRBs conocidos hasta 2019 \citep{Petroff2019}. Por ejemplo, Parkes encontró los primeros
-20 FRBs usando dedispersión en CPU con PRESTO, mientras ASKAP halló unos 20 en su búsqueda
-interferométrica con algoritmos en GPU; CHIME, entre 2018--2019, descubrió 535 FRBs (incluyendo 18
-repetidores) en su primer catálogo usando dedispersión rápida (bonsai) y una robusta jerarquía de
-filtros en GPU \citep{CHIME2021}. Sin embargo, el factor limitante de estos métodos
-tradicionales es la dependencia de la inspección humana y de reglas estáticas para reconocer patrones,
-lo cual empieza a ser inviable ante la escala de datos de nuevas encuestas. Aquí es donde intervienen
-las técnicas de aprendizaje automático, que han revolucionado la etapa final de clasificación de
-candidatos como veremos a continuación.
+Pese a la diversidad de implementaciones, todos los pipelines tradicionales comparten limitaciones estructurales fundamentales. Los métodos tradicionales descubrieron $\sim$600 FRBs hasta 2019 (Parkes, ASKAP, CHIME con 535 en su primer catálogo) \citep{Petroff2019,CHIME2021}. Sin embargo, enfrentan limitaciones críticas: (i) calibración de umbral S/N requiere balance entre sensibilidad y tasa de falsas alarmas (CHIME genera millones de candidatos 6$\sigma$ diarios), (ii) incompletitud ante morfologías atípicas (pulsos estrechos en banda, estructuras complejas), y (iii) dependencia de inspección humana inviable ante escalas de datos actuales. Estas limitaciones motivan técnicas de aprendizaje automático que revolucionan la clasificación y detección directa de candidatos.
 
 \subsection{Enfoques de Aprendizaje Automático para la Detección de FRBs}
 
-Los pipelines tradicionales (p.ej. algoritmos de dedispersión y umbralización como PRESTO o
-Heimdall) suelen producir miles de candidatos por observación, de los cuales la mayoría son falsos
-positivos. Esto impone una carga significativa de análisis manual para diferenciar eventos
-astrofísicos reales de RFI o ruido aleatorio. En respuesta, desde mediados de la década de 2010 se han
-incorporado técnicas de aprendizaje automático (machine learning) para agilizar y automatizar la
-búsqueda de FRBs.
+Las limitaciones de los métodos tradicionales --en particular, la alta tasa de falsos positivos y la incompletitud ante morfologías atípicas-- han impulsado la adopción progresiva de técnicas de aprendizaje automático que automatizan y mejoran la detección. Esta sección traza la evolución desde sistemas asistidos por ML hasta pipelines integrales como DRAFTS, fundamento del trabajo desarrollado en esta tesis.
 
 \subsubsection{Primeros Sistemas Asistidos por Machine Learning}
 
@@ -361,13 +234,13 @@ candidatos con una precisión $>98\%$, reduciendo drásticamente la carga de rev
 
 \subsubsection{Clasificadores de Candidatos con Deep Learning}
 
-En años posteriores, \citet{Connor2018} aplicaron
+Construyendo sobre estos primeros éxitos, la comunidad comenzó a explorar arquitecturas de aprendizaje profundo más sofisticadas. En años posteriores, \citet{Connor2018} aplicaron
 redes neuronales profundas para la clasificación de pulsos detectados en nuevos sondeos de FRBs.
 Desarrollaron una arquitectura jerárquica de deep learning que combinaba múltiples representaciones
 de los pulsos (p.ej. espectros dinámicos de distintos haces) para estimar la probabilidad de que un
 evento sea un FRB real. Entrenado con miles de ejemplos de falsos positivos de radiotelescopios
 como CHIME Pathfinder y Apertif, este sistema alcanzó alta exactitud y permitió priorizar en tiempo real
-los eventos más probables de ser auténticos transientes. En paralelo, \citet{Agarwal2020}
+los eventos más probables de ser auténticos transientes. Simultáneamente y con enfoque complementario, \citet{Agarwal2020}
 desarrollaron el clasificador FETCH (Fast Extragalactic Transient Candidate Hunter), basado en aprendizaje
 profundo con transfer learning. FETCH emplea redes convolucionales pre-entrenadas para distinguir
 imágenes de candidatos FRB frente a RFI, usando como entrada tanto la intensidad vs. tiempo como la
@@ -382,15 +255,14 @@ siquiera aparecer entre los candidatos generados por los algoritmos tradicionale
 
 \subsubsection{Detección Directa con Deep Learning}
 
-Detección directa con deep learning: Reconociendo las limitaciones de los métodos clásicos, algunos
-investigadores intentaron usar deep learning para detectar directamente las señales de FRB en los
+Si bien los clasificadores mejoraron drásticamente la precisión, aún dependían de pipelines tradicionales para generar candidatos iniciales, heredando así su incompletitud. Reconociendo esta limitación, algunos investigadores intentaron usar deep learning para detectar directamente las señales de FRB en los
 datos crudos, en lugar de solo clasificar candidatos pre-seleccionados. Por ejemplo, \citet{Zhang2018}
 re-analizaron datos del repetidor FRB 121102 mediante una red neuronal convolucional entrenada para
 reconocer la huella característica de un FRB. Este algoritmo descubrió 72 nuevas ráfagas en 5 horas de
 observación que no habían sido detectadas por las técnicas convencionales, incrementando en un
 $\sim30\%$ el número total de pulsos conocidos de dicha fuente. Este resultado pionero demostró el
 potencial de la IA para encontrar señales astrofísicas sutiles que escapan a los pipelines clásicos y
-motivó nuevos esfuerzos en esta dirección. Recientemente, \citet{Liu2022} propusieron un pipeline
+motivó nuevos esfuerzos en esta dirección. Construyendo sobre este éxito, \citet{Liu2022} propusieron recientemente un pipeline
 llamado DDSS (Dispersed Dynamic Spectrum Search) que aplica directamente un clasificador profundo
 sobre las representaciones tiempo-frecuencia de las observaciones, intentando identificar en ellas las
 huellas dispersas de FRBs sin etapa previa de detección clásica. No obstante, \citet{Zhang2018} y \citet{Liu2022} evidenciaron también las dificultades de la detección directa: las ráfagas débiles (de bajo
@@ -406,7 +278,7 @@ learning integrales.
 
 \subsubsection{El pipeline DRAFTS: detección con objeto y clasificación binaria}
 
-El esfuerzo más reciente en esta línea es DRAFTS (Deep Learning-based RAdio Fast Transient Search),
+Las experiencias con detección directa demostraron tanto el potencial como las limitaciones de enfoques puramente imagen-céntricos. Esto motivó el desarrollo de arquitecturas híbridas que combinan lo mejor de ambos mundos: detección eficiente en espacio comprimido y clasificación robusta. El esfuerzo más reciente en esta línea es DRAFTS (Deep Learning-based RAdio Fast Transient Search),
 presentado por \citet{zhang2024drafts} como un pipeline de nueva generación para detectar FRBs en datos
 de radio mediante aprendizaje profundo. DRAFTS propone una arquitectura de dos etapas
 especialmente diseñada para resolver las deficiencias de los métodos previos, abordando tanto la
@@ -418,13 +290,14 @@ busca de la característica forma de ``lazo'' o bow-tie que deja una ráfaga dis
 de enfoques anteriores que convertían los datos en imágenes para ingresarlos a la red, aquí el modelo
 opera directamente sobre el stream numérico tiempo-DM, lo que ahorra tiempo de I/O en la inferencia
 . El detector devuelve las coordenadas centrales del posible evento (es decir, estima
-simultáneamente el tiempo de llegada y la medida de dispersión óptima del FRB). A
-continuación, en la segunda etapa, DRAFTS extrae la porción correspondiente a la señal candidata en
+simultáneamente el tiempo de llegada y la medida de dispersión óptima del FRB). 
+
+Habiendo identificado candidatos potenciales, la segunda etapa valida su autenticidad. DRAFTS extrae la porción correspondiente a la señal candidata en
 los datos originales (espectro dinámico dedispersado al DM encontrado) y la alimenta a un clasificador
 binario basado en ResNet. Este clasificador de imagen verifica si la señal corresponde a un FRB
 real o a ruido/RFI, descartando así las detecciones espurias restantes.
 
-Esta combinación secuencial de detección y clasificación proporciona notables ventajas. Por un lado,
+¿Por qué esta arquitectura de dos etapas es superior? Esta combinación secuencial de detección y clasificación proporciona notables ventajas. Por un lado,
 al detectar en el espacio tiempo-DM, DRAFTS soluciona la incompletitud: cualquier FRB presente,
 incluso débil, tiende a manifestarse como un pico localizado cuando los datos se dedispersan
 correctamente, lo que el detector puede identificar con alta sensibilidad. Por otro lado, la etapa de
@@ -433,7 +306,9 @@ ruido logra disparar el detector, es muy probable que el clasificador ResNet lo 
 astrofísico, evitando un reporte erróneo. De hecho, el diseño garantiza que la misma ráfaga no sea
 detectada múltiples veces y que prácticamente ninguna interferencia supere ambas etapas: si una
 señal falsa es marcada en la primera fase, es filtrada en la segunda, haciendo casi innecesaria la
-intervención manual humana en la validación. \citet{zhang2024drafts} reportan que este pipeline alcanza
+intervención manual humana en la validación. 
+
+Los resultados empíricos confirman estas ventajas teóricas. \citet{zhang2024drafts} reportan que este pipeline alcanza
 niveles de desempeño muy superiores a los métodos convencionales en todos los aspectos clave:
 precisión, exhaustividad y velocidad de detección. Entrenado con un extenso conjunto de $\sim2700$
 bursts reales de FAST (incluyendo fuentes repetidoras conocidas) y datos simulados, DRAFTS demostró
@@ -443,116 +318,23 @@ de los datos del repetidor FRB 20190520B (observados con el radiotelescopio FAST
 más del triple de ráfagas comparado con el pipeline tradicional Heimdall en ese mismo conjunto de datos. Este resultado subraya cuánto puede mejorar la sensibilidad efectiva mediante técnicas de
 deep learning, recuperando muchos eventos que los algoritmos clásicos pasaron por alto. Al mismo
 tiempo, la combinación de detector + clasificador redujo drásticamente los falsos positivos, por lo que
-prácticamente no se requieren inspecciones manuales de candidatos, incluso operando en tiempo real
-. En suma, DRAFTS representa el estado del arte en pipelines de búsqueda de FRBs: una solución
+prácticamente no se requieren inspecciones manuales de candidatos, incluso operando en tiempo real. 
+
+En suma, DRAFTS representa el estado del arte en pipelines de búsqueda de FRBs: una solución
 híbrida que integra visión computacional y clasificación profunda para lograr detecciones más
 completas, confiables y rápidas que los enfoques previos, abriendo la vía a escaneos autónomos de
-próxima generación en radioastronomía \citep{zhang2024drafts}. La Figura~\ref{fig:drafts_architecture} ilustra esquemáticamente la arquitectura de este pipeline innovador.
+próxima generación en radioastronomía \citep{zhang2024drafts}. La Figura~\ref{fig:drafts_architecture} ilustra esquemáticamente la arquitectura de este pipeline innovador, cuya evolución hacia DRAFTS++ constituye el núcleo de esta tesis.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.95\textwidth]{WorkFlow-original.png}
-\caption{Arquitectura del pipeline DRAFTS (Deep Learning-based RAdio Fast Transient Search). El sistema opera en dos etapas secuenciales: \textbf{Etapa 1 - Detección de Objetos:} Un detector basado en CenterNet analiza los datos transformados al espacio DM--tiempo (Medida de Dispersión vs. Tiempo) mediante aceleración CUDA, localizando candidatos potenciales de FRBs. La salida del CenterNet identifica las coordenadas centrales (DM óptima y tiempo de arribo) de cada evento candidato. \textbf{Etapa 2 - Clasificación Binaria:} Los candidatos detectados son extraídos de los datos originales en formato frecuencia--tiempo, preprocesados y alimentados a una red ResNet18 que evalúa su autenticidad mediante capas convolucionales con conexiones residuales (skip connections). La salida final es una probabilidad (sigmoid) que indica si el candidato corresponde a un FRB real (verde/rojo) o a ruido/RFI (azul). Esta arquitectura híbrida permite recuperar $\sim$3× más ráfagas que métodos tradicionales manteniendo tasas de falsos positivos mínimas. Adaptado de \citet{zhang2024drafts}.}
+\caption{Arquitectura del pipeline DRAFTS. Sistema de dos etapas: \textbf{Etapa 1:} Detector CenterNet analiza espacio DM--tiempo identificando coordenadas (DM, tiempo) de candidatos. \textbf{Etapa 2:} Clasificador ResNet18 evalúa autenticidad de candidatos extraídos en formato frecuencia--tiempo. Salida: probabilidad FRB real vs. RFI/ruido. Esta arquitectura híbrida recupera $\sim$3× más ráfagas que métodos tradicionales con mínimos falsos positivos. Adaptado de \citet{zhang2024drafts}.}
 \label{fig:drafts_architecture}
 \end{figure}
 
-\subsection{Desafíos en la Detección de FRBs a Altas Frecuencias}
-
-La extensión de las búsquedas de FRBs hacia el régimen milimétrico representa una frontera científica
-prometedora, como se discutió en la sección 2.5. Sin embargo, junto con las oportunidades vienen desafíos
-técnicos y metodológicos significativos que el campo apenas comienza a explorar. Esta sección presenta
-el estado actual del conocimiento sobre estos desafíos observacionales e instrumentales, documentando
-lo que se ha observado hasta ahora en los primeros experimentos con ALMA y otros telescopios mm.
-
-Si bien la observación de FRBs en bandas de radio más altas ofrece ventajas como discutimos, también
-conlleva dificultades únicas que han comenzado a manifestarse:
-
-\subsubsection{Sensibilidad y Espectros de Emisión}
-
-Dado un espectro no trivial de emisión, es posible que los FRBs
-sean intrínsecamente menos enérgicos a frecuencias mm que en cm. Muchos púlsares y
-magnetars siguen leyes de potencia con $\alpha \approx -1$ a $-3$ (flux $\propto \nu^\alpha$),
-lo que significa que sus pulsos a 100 GHz podrían tener intensidades 1--2 órdenes de magnitud
-menores que a 1 GHz \citep{Jankowski2017}. Si los FRBs comparten esta tendencia, se requerirá
-integrar más tiempo o usar telescopios aún más grandes para detectarlos. Por ahora, ALMA es el
-único con sensibilidad suficiente; aun así, un FRB ``típico'' de 1 Jy$\cdot$ms a 1.4 GHz podría presentarse
-con solo $\sim0.1$ Jy$\cdot$ms a 90 GHz, al límite de detección en una sola antena de 12 m. Sumado a esto,
-no sabemos la tasa de repetición de FRBs en altas frecuencias: podrían repetir con igual
-frecuencia pero simplemente ser más débiles (lo cual es manejable), o podría suceder que la
-física de emisión limite la radiación coherente a cierto rango de frecuencias (p.ej., corte alto del
-espectro), reduciendo drásticamente la ocurrencia de pulsos detectables en mm. Explorar este
-aspecto requiere tiempo de integración sustancial apuntando a repetidores conocidos. Si en
-decenas de horas ALMA no detectase nada de, por ejemplo, FRB 121102, se podría establecer la
-primera restricción de que su espectro cae abruptamente por encima de X GHz.
-
-\subsubsection{Reducción de la Firma Dispersiva}
-
-Como se mencionó, a mayor frecuencia la firma de dispersión
-dentro de anchos de banda típicos es menos pronunciada. En un experimento ciego en banda
-Ku (12--18 GHz) o W (75--110 GHz), un FRB podría aparecer casi como un pulso de banda ancha
-simultáneo (pues el retardo entre sub-bandas es menor que la duración del pulso). Esto dificulta
-la distinción de un FRB frente a un pulso RFI impulsivo que afecte todas las frecuencias a la vez.
-La dispersión diferencial es lo que hace inconfundible a los FRBs en bandas bajas; sin ella, se
-pierde una de las características definitorias. Para solventar esto, se puede: (i) requerir
-detecciones paralelas en varios telescopios en diferentes bandas (por ejemplo, una detección
-simultánea en ALMA y en un radiotelescopio de 1.4 GHz restablecería la certeza); (ii) apoyarse en
-la polarización --la RFI suele ser no polarizada, mientras que un FRB genuino tal vez presente
-polarización lineal significativa--; o (iii) utilizar la distribución de energía en DM--tiempo,
-buscando ese patrón de bow-tie a microescala, aunque sea en un rango de DM muy pequeño
-(esto es retador, pero en principio detectable si la resolución temporal es suficiente para ver que
-la S/N maximiza exactamente a la DM correcta y decae a su alrededor). En cualquier caso, la
-mitigación de RFI en alta frecuencia requerirá criterios adicionales. Por ejemplo, ALMA se
-apoya en su correlación interferométrica: señales de RFI local no correlacionadas entre antenas
-se atenúan al formar el haz fasado, y además cada antena dispone de detectores de espectro
-RFI. Aun así, pulsos cortos de origen instrumental podrían colarse. La experiencia con el
-experimento Phased ALMA demuestra que examinar la polarización y la coincidencia con la
-rotación del pulsar (si se trata de un magnetar conocido) fue crucial para validar las detecciones
-\citep{veracasanova2025}.
-
-\subsubsection{Morfología de Señales en Banda Milimétrica}
-
-Otra incógnita es cómo lucen los FRBs a escalas temporales
-ultra cortas. Si la emisión viene de regiones muy compactas, a menor longitud de onda
-podríamos resolver sub-estructuras temporales más finas, incluso del orden de microsegundos.
-De hecho, ya se han medido microestructuras de $\sim30$ $\mu$s en repetidores a 1.4 GHz (FRB
-121102; \citet{Michilli2018}) y hasta de 3--4 $\mu$s en FRB 180916 a 600 MHz \citep{Nimmo2021}. A
-100 GHz, un pulso sin scattering podría revelar variabilidad intrínseca a microsegundos o
-nanosegundos si existiese --similar a los giant pulses del púlsar del Cangrejo que llegan a ns--.
-Pero capturar esa morfología exige muestreos muy rápidos y gran ancho de banda sin
-dispersión. ALMA actualmente alcanza resolución de hasta 31.25 $\mu$s en modo pulsar \citep{Torne2021}; futuras mejoras podrían bajar a 1--10 $\mu$s. Si se descubriera un FRB repetidor brillante en
-mm, se podrían buscar estas subestructuras: su presencia o ausencia daría información sobre el
-mecanismo de emisión (por ejemplo, pulsos a ns indicarían regiones emisoras extremadamente
-pequeñas, del orden de metros, incompatibles con ciertos modelos). Por otro lado, las ráfagas
-en mm podrían carecer de algunas complejidades presentes a 600 MHz, como los múltiples subpulsos con drift. Es posible que a frecuencias altas solo se vea la última porción del espectro de
-emisión coherente, quizá un único pulso más simple. Esto complicaría usar la morfología como
-sello de repetidor o no repetidor.
-
-\subsubsection{Limitaciones Instrumentales}
-
-Finalmente, los retos prácticos de operar en mm no son menores: la
-atenuación atmosférica, el ruido térmico más elevado de los receptores a esas frecuencias y la
-necesidad de un calibrado y sincronización precisos de múltiples antenas. Todo ello conlleva que
-la disponibilidad de tiempo para experimentos FRB en telescopios como ALMA sea limitada,
-debiendo competir con otros programas de tiempo. Aun así, la comunidad FRB está invirtiendo
-en este frente, pues los posibles descubrimientos (por ejemplo, correlaciones simultáneas con
-rayos X, detecciones en óptico de destellos asociados, etc.) serían revolucionarios.
-
 \medskip
 
-La detección de FRBs en altas frecuencias milimétricas se encuentra en sus albores. Los
-progresos teóricos y experimentales de la última década --desde establecer la naturaleza extragaláctica
-de los FRBs, pasando por identificar repetidores y un magnetar galáctico progenitor, hasta desarrollar
-sofisticadas herramientas de detección automáticas-- han sentado las bases para esta nueva fase. El
-estado del arte actual nos muestra un campo vibrante: conocemos ya del orden de $10^3$ FRBs,
-entendemos mejor sus distribuciones de energía y periodicidad, sospechamos fuertemente de los
-magnetars como origen común en muchos casos, y disponemos de tecnología como redes neuronales
-y telescopios fasados que nos permiten explorar dominios antes inaccesibles. Los próximos años, con la
-consolidación de catálogos masivos (p.ej. CHIME, DSA-2000) y la incursión en frecuencias extremas
-(desde 50 MHz hasta 300 GHz), probablemente convertirán a los FRBs en una herramienta cosmológica
-y astrofísica madura --usándolos para sondear el medio intergaláctico, explorar física de plasma
-relativista e incluso, quizá, para detectar estructuras de materia oscura a través de dispersiones
-inusuales--. Cada nueva ventana frecuencial abierta, como la de mm, añade una pieza al rompecabezas
-y nos acerca un poco más a desvelar la naturaleza última de estos misteriosos destellos de radio
-extragalácticos.
+Este marco conceptual ha trazado el camino desde los fundamentos físicos de los FRBs hasta el estado del arte en detección mediante aprendizaje profundo, integrando casos históricos, conexión con magnetars, y desafíos específicos de alta frecuencia. La fenomenología observacional diversa, las limitaciones de métodos tradicionales, el éxito de DRAFTS en frecuencias centimétricas, y los desafíos únicos del régimen milimétrico (compresión de firma dispersiva, validación por polarización, limitaciones instrumentales) establecen el contexto completo que motiva el desarrollo de DRAFTS++: un pipeline operativo, robusto y extensible capaz de operar efectivamente tanto en regímenes de dispersión prominente como comprimida.
+
 
 

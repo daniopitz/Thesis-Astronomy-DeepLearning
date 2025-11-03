@@ -17,7 +17,7 @@
 
 En este capítulo se propone el diseño e implementación de DRAFTS++, una nueva versión de DRAFTS \cite{zhang2024drafts}. 
 
-\noindent\textbf{Alcance y contribución de esta tesis:} Es fundamental establecer que \textbf{esta tesis NO desarrolla ni entrena modelos de redes neuronales}. Los modelos de deep learning (CenterNet para detección de objetos y ResNet18 para clasificación binaria) son componentes \textbf{pre-existentes y pre-entrenados} del trabajo original de DRAFTS \citep{zhang2024drafts}. \textbf{La contribución de este trabajo radica exclusivamente en la ingeniería de software}: transformar un prototipo de investigación en un sistema productivo mediante arquitectura modular, gestión eficiente de memoria, procesamiento por streaming, automatización del workflow, validación científica robusta y extensión a múltiples bandas de frecuencia. Los modelos se utilizan como herramientas mediante inferencia, no como objetos de desarrollo.
+\noindent\textbf{Alcance y contribución de esta tesis:} Es fundamental establecer que \textbf{esta tesis NO desarrolla ni entrena modelos de redes neuronales}. Los modelos de deep learning (CenterNet para detección de objetos y ResNet18 para clasificación binaria) son componentes \textbf{pre-existentes y pre-entrenados} del trabajo original de DRAFTS \citep{zhang2024drafts}. La contribución de este trabajo radica en transformar un prototipo de investigación (DRAFTS) en un sistema productivo mediante arquitectura modular, gestión eficiente de memoria, procesamiento por streaming, automatización del workflow, validación científica robusta y extensión a múltiples bandas de frecuencia. Los modelos se utilizan como herramientas mediante inferencia, no como objetos de desarrollo.
 
 A diferencia del prototipo original, centrado en la validación de modelos de detección y clasificación de Fast Radio Bursts (FRBs), DRAFTS++ se concibe como un \textit{pipeline} operativo, robusto y eficiente, capaz de integrar procesos de ingesta, preprocesamiento, inferencia con modelos pre-entrenados y reporte de resultados en un flujo extremo a extremo.
 Adicionalmente, la propuesta extiende la arquitectura hacia el régimen de frecuencias milimétricas mediante estrategias de detección adaptativas, ampliando significativamente las capacidades operacionales del sistema.
@@ -831,9 +831,48 @@ La detección primaria consiste en seleccionar instantes $t_i$ tales que $\mathr
 \label{fig:hf-snr-branch}
 \end{figure}
 
-\subsection{Síntesis Comparativa: DRAFTS vs DRAFTS++}
+\subsubsection{Línea 3: Representaciones 2D Alternativas (Propuesta No Implementada)}
 
-La Tabla~\ref{tab:drafts-comparison} sintetiza las diferencias arquitectónicas y operativas entre el prototipo DRAFTS original y el sistema productivo DRAFTS++ desarrollado en este trabajo. \textbf{Nota importante: Ambos sistemas utilizan los mismos modelos de deep learning pre-entrenados (CenterNet y ResNet18); las diferencias radican exclusivamente en la ingeniería de software, la arquitectura del pipeline y las capacidades operativas del sistema.}
+\textit{Nota: Esta línea fue propuesta conceptualmente pero NO implementada ni validada en esta memoria. Constituye trabajo futuro de nivel posgrado.}
+
+\medskip
+
+En frecuencias milimétricas donde la firma ``bow-tie'' se comprime, se proponen representaciones 2D alternativas que generen patrones discriminativos artificiales:
+
+\paragraph{Propuestas de Representaciones}
+
+\textbf{Espectrograma Polarimétrico (Stokes IQUV):} Imagen multicanal (I, Q, U, V) explotando polarización extrema de FRBs ($>50\%$) versus RFI no polarizada. FRBs generan trazas coherentes en canales I/Q/U, mientras RFI aparece solo en I.
+
+\textbf{Mapa Tiempo-Ancho:} Respuesta SNR a diferentes ventanas de integración. Pulsos astrofísicos producen patrón ``triángulo invertido'' (máxima SNR en $w \approx \tau_{\text{pulso}}$), distintivo de RFI breve o extendida.
+
+\textbf{Mapa Tiempo-RM:} Explora espacio de rotación Faraday. FRBs con RM elevada producen franjas verticales; RFI aparece cerca de RM=0.
+
+\textbf{Coherencia Espectral:} Autocorrelación por frecuencia. FRBs broadband persisten a lags grandes; RFI narrowband decae abruptamente.
+
+\textbf{Bow-tie Artificial:} Combinación multi-representación mediante concatenación $\mathbf{I}_{\mathrm{combined}} = \mathrm{concat}[\mathbf{I}_{\mathrm{width}}, \mathbf{I}_{\mathrm{RM}}, \mathbf{I}_{\mathrm{coherence}}]$, generando firma multidimensional equivalente al bow-tie clásico.
+
+
+\subsubsection{Línea 4: Estrategias Avanzadas de Zhang (Propuesta No Implementada)}
+
+\textit{Nota: Esta línea fue propuesta conceptualmente pero NO implementada ni validada en esta memoria. Constituye trabajo futuro de nivel posgrado.}
+
+\medskip
+
+Se proponen dos estrategias que preservan la filosofía DM-centrada adaptándose a compresión dispersiva:
+
+\paragraph{Estrategias Propuestas}
+
+\textbf{Estrategia 1 - Expansión de Rejilla DM:} Forzar apertura morfológica del bow-tie mediante rangos DM ampliados ($\gamma > 1$) y pasos más gruesos, permitiendo que modelos entrenados en bow-ties desarrollados recuperen sensibilidad en regímenes comprimidos. Requiere módulo de cálculo dinámico de parámetros $\gamma$ y $d_{\min}$ según frecuencia central, ancho de banda y resolución temporal.
+
+\textbf{Estrategia 2 - Fishing a DM$\approx$0:} Detección primaria permisiva en DM mínimo seguida de validación física rigurosa: (i) ajuste de DM por maximización SNR en sub-bandas ($\mathrm{DM}_{\mathrm{best-fit}} = \arg\max_{\mathrm{DM}} \sum_{f} \mathrm{SNR}_f(\mathrm{DM})$), (ii) verificación de coherencia entre sub-bandas ($\mathrm{Consistency} > \alpha_{\mathrm{consistency}}$), y (iii) consistencia temporal cross-chunk. Requiere validador DM-aware multi-criterio integrado.
+
+\subsection{DRAFTS++: Síntesis Final del Sistema Unificado}
+
+Esta sección presenta DRAFTS++\footnote{\href{https://github.com/Kodamonkey/DRAFTS-UC}{Repositorio de DRAFTS++ en GitHub}}, sistema operativo que integra las mejoras de ingeniería del Bloque 1 con las estrategias de detección del Bloque 2, habilitando procesamiento multi-banda end-to-end sin modificar los modelos de deep learning pre-entrenados.
+
+\subsubsection{Transformación Arquitectónica y Operativa}
+
+La Tabla~\ref{tab:drafts-comparison} sintetiza las diferencias entre el prototipo DRAFTS y el sistema productivo DRAFTS++. \textbf{Nota crítica: Ambos utilizan los mismos modelos pre-entrenados (CenterNet y ResNet18); la contribución de esta tesis es exclusivamente ingeniería de software y arquitectura del pipeline.}
 
 \begin{table}[H]
 \centering
@@ -885,361 +924,107 @@ Estrategias HF & No implementadas & SNR-threshold + validación DM \\
 \end{tabular}
 \end{table}
 
-Esta transformación establece a DRAFTS++ como un sistema operativo capaz de integrarse en flujos observacionales reales, superando las limitaciones del prototipo de investigación original mediante mejoras de ingeniería de software y habilitando la detección multi-banda de transientes de radio sin modificar los modelos de deep learning subyacentes.
+\subsubsection{Arquitectura Unificada: Principios y Flujo Operativo}
+
+DRAFTS++ se fundamenta en tres principios arquitectónicos: \textbf{(1) Modularidad Estratégica} mediante patrón Strategy para intercambiar algoritmos según régimen observacional, \textbf{(2) Validación Física Unificada} mediante validador común aplicando criterios consistentes (DM válido, SNR umbral, coherencia temporal), y \textbf{(3) Visualización Desacoplada} generando artefactos estándar (CSV, plots, métricas).
+
+El flujo operativo implementa selección automática de estrategia según criterio físico de resolubilidad dispersiva: cuando $\Delta t_{\mathrm{ms}} > \alpha t_{\mathrm{samp}}$, utiliza DM-Time/CenterNet (bow-tie resoluble); cuando $\Delta t_{\mathrm{ms}} \leq \alpha t_{\mathrm{samp}}$, activa SNR-threshold (implementado y validado en esta memoria). El diseño permite incorporar estrategias adicionales (Líneas 3-4 propuestas) mediante extensión del patrón Strategy sin modificar infraestructura base.
+
+La Figura~\ref{fig:pipeline-end-to-end} ilustra el flujo completo: inicialización $\to$ selección de estrategia $\to$ procesamiento streaming por chunks $\to$ propuesta de candidatos (DM-Time/CenterNet o SNR-threshold según régimen) $\to$ clasificación ResNet18 $\to$ validación física $\to$ artefactos estandarizados.
+
+\begin{figure}[H]
+\centering
+\resizebox{0.5\textwidth}{!}{%
+\begin{tikzpicture}[
+    node distance=1.0cm and 1.5cm,
+    box/.style={rectangle, draw, fill=blue!20, text width=2.0cm, text centered, minimum height=0.6cm, font=\tiny},
+    decision/.style={diamond, draw, fill=yellow!20, text width=1.6cm, text centered, minimum height=0.6cm, font=\tiny},
+    process/.style={rectangle, draw, fill=green!20, text width=2.0cm, text centered, minimum height=0.6cm, font=\tiny},
+    output/.style={rectangle, draw, fill=orange!20, text width=2.0cm, text centered, minimum height=0.6cm, font=\tiny},
+    arrow/.style={-Stealth, thick}
+]
+
+% FLUJO SIMPLIFICADO
+\node[box] (A) {main.py};
+\node[box, below=of A] (B) {run\_pipeline};
+\node[box, below=of B] (C) {Cargar Modelos};
+
+% ENTRADA DE DATOS
+\node[box, right=of B] (D) {find\_data\_files};
+\node[decision, below=of D] (E) {Tipo Archivo?};
+\node[box, below left=of E] (F) {fits\_handler};
+\node[box, below right=of E] (G) {filterbank\_handler};
+
+% PROCESAMIENTO
+\node[box, below=of E] (H) {streaming\_orchestrator};
+\node[box, below=of H] (I) {Procesar Chunk};
+\node[decision, below=of I] (J) {Frecuencia $\geq$ 8GHz?};
+
+% PIPELINES
+\node[box, below left=of J] (K) {Pipeline Alta Frecuencia};
+\node[box, below right=of J] (L) {Pipeline Clásico};
+
+% DETECCIÓN
+\node[decision, below=of K] (M) {representaciones 2D alternativas simulan el bow tie?};
+\node[box, below left=of M] (N) {Mapa característico alternativo + CenterNet};
+\node[box, below right=of M] (O) {SNR Tradicional};
+\node[process, below=of L] (P) {CenterNet DM-Time};
+
+% CLASIFICACIÓN
+\node[process, below=of N] (Q) {classify\_patch};
+\node[process, below=of O] (R) {classify\_patch};
+\node[process, below=of P] (S) {classify\_patch};
+
+% RESULTADOS
+\node[output, below=of Q] (T) {Guardar Candidatos};
+\node[output, below=of R] (U) {Guardar Candidatos};
+\node[output, below=of S] (V) {Guardar Candidatos};
+
+% VISUALIZACIÓN
+\node[output, below=of T] (W) {Plots + CSV};
+\node[output, below=of U] (X) {Plots + CSV};
+\node[output, below=of V] (Y) {Plots + CSV};
+
+% Conexiones principales
+\draw[arrow] (A) -- (B);
+\draw[arrow] (B) -- (C);
+\draw[arrow] (B) -- (D);
+\draw[arrow] (D) -- (E);
+\draw[arrow] (E) -- node[left] {FITS} (F);
+\draw[arrow] (E) -- node[right] {Filterbank} (G);
+\draw[arrow] (F) -- (H);
+\draw[arrow] (G) -- (H);
+\draw[arrow] (H) -- (I);
+\draw[arrow] (I) -- (J);
+\draw[arrow] (J) -- node[left] {Sí} (K);
+\draw[arrow] (J) -- node[right] {No} (L);
+
+% Detección
+\draw[arrow] (K) -- (M);
+\draw[arrow] (M) -- node[left] {Sí} (N);
+\draw[arrow] (M) -- node[right] {No} (O);
+\draw[arrow] (L) -- (P);
+
+% Clasificación
+\draw[arrow] (N) -- (Q);
+\draw[arrow] (O) -- (R);
+\draw[arrow] (P) -- (S);
+
+% Resultados
+\draw[arrow] (Q) -- (T);
+\draw[arrow] (R) -- (U);
+\draw[arrow] (S) -- (V);
+
+% Visualización
+\draw[arrow] (T) -- (W);
+\draw[arrow] (U) -- (X);
+\draw[arrow] (V) -- (Y);
+
+\end{tikzpicture}}
+\caption[Diagrama end-to-end DRAFTS++]{Diagrama end-to-end de DRAFTS++: Integración de Bloques 1 y 2, mostrando flujo desde inicialización hasta artefactos finales. La selección de estrategias en el diagrama incluye las 4 líneas exploratorias del Componente 2, aunque solo Líneas 1-2 están implementadas en esta memoria (Líneas 3-4 son extensiones arquitectónicas para trabajo futuro). \textit{Fuente: Elaboración propia}.}
+\label{fig:pipeline-end-to-end}
+\end{figure}
+
+\medskip
 
-% \subsubsection{Línea 3: Nuevos Plots Característicos}
-
-% En frecuencias milimétricas, la ausencia de la firma dispersiva clásica (``bow-tie'') elimina el principal discriminador visual entre señales astrofísicas genuinas e interferencia de radiofrecuencia. Esta pérdida de información morfológica requiere la exploración de representaciones 2D alternativas que capturen características distintivas de pulsos cósmicos en regímenes donde $\Delta t_{\mathrm{ms}} \ll t_{\mathrm{samp}}$. Las siguientes propuestas de \textit{plots} característicos buscan ``engañar'' a las redes neuronales de detección mediante la generación artificial de patrones visuales que permitan la identificación de FRBs a pesar de la compresión dispersiva.
-
-% La implementación de las representaciones 2D alternativas se encuentra actualmente en desarrollo activo en una rama separada del repositorio de DRAFTS++ en GitHub. Esta línea de investigación está aislada del pipeline principal para permitir experimentación y refinamiento independiente sin comprometer la estabilidad del sistema productivo. La integración en el pipeline unificado se realizará una vez que las implementaciones alcancen un estado de madurez suficiente para su validación experimental completa.
-
-% \paragraph{Espectrograma Dinámico Polarimétrico (Tiempo–Frecuencia con Stokes IQUV)}
-
-% Una representación fundamental consiste en enriquecer el espectrograma tradicional con información polarimétrica completa. En lugar de usar únicamente la intensidad total (Stokes I), se construye una imagen multicanal que incluye los cuatro parámetros de Stokes I, Q, U, V como capas superpuestas. Cada píxel $(t,f)$ contiene un vector de 4 valores que puede procesarse como imagen RGB con canal adicional por una CNN. Esta representación aprovecha el hecho de que los FRBs exhiben típicamente polarización extrema (>50\%), mientras que la RFI terrestre tiende a ser no polarizada o con polarización constante.
-
-% Un FRB altamente polarizado aparecerá como una traza vertical simultánea en el canal I (intensidad) y en los canales Q/U (polarización lineal), generando una ``firma'' multicanal coherente. La rotación Faraday, aunque reducida en mm, aún puede manifestarse como variaciones sistemáticas en Q/U a través de la banda, creando patrones de ``ondulación'' que las CNNs pueden aprender a reconocer como características de origen astrofísico.
-
-% \paragraph{Mapa Tiempo-Ancho de Pulso (Multi-Escala Temporal)}
-
-% Esta representación explora la respuesta de la señal a diferentes filtros de integración temporal. El eje horizontal representa el tiempo, mientras que el eje vertical codifica el ancho de ventana de integración aplicado. Para cada tiempo $t$ y ancho $w$, se calcula la SNR de la señal integrada en una ventana $\pm w/2$ alrededor de $t$.
-
-% Un pulso astrofísico genuino de duración intrínseca $\tau$ produce un patrón característico tipo ``triángulo invertido'': máxima SNR en la fila correspondiente a $w \approx \tau$, con atenuación gradual para anchos mayores (dilución en ruido) y menores (no capturan toda la energía). Esta morfología multi-escala es distintiva de pulsos cósmicos, ya que la RFI tiende a ser o extremadamente breve (una sola muestra) o persistentemente extendida, generando patrones fundamentalmente diferentes.
-
-% La ventaja de esta representación radica en su capacidad de ``simular'' la estructura temporal que la dispersión proporciona en frecuencias bajas, creando artificialmente una dimensión discriminativa donde los FRBs muestran concentración de energía en escalas específicas, mientras que la RFI aparece distribuida o ausente de picos definidos.
-
-% \paragraph{Mapa Tiempo-RM (Rotación Faraday versus Tiempo)}
-
-% Para datos polarimétricos, se puede construir un mapa que explore el espacio de rotación Faraday. Similar a como la dispersión DM introduce retardos en frecuencia, la RM introduce giros en la polarización lineal. Para cada instante temporal, se evalúa cómo varía la potencia polarizada al asumir diferentes valores de RM mediante rotación de los vectores Q/U.
-
-% Un pulso astrofísico altamente polarizado produce una franja vertical brillante en el mapa tiempo–RM, alineada con su RM verdadera. En contraste, la RFI terrestre raramente presenta rotación Faraday significativa, apareciendo principalmente cerca de RM = 0. Esta representación ``engaña'' a la red neuronal al proporcionar una dimensión adicional de discriminación: la capacidad de distinguir pulsos con RM elevados (típicos de entornos magnetizados cósmicos) de interferencia local.
-
-% \paragraph{Mapa de Coherencia Espectral (Correlación en Frecuencia)}
-
-% Esta representación menos convencional captura la extensión en frecuencia de una señal mediante autocorrelación espectral. Para cada intervalo temporal, se calcula la autocorrelación del vector de intensidades por frecuencia, midiendo cuán ancha en espectro es la señal.
-
-% Los pulsos astrofísicos, siendo típicamente broadband, producen autocorrelaciones que persisten hasta lags de frecuencia grandes, manifestándose como franjas horizontales extendidas en el mapa tiempo–lag. Por el contrario, la RFI narrowband genera correlaciones que decaen abruptamente, apareciendo como líneas delgadas confinadas a lag $\approx$ 0. Esta representación ``simula'' la coherencia espectral que caracteriza a los pulsos cósmicos, proporcionando a la CNN un criterio adicional para distinguir emisiones de banda ancha genuinas de interferencia localizada.
-
-% \paragraph{Estrategia de ``Bow-tie Artificial'' mediante Combinación de Representaciones}
-
-% La propuesta más innovadora consiste en combinar múltiples representaciones para generar artificialmente una ``firma bow-tie'' en el espacio de características de alta dimensión. Mediante la concatenación de los mapas tiempo–ancho, tiempo–RM, y coherencia espectral, se crea una imagen multicanal donde cada representación aporta una ``dimensión'' del patrón dispersivo perdido:
-
-% \[
-% \mathbf{I}_{\mathrm{combined}} = \mathrm{concat}[\mathbf{I}_{\mathrm{width}}, \mathbf{I}_{\mathrm{RM}}, \mathbf{I}_{\mathrm{coherence}}]
-% \]
-
-% donde $\mathbf{I}_{\mathrm{width}}$, $\mathbf{I}_{\mathrm{RM}}$, y $\mathbf{I}_{\mathrm{coherence}}$ representan las representaciones 2D correspondientes. Un FRB genuino manifestará patrones coherentes en todas las dimensiones: pico temporal en tiempo–ancho, alineación polarimétrica en tiempo–RM, y persistencia espectral en coherencia, generando una ``firma multidimensional'' que la CNN puede aprender a reconocer como equivalente al bow-tie dispersivo clásico.
-
-% Esta estrategia de ``engaño neuronal'' preserva la filosofía DM-centrada de DRAFTS mientras adapta la detección a regímenes donde la dispersión temporal es despreciable, manteniendo la capacidad discriminativa mediante representaciones alternativas que capturan aspectos fundamentales de la física de pulsos astrofísicos.
-
-
-% \[
-% \mathrm{DM}_{\mathrm{best-fit}} = \arg\max_{\mathrm{DM}} \sum_{f} \mathrm{SNR}_f(\mathrm{DM}) > \epsilon_{\mathrm{DM}}
-% \]
-
-% donde $\epsilon_{\mathrm{DM}}$ es un umbral mínimo de dispersión medible y $\mathrm{SNR}_f(\mathrm{DM})$ representa la relación señal-ruido en cada sub-banda tras dedispersión. Adicionalmente, se exige consistencia entre sub-bandas y, cuando sea aplicable, entre chunks procesados independientemente:
-
-% \[
-% \mathrm{Consistency} = \frac{1}{N_{\mathrm{subbands}}} \sum_{f=1}^{N_{\mathrm{subbands}}} \mathbf{1}[\mathrm{SNR}_f(\mathrm{DM}_{\mathrm{best-fit}}) > T_{\mathrm{subband}}] > \alpha_{\mathrm{consistency}}
-% \]
-
-% donde $T_{\mathrm{subband}}$ es el umbral de SNR por sub-banda y $\alpha_{\mathrm{consistency}}$ representa la fracción mínima de sub-bandas que deben exhibir detección coherente.
-
-% \begin{algorithm}[H]
-% \caption{Estrategias Alternativas de Zhang para Detección HF}
-% \label{alg:zhang-strategies}
-% \begin{algorithmic}[1]
-% \Input{$\mathcal{D}$: datos de alta frecuencia, $\gamma$: factor de expansión DM}
-% \Output{Candidatos validados HF}
-% \Function{ZhangStrategy1}{$\mathcal{D}$, $\gamma$}
-%     \State $\mathcal{D}_{\mathrm{expanded}} \leftarrow \text{expand\_dm\_grid}(\gamma)$
-%     \For{$\mathrm{DM} \in \mathcal{D}_{\mathrm{expanded}}$}
-%         \State $I_{\mathrm{dedispersed}} \leftarrow \text{dedisperse}(\mathcal{D}, \mathrm{DM})$
-%         \State $\text{bow-tie} \leftarrow \text{detect\_bowtie}(I_{\mathrm{dedispersed}})$
-%         \If{$\text{bow-tie}$ existe y $|\text{offset}_{\text{center}}| > \sigma_{\text{threshold}}$}
-%             \State $\text{DM}_{\text{best}} \leftarrow \text{refine\_dm\_fit}(\text{bow-tie})$
-%             \If{$\text{DM}_{\text{best}} > \epsilon_{\text{DM}}$}
-%                 \State $\text{add\_candidate}(\text{bow-tie}, \text{DM}_{\text{best}})$
-%             \EndIf
-%         \EndIf
-%     \EndFor
-% \EndFunction
-
-% \Function{ZhangStrategy2}{$\mathcal{D}$}
-%     \State $\text{candidates} \leftarrow \text{classifier}(\mathcal{D}, \mathrm{DM} \approx 0)$
-%     \For{$\text{candidate} \in \text{candidates}$}
-%         \State $\text{DM}_{\text{best-fit}} \leftarrow \text{fit\_dm\_range}(\text{candidate})$
-%         \If{$\text{DM}_{\text{best-fit}} > \epsilon_{\text{DM}}$}
-%             \State $\text{consistency} \leftarrow \text{check\_subband\_consistency}(\text{candidate})$
-%             \If{$\text{consistency} > \alpha_{\text{consistency}}$}
-%                 \State $\text{validate\_cross\_chunk}(\text{candidate})$
-%                 \State $\text{add\_validated\_candidate}(\text{candidate})$
-%             \EndIf
-%         \EndIf
-%     \EndFor
-% \EndFunction
-% \end{algorithmic}
-% \end{algorithm}
-
-% La implementación de estas estrategias requiere modificaciones arquitectónicas específicas en DRAFTS++ para soportar rejillas DM adaptativas y validación multi-criterio. La \textbf{Estrategia 1} demanda un módulo de expansión de rejilla DM que calcule dinámicamente los parámetros $\gamma$ y $d_{\min}$ basados en las características observacionales (frecuencia central, ancho de banda, resolución temporal). La \textbf{Estrategia 2} requiere la integración de un validador DM-aware que implemente las verificaciones de consistencia sub-banda y cross-chunk, así como la capacidad de ejecutar el clasificador en múltiples regímenes de DM.
-
-% Ambas estrategias abordan el problema fundamental de que, en frecuencias milimétricas, la pregunta ``?`está dispersado?'' pierde su poder discriminativo. La solución propuesta por Zhang consiste en combinar detección adaptativa con validación física rigurosa, preservando la filosofía DM-centrada de DRAFTS mientras se adapta a las limitaciones impuestas por la compresión dispersiva en alta frecuencia. La implementación de estas estrategias en DRAFTS++ constituye una extensión natural del pipeline existente, manteniendo la compatibilidad con el \textit{workflow} estándar mientras se proporcionan rutas alternativas para regímenes observacionales desafiantes.
-
-% \subsection{DRAFTS++: Pipeline E2E para detección y clasificación de transientes de radio en multiples bandas de frecuencia}
-
-% Esta sección presenta la síntesis arquitectónica que unifica ambos bloques en un sistema coherente y escalable, donde se da por sentado DRAFTS++\footnote{\href{https://github.com/Kodamonkey/DRAFTS-UC}{Repositorio de DRAFTS++ en GitHub}} como el producto final de este trabajo de ingeniería de software/datos e investigación. Hablaremos principalmente de la arquitectura final de DRAFTS++, la cual integra las mejoras fundamentales del Bloque 1 (pipeline modular, streaming, gestión de memoria, integración de modelos) con las estrategias especializadas del Bloque 2 (detección en alta frecuencia).
-
-% \subsubsection{Visión Arquitectónica Unificada}
-
-% La arquitectura de DRAFTS++ se fundamenta en tres principios de diseño que emergen de la integración de los Bloques 1 y 2:
-
-% \textbf{1. Modularidad Estratégica}: El sistema adopta un patrón \textbf{Strategy} que permite intercambiar algoritmos de propuesta de candidatos según el régimen observacional. Las estrategias incluyen: (i) DM--Time/CenterNet para frecuencias tradicionales, (ii) SNR-threshold para alta frecuencia cuando $\Delta t_{\mathrm{ms}} \leq \alpha t_{\mathrm{samp}}$, (iii) representaciones 2D alternativas (polarimétricas, tiempo-ancho, tiempo-RM, coherencia espectral) para ``engañar'' a las redes neuronales, y (iv) estrategias de Zhang (DM-expand y fishing en DM$\approx0$) como alternativas avanzadas.
-
-% \textbf{2. Validación Física Unificada}: Un \textbf{validador DM-aware} común procesa todos los candidatos independientemente de la estrategia de propuesta, aplicando criterios físicos consistentes (DM válido, SNR umbral, coherencia temporal) que garantizan la integridad científica del pipeline.
-
-% \textbf{3. Visualización Desacoplada}: Un \textbf{visualizador independiente} genera artefactos estándar (CSV, plots, métricas) que facilitan el análisis posterior y la comparación entre diferentes estrategias de detección.
-
-% Esta arquitectura unificada permite que DRAFTS++ opere como un sistema único que se adapta automáticamente a diferentes regímenes observacionales mediante un criterio físico objetivo: la resolubilidad del retardo dispersivo. Cuando $\Delta t_{\mathrm{ms}} > \alpha t_{\mathrm{samp}}$, el sistema utiliza la estrategia clásica DM-Time/CenterNet, ya que el patrón bow-tie permanece detectable. Cuando $\Delta t_{\mathrm{ms}} \leq \alpha t_{\mathrm{samp}}$, el sistema activa una de las cuatro líneas de investigación del Bloque 2, manteniendo la coherencia metodológica mientras optimiza el rendimiento según las características específicas de cada banda de frecuencia.
-
-% \begin{figure}[H] 
-% \centering 
-% % \includegraphics[width=0.96\textwidth]{arquitectura_unificada.pdf} 
-% \caption{Arquitectura unificada de DRAFTS++: Integración de mejoras del Bloque 1 (streaming, gestión de memoria, modelos) con estrategias del Bloque 2 (detección HF), mediante patrón Strategy para propuesta de candidatos, validador DM-aware común, y visualizador desacoplado. \textit{Fuente: Elaboración propia}.}
-% \label{fig:arquitectura-unificada} 
-% \end{figure}
-
-% \subsubsection{Algoritmo de Orquestación Unificada}
-
-% El algoritmo de orquestación unificada no es mas que la lógica para integrar los Bloques 1 y 2 mediante un flujo que selecciona automáticamente la estrategia apropiada según las características observacionales y procesa los datos utilizando la infraestructura modular desarrollada en el Bloque 1.
-
-% \begin{algorithm}[H]
-% \footnotesize
-% \caption{Pipeline Unificado DRAFTS++: Integración Bloques 1 y 2}
-% \label{alg:unified-pipeline}
-% \begin{algorithmic}[1]
-% \Input{$config$: configuración del pipeline, $obs\_params$: parámetros observacionales, $data\_files$: archivos de datos}
-% \Output{Candidatos validados, métricas, y artefactos de visualización}
-% \Function{RunUnifiedPipeline}{$config$, $obs\_params$, $data\_files$}
-%     \State \textbf{// Bloque 1: Inicialización de infraestructura modular}
-%     \State $models \leftarrow load\_pretrained\_models()$ \Comment{CenterNet, ResNet18}
-%     \State $memory\_manager \leftarrow initialize\_memory\_budget()$
-%     \State $streaming\_orchestrator \leftarrow setup\_streaming(config)$
-    
-%     \State \textbf{// Selección de estrategia basada en criterio de resolubilidad}
-%     \State $freq\_central \leftarrow obs\_params.freq\_central$
-%     \State $\Delta t_{\mathrm{ms}} \leftarrow \text{compute\_dispersion\_delay}(freq\_central, obs\_params)$
-%     \State $t_{\mathrm{samp}} \leftarrow obs\_params.temporal\_resolution$
-    
-%     \If{$\Delta t_{\mathrm{ms}} > \alpha \cdot t_{\mathrm{samp}}$}
-%         \State $strategy \leftarrow \text{DM-Time/CenterNet}$ \Comment{Estrategia clásica - bow-tie resoluble}
-%     \Else
-%         \State \textbf{// Alta frecuencia: seleccionar estrategia específica}
-%         \If{$config.hf\_mode == \text{``Línea 1''}$}
-%             \State $strategy \leftarrow \text{DM-Time/CenterNet}$ \Comment{Validación sin modificaciones}
-%         \ElsIf{$config.hf\_mode == \text{``Línea 2''}$}
-%             \State $strategy \leftarrow \text{SNR-threshold}$ \Comment{Detección por SNR + clasificación}
-%         \ElsIf{$config.hf\_mode == \text{``Línea 3''}$}
-%             \State $strategy \leftarrow \text{Alternative 2D plots}$ \Comment{Representaciones alternativas}
-%         \ElsIf{$config.hf\_mode == \text{``Línea 4''}$}
-%             \State $strategy \leftarrow \text{Zhang strategies}$ \Comment{DM-expand o fishing DM$\approx$0}
-%         \EndIf
-%     \EndIf
-    
-%     \State \textbf{// Procesamiento unificado con streaming}
-%     \For{$chunk$ \textbf{in} $streaming\_orchestrator.get\_chunks(data\_files)$}
-%         \State $memory\_manager.allocate\_gpu\_budget(chunk.size)$
-%         \State $slices \leftarrow chunk.get\_slices()$
-        
-%         \For{$slice$ \textbf{in} $slices$}
-%             \State \textbf{// Estrategia de propuesta (variable según régimen)}
-%             \State $candidates \leftarrow strategy.propose\_candidates(slice, models)$
-            
-%             \For{$candidate$ \textbf{in} $candidates$}
-%                 \State \textbf{// Bloque 1: Clasificación automatizada}
-%                 \State $patch \leftarrow extract\_patch\_and\_dedisperse(slice, candidate)$
-%                 \State $classification \leftarrow models.resnet18.predict(patch)$
-                
-%                 \State \textbf{// Validación física unificada}
-%                 \If{$classification.is\_burst$ \textbf{and} $validate\_physical\_criteria(candidate)$}
-%                     \State $metrics \leftarrow compute\_validation\_metrics(candidate, patch)$
-%                     \State $save\_candidate(candidate, classification, metrics)$
-%                 \EndIf
-%             \EndFor
-            
-%             \State $memory\_manager.cleanup\_gpu\_memory()$ \Comment{Gestión automática}
-%         \EndFor
-%     \EndFor
-    
-%     \State \textbf{// Bloque 1: Visualización y artefactos}
-%     \State $artifacts \leftarrow generate\_output\_artifacts()$
-%     \State $visualize\_and\_summarize(artifacts, strategy)$
-%     \State \textbf{RETURN} $artifacts$
-% \EndFunction
-% \end{algorithmic}
-% \end{algorithm}
-
-% La selección de estrategia se basa en un criterio físico objetivo (resolubilidad del retardo dispersivo) que determina automáticamente cuándo utilizar el flujo clásico versus las estrategias especializadas, creando un sistema coherente que se adapta a diferentes regímenes observacionales sin intervención manual.
-
-% \subsubsection{Diagrama End-to-End: Integración de Bloques 1 y 2}
-
-% La Figura \ref{fig:pipeline-end-to-end} presenta una vista integral del pipeline DRAFTS++ que ilustra cómo se integran las mejoras arquitectónicas. El diagrama muestra el flujo completo desde la inicialización del sistema hasta la generación de artefactos finales, destacando:
-
-% \textbf{Infraestructura del Bloque 1}: El diagrama muestra cómo la infraestructura modular (streaming, gestión de memoria, carga de modelos) proporciona la base común para todas las estrategias de detección.
-
-% \textbf{Estrategias del Bloque 2}: Se visualiza la selección automática basada en el criterio de resolubilidad $\Delta t_{\mathrm{ms}} > \alpha t_{\mathrm{samp}}$, incluyendo las cuatro líneas de investigación: (i) validación sin modificaciones, (ii) detección SNR-threshold, (iii) representaciones 2D alternativas, y (iv) estrategias avanzadas de Zhang.
-
-% \textbf{Flujo Unificado}: El diagrama demuestra cómo todas las estrategias convergen en un validador común y un sistema de visualización unificado, manteniendo la coherencia metodológica mientras optimiza el rendimiento según el régimen observacional.
-
-% \begin{figure}[H]
-% \centering
-% \resizebox{0.5\textwidth}{!}{%
-% \begin{tikzpicture}[
-%     node distance=1.0cm and 1.5cm,
-%     box/.style={rectangle, draw, fill=blue!20, text width=2.0cm, text centered, minimum height=0.6cm, font=\tiny},
-%     decision/.style={diamond, draw, fill=yellow!20, text width=1.6cm, text centered, minimum height=0.6cm, font=\tiny},
-%     process/.style={rectangle, draw, fill=green!20, text width=2.0cm, text centered, minimum height=0.6cm, font=\tiny},
-%     output/.style={rectangle, draw, fill=orange!20, text width=2.0cm, text centered, minimum height=0.6cm, font=\tiny},
-%     arrow/.style={-Stealth, thick}
-% ]
-
-% % FLUJO SIMPLIFICADO
-% \node[box] (A) {main.py};
-% \node[box, below=of A] (B) {run\_pipeline};
-% \node[box, below=of B] (C) {Cargar Modelos};
-
-% % ENTRADA DE DATOS
-% \node[box, right=of B] (D) {find\_data\_files};
-% \node[decision, below=of D] (E) {Tipo Archivo?};
-% \node[box, below left=of E] (F) {fits\_handler};
-% \node[box, below right=of E] (G) {filterbank\_handler};
-
-% % PROCESAMIENTO
-% \node[box, below=of E] (H) {streaming\_orchestrator};
-% \node[box, below=of H] (I) {Procesar Chunk};
-% \node[decision, below=of I] (J) {Frecuencia $\geq$ 8GHz?};
-
-% % PIPELINES
-% \node[box, below left=of J] (K) {Pipeline Alta Frecuencia};
-% \node[box, below right=of J] (L) {Pipeline Clásico};
-
-% % DETECCIÓN
-% \node[decision, below=of K] (M) {representaciones 2D alternativas simulan el bow tie?};
-% \node[box, below left=of M] (N) {Mapa característico alternativo + CenterNet};
-% \node[box, below right=of M] (O) {SNR Tradicional};
-% \node[process, below=of L] (P) {CenterNet DM-Time};
-
-% % CLASIFICACIÓN
-% \node[process, below=of N] (Q) {classify\_patch};
-% \node[process, below=of O] (R) {classify\_patch};
-% \node[process, below=of P] (S) {classify\_patch};
-
-% % RESULTADOS
-% \node[output, below=of Q] (T) {Guardar Candidatos};
-% \node[output, below=of R] (U) {Guardar Candidatos};
-% \node[output, below=of S] (V) {Guardar Candidatos};
-
-% % VISUALIZACIÓN
-% \node[output, below=of T] (W) {Plots + CSV};
-% \node[output, below=of U] (X) {Plots + CSV};
-% \node[output, below=of V] (Y) {Plots + CSV};
-
-% % Conexiones principales
-% \draw[arrow] (A) -- (B);
-% \draw[arrow] (B) -- (C);
-% \draw[arrow] (B) -- (D);
-% \draw[arrow] (D) -- (E);
-% \draw[arrow] (E) -- node[left] {FITS} (F);
-% \draw[arrow] (E) -- node[right] {Filterbank} (G);
-% \draw[arrow] (F) -- (H);
-% \draw[arrow] (G) -- (H);
-% \draw[arrow] (H) -- (I);
-% \draw[arrow] (I) -- (J);
-% \draw[arrow] (J) -- node[left] {Sí} (K);
-% \draw[arrow] (J) -- node[right] {No} (L);
-
-% % Detección
-% \draw[arrow] (K) -- (M);
-% \draw[arrow] (M) -- node[left] {Sí} (N);
-% \draw[arrow] (M) -- node[right] {No} (O);
-% \draw[arrow] (L) -- (P);
-
-% % Clasificación
-% \draw[arrow] (N) -- (Q);
-% \draw[arrow] (O) -- (R);
-% \draw[arrow] (P) -- (S);
-
-% % Resultados
-% \draw[arrow] (Q) -- (T);
-% \draw[arrow] (R) -- (U);
-% \draw[arrow] (S) -- (V);
-
-% % Visualización
-% \draw[arrow] (T) -- (W);
-% \draw[arrow] (U) -- (X);
-% \draw[arrow] (V) -- (Y);
-
-% \end{tikzpicture}}
-% \caption[Diagrama end-to-end DRAFTS++]{Diagrama end-to-end de DRAFTS++: Integración completa de Bloques 1 y 2, mostrando el flujo desde inicialización hasta resultados finales, con selección automática de estrategias según frecuencia observacional y infraestructura modular unificada. \textit{Fuente: Elaboración propia}.}
-% \label{fig:pipeline-end-to-end}
-% \end{figure}
-
-% % Diagramas específicos para Línea 3 y Línea 4 ubicados en 5.4.3 debajo del end-to-end
-% \begin{figure}[H]
-% \centering
-% \resizebox{0.85\textwidth}{!}{%
-% \begin{tikzpicture}[
-%     node distance=0.9cm and 1.6cm,
-%     stage/.style={rectangle, draw, fill=blue!20, text width=2.3cm, text centered, minimum height=0.7cm, font=\scriptsize},
-%     decision/.style={diamond, draw, fill=yellow!20, aspect=2, text width=2.4cm, text centered, inner sep=1pt, font=\scriptsize},
-%     arrow/.style={-Stealth, thick}
-% ]
-% % Nodos principales (Línea 3)
-% \node[stage] (inputL3) {Archivo\\HF};
-% \node[decision, right=of inputL3] (condL3) {$\Delta t_{\mathrm{ms}} \le \alpha t_{\mathrm{samp}}$?};
-% \node[stage, right=of condL3] (rep2d) {Línea 3:\\Representaciones 2D\\alternativas};
-% \node[stage, right=2.8cm of rep2d] (centernetL3) {CenterNet\\(detección)};
-% \node[stage, right=of centernetL3] (clfL3) {Clasificación\\binaria};
-% \node[stage, right=of clfL3] (valL3) {Validación\\Física};
-% \node[stage, right=of valL3] (outL3) {Artefactos\\Estandarizados};
-% % Flujo L3
-% \draw[arrow] (inputL3) -- (condL3);
-% \draw[arrow] (condL3) -- (rep2d);
-% \draw[arrow] (rep2d) -- (centernetL3);
-% \draw[arrow] (centernetL3) -- (clfL3);
-% \draw[arrow] (clfL3) -- (valL3);
-% \draw[arrow] (valL3) -- (outL3);
-% \end{tikzpicture}}
-% \caption[Línea 3 (HF): Representaciones 2D alternativas]{Línea 3 (HF): Representaciones 2D alternativas (IQUV, tiempo–ancho, tiempo–RM, coherencia espectral) seguidas por detección con CenterNet, clasificación binaria y validación física.}
-% \label{fig:hf-line3}
-% \end{figure}
-
-% \begin{figure}[H]
-% \centering
-% \resizebox{0.85\textwidth}{!}{%
-% \begin{tikzpicture}[
-%     node distance=0.9cm and 1.6cm,
-%     stage/.style={rectangle, draw, fill=blue!20, text width=2.3cm, text centered, minimum height=0.7cm, font=\scriptsize},
-%     decision/.style={diamond, draw, fill=yellow!20, aspect=2, text width=2.4cm, text centered, inner sep=1pt, font=\scriptsize},
-%     arrow/.style={-Stealth, thick}
-% ]
-% % Nodos principales (Línea 4)
-% \node[stage] (inputL4) {Archivo\\HF};
-% \node[decision, right=of inputL4] (condL4) {$\Delta t_{\mathrm{ms}} \le \alpha t_{\mathrm{samp}}$?};
-% \node[stage, right=of condL4] (branchA) {Línea 4A:\\DM-grid expandida};
-% \node[stage, below=1.2cm of branchA] (branchB) {Línea 4B:\\Classifier @ DM $\approx 0$};
-% \node[stage, right=3.0cm of branchA] (dedispL4) {Dedispersión\\Ajuste DM};
-% \node[stage, right=of dedispL4] (clfL4) {Clasificación\\binaria};
-% \node[stage, right=of clfL4] (valL4) {Validación\\DM-aware};
-% \node[stage, right=of valL4] (outL4) {Artefactos\\Estandarizados};
-% % Flujo L4
-% \draw[arrow] (inputL4) -- (condL4);
-% \draw[arrow] (condL4) -- (branchA);
-% \draw[arrow] (condL4) |- (branchB);
-% \draw[arrow] (branchA) -- (dedispL4);
-% \draw[arrow] (branchB) -| (dedispL4);
-% \draw[arrow] (dedispL4) -- (clfL4);
-% \draw[arrow] (clfL4) -- (valL4);
-% \draw[arrow] (valL4) -- (outL4);
-% \end{tikzpicture}}
-% \caption[Línea 4 (HF): Estrategias alternativas de Zhang]{Línea 4 (HF): Estrategias alternativas de Zhang: (A) expansión de rejilla de DM y búsqueda de bow-tie; (B) clasificación a DM $\approx 0$ con validación DM-aware por sub-banda y consistencia.}
-% \label{fig:hf-line4}
-% \end{figure}
+\textit{Nota: Los diagramas detallados de flujo para Líneas 3 y 4 se omiten dado que estas líneas no fueron implementadas en esta memoria. Su diseño arquitectónico completo se desarrollará como parte del trabajo futuro de posgrado.}
