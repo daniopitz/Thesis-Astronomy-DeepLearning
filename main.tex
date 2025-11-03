@@ -96,6 +96,21 @@ Corresponde a la traducción al idioma inglés de Palabras Clave anteriores.
 \usepackage{adjustbox}  % Para redimensionar entornos (p.ej., TikZ) de forma segura
 \usepackage{algorithm}  % Para pseudocódigos
 \usepackage{algpseudocode}  % Para pseudocódigos con estilo
+\usepackage{multicol}   % Para bibliografía en dos columnas
+
+% Configuración profesional para captions de figuras y tablas
+\usepackage[
+  font=small,              % Letra más pequeña que el texto principal
+  labelfont=bf,            % Etiqueta "Figura X.Y" en negrita
+  textfont=it,             % Texto del caption en itálica
+  justification=justified, % Justificado para mejor presentación
+  skip=10pt,               % Espaciado entre figura y caption
+  position=bottom          % Caption debajo de la figura
+]{caption}
+
+% Espaciado adicional alrededor de figuras para distinguirlas del texto
+\setlength{\intextsep}{15pt plus 3pt minus 2pt}   % Espacio arriba/abajo de figuras
+\setlength{\textfloatsep}{15pt plus 3pt minus 2pt} % Espacio para floats en top/bottom
 
 % Configuración para algoritmos (ya están definidos por algpseudocode)
 \usepackage{listings}   % Para código con formato
@@ -173,10 +188,14 @@ Corresponde a la traducción al idioma inglés de Palabras Clave anteriores.
 \renewenvironment{thebibliography}[1]
      {\secnumberlesssection{REFERENCIAS BIBLIOGRÁFICAS}
       \@mkboth{\MakeUppercase\bibname}{\MakeUppercase\bibname}%
-      \list{\@biblabel{\@arabic\c@enumiv}}%
-           {\settowidth\labelwidth{\@biblabel{#1}}%
+      \small % Letra más pequeña para bibliografía
+      \begin{multicols}{2} % Inicio de dos columnas
+      \list{[\@arabic\c@enumiv]}% Numeración entre corchetes [1], [2], etc.
+           {\settowidth\labelwidth{[#1]}% Ancho para números
             \leftmargin\labelwidth
             \advance\leftmargin\labelsep
+            \itemsep=0.3em % Espaciado sutil entre referencias
+            \parsep=0pt
             \@openbib@code
             \usecounter{enumiv}%
             \let\p@enumiv\@empty
@@ -188,7 +207,8 @@ Corresponde a la traducción al idioma inglés de Palabras Clave anteriores.
       \sfcode`\.\@m}
      {\def\@noitemerr
        {\@latex@warning{Empty `thebibliography' environment}}%
-      \endlist}
+      \endlist
+      \end{multicols}} % Fin de dos columnas
 \makeatother
 
 % Configuración de numeración de figuras y tablas

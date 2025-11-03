@@ -15,9 +15,14 @@
 %mejoras incrementales, sino que además establece una \textbf{extensión fundamental para regímenes de alta frecuencia} que expande significativamente las capacidades de 
 %detección en el espectro milimétrico.%
 
-En este capítulo se propone el diseño e implementación de DRAFTS++, una nueva versión de DRAFTS \cite{zhang2024drafts}. A diferencia del prototipo original, centrado en la validación de modelos de detección y clasificación de Fast Radio Bursts (FRBs), DRAFTS++ se concibe como un \textit{pipeline} operativo, robusto y eficiente, capaz de integrar procesos de ingesta, preprocesamiento, inferencia y reporte de resultados en un flujo extremo a extremo.
-Adicionalmente, la propuesta extiende la arquitectura de DRAFTS hacia el régimen de frecuencias milimétricas, ampliando de manera significativa las capacidades de detección y caracterización de transientes de radio en este dominio.
-La propuesta se organiza en dos componentes principales: (i) el desarrollo de DRAFTS++ como pipeline productivo end-to-end, y (ii) su extensión al régimen milimétrico mediante nuevas estrategias de detección y análisis. De aquí en adelante, el término DRAFTS++ se utilizará para referirse a esta propuesta, que constituye el núcleo central de la presente memoria.
+En este capítulo se propone el diseño e implementación de DRAFTS++, una nueva versión de DRAFTS \cite{zhang2024drafts}. 
+
+\noindent\textbf{Alcance y contribución de esta tesis:} Es fundamental establecer que \textbf{esta tesis NO desarrolla ni entrena modelos de redes neuronales}. Los modelos de deep learning (CenterNet para detección de objetos y ResNet18 para clasificación binaria) son componentes \textbf{pre-existentes y pre-entrenados} del trabajo original de DRAFTS \citep{zhang2024drafts}. \textbf{La contribución de este trabajo radica exclusivamente en la ingeniería de software}: transformar un prototipo de investigación en un sistema productivo mediante arquitectura modular, gestión eficiente de memoria, procesamiento por streaming, automatización del workflow, validación científica robusta y extensión a múltiples bandas de frecuencia. Los modelos se utilizan como herramientas mediante inferencia, no como objetos de desarrollo.
+
+A diferencia del prototipo original, centrado en la validación de modelos de detección y clasificación de Fast Radio Bursts (FRBs), DRAFTS++ se concibe como un \textit{pipeline} operativo, robusto y eficiente, capaz de integrar procesos de ingesta, preprocesamiento, inferencia con modelos pre-entrenados y reporte de resultados en un flujo extremo a extremo.
+Adicionalmente, la propuesta extiende la arquitectura hacia el régimen de frecuencias milimétricas mediante estrategias de detección adaptativas, ampliando significativamente las capacidades operacionales del sistema.
+
+La propuesta se organiza en dos componentes principales: (i) el desarrollo de DRAFTS++ como pipeline productivo end-to-end con ingesta multi-formato, streaming eficiente y orquestación automatizada de modelos, y (ii) su extensión al régimen milimétrico mediante estrategias de detección basadas en SNR y validación física robusta. De aquí en adelante, el término DRAFTS++ se utilizará para referirse a esta propuesta, que constituye el núcleo central de la presente memoria.
 
 \vspace{0.3cm}
 \noindent\textbf{Contexto de Implementación:} DRAFTS++ está implementado en Python 3.9+ utilizando PyTorch y torchvision (inferencia de modelos CenterNet y ResNet18), Astropy (lectura y escritura de archivos FITS/PSRFITS), NumPy (procesamiento numérico de arreglos multidimensionales tiempo-frecuencia), psutil (cálculo dinámico de presupuestos de memoria RAM disponible), fitsio y struct nativo (parseo eficiente de headers Filterbank), y librerías auxiliares como scipy (filtrado y convoluciones SNR), matplotlib/seaborn (generación de plots diagnósticos), y numba (aceleración de operaciones de dedispersión). El sistema está diseñado para procesar observaciones continuas de larga duración (típicamente 1-8 horas) provenientes de radiotelescopios como FAST (Fast Radio Burst Survey con archivos de 50-200 GB) y Parkes (observaciones de seguimiento de 2-4 horas con resoluciones temporales de 64-256 $\mu$s).
@@ -38,7 +43,7 @@ La propuesta se organiza en dos componentes principales: (i) el desarrollo de DR
 
 %Como ya se mencionó anteriormente, aquí se contempla la transformación fundamental del prototipo DRAFTS hacia un sistema productivo capaz de operar en entornos observacionales reales. La evolución desde un prototipo de investigación hacia un sistema productivo requiere una transformación arquitectónica fundamental que aborde las limitaciones inherentes del código base original.
 
-\subsection{Componente 1: DRAFTS++: \textit{Pipeline} astronómico E2E, productivo, robusto y eficiente}
+\subsection{Componente 1: Ingeniería de Software para un Pipeline E2E Productivo}
 
 Como se indicó en la introducción de este capítulo, este \textbf{componente} aborda la transición de \textbf{DRAFTS}, concebido originalmente como un prototipo de investigación, hacia un sistema \textbf{productivo y operativo} capaz de funcionar en entornos observacionales reales. Esta transición requiere una \textbf{reformulación arquitectónica profunda}, orientada a superar las limitaciones del código base original y a garantizar la escalabilidad, robustez y reproducibilidad necesarias para su integración en flujos astronómicos de detección de transientes.
 
@@ -489,13 +494,22 @@ Este algoritmo garantiza que cada \emph{chunk} sea procesable con la memoria dis
 \end{algorithmic}
 \end{algorithm}
 
-\subsubsection{Integración y Automatización del Workflow de Modelos de DRAFTS}
+\subsubsection{Integración y Automatización del Workflow de Modelos Pre-entrenados}
 
-La etapa de procesamiento integrado representa el núcleo computacional más sofisticado del pipeline DRAFTS++, donde se materializa la convergencia entre ingeniería de software avanzada y la integración automatizada de los modelos de deep learning existentes en DRAFTS-main. Esta sección detalla cómo se procesan los datos astronómicos para identificar y clasificar candidatos FRB utilizando los modelos CenterNet y ResNet18 de manera integrada, automatizada y eficiente dentro de un flujo de trabajo unificado.
+Esta sección describe el núcleo de la \textbf{contribución de ingeniería de software de DRAFTS++}: la integración automatizada de los modelos de deep learning existentes (CenterNet y ResNet18, desarrollados y entrenados en el trabajo original de DRAFTS \citep{zhang2024drafts}) dentro de un pipeline de streaming productivo. \textbf{Es importante enfatizar que el presente trabajo no desarrolla ni entrena nuevos modelos de redes neuronales; los modelos de detección y clasificación son componentes pre-existentes que se utilizan como herramientas mediante inferencia.} La innovación radica en la arquitectura de software que permite su ejecución eficiente, automatizada y robusta en entornos observacionales reales.
 
-A diferencia del prototipo DRAFTS-main que ejecutaba los modelos de detección y clasificación como etapas separadas y desacopladas, DRAFTS++ implementa un sistema integrado que automatiza la orquestación de estos modelos, combinando detección de objetos, clasificación binaria y validación científica en un flujo unificado y optimizado. Esta aproximación elimina las limitaciones del procesamiento manual por lotes separado y establece las bases para un sistema productivo capaz de manejar observaciones de larga duración en tiempo real, tal como se conceptualizó originalmente en el workflow de DRAFTS. El tiempo de inferencia combinado (CenterNet + ResNet18) es de ~150-300 ms por slice de 512 ms, permitiendo procesamiento casi en tiempo real para observaciones continuas.
+A diferencia del prototipo DRAFTS que ejecutaba los modelos como scripts separados y desacoplados, requiriendo intervención manual para coordinar las etapas, DRAFTS++ implementa un \textbf{sistema de orquestación automatizada} que:
 
-El procesamiento integrado opera mediante tres pilares fundamentales: (i) integración automatizada del modelo CenterNet para detección de candidatos FRB, (ii) orquestación en flujo del modelo ResNet18 para clasificación binaria, y (iii) validación física y temporal que asegura la coherencia científica de las detecciones. Esta arquitectura integrada representa una mejora significativa sobre el prototipo original, que carecía de integración coherente entre estas etapas y requería intervención manual para coordinar los modelos.
+\begin{itemize}
+    \item Carga dinámicamente los checkpoints de modelos pre-entrenados desde rutas configurables
+    \item Gestiona automáticamente la transferencia de datos entre CPU y GPU
+    \item Ejecuta la inferencia de CenterNet y ResNet18 en secuencia dentro de cada slice
+    \item Maneja errores de carga de modelos con fallback automático a CPU
+    \item Libera memoria GPU de manera determinística tras cada inferencia
+    \item Mantiene trazabilidad completa de versiones de modelos y configuraciones utilizadas
+\end{itemize}
+
+El tiempo de inferencia combinado (CenterNet + ResNet18) es de $\sim$150--300 ms por slice de 512 ms, permitiendo procesamiento casi en tiempo real para observaciones continuas. Esta arquitectura integrada representa el valor de ingeniería fundamental de DRAFTS++: transformar modelos de investigación en componentes productivos operables en flujos astronómicos reales.
 
 \begin{figure}[H]
 \centering
@@ -542,173 +556,70 @@ El procesamiento integrado opera mediante tres pilares fundamentales: (i) integr
 \end{figure}
 \paragraph{Integración Automatizada del Modelo CenterNet}
 
-El sistema de detección integra el modelo CenterNet existente en DRAFTS-main, una arquitectura de deep learning especializada en detección de objetos, que fue previamente entrenada para identificar candidatos FRB en imágenes DM-tiempo. La contribución de DRAFTS++ no radica en el desarrollo o entrenamiento de este modelo, sino en la implementación de la infraestructura de software necesaria para embeber, ejecutar y orquestar este modelo de manera automatizada dentro del pipeline de streaming.
+El sistema de detección integra el modelo CenterNet existente en DRAFTS-main \citep{Zhou2019}, una arquitectura de deep learning especializada en detección de objetos, que fue previamente entrenada para identificar candidatos FRB en imágenes DM-tiempo \citep{zhang2024drafts}. \textbf{La contribución de DRAFTS++ no radica en el desarrollo o entrenamiento de este modelo, sino en la implementación de la infraestructura de software necesaria para embeber, ejecutar y orquestar este modelo de manera automatizada dentro del pipeline de streaming.}
 
-CenterNet opera mediante la detección de objetos como puntos centrales en el espacio de la imagen, eliminando la necesidad de anclas y procesos de supresión no máxima (NMS). Esta aproximación es particularmente efectiva para detectar transientes rápidos como FRBs, donde la forma y localización precisa son críticas para la validación científica posterior. DRAFTS++ proporciona la infraestructura de software para ejecutar este modelo de manera eficiente y automática.
+CenterNet opera mediante la detección de objetos como puntos centrales en el espacio de la imagen, eliminando la necesidad de anclas y procesos de supresión no máxima (NMS). El modelo pre-entrenado genera tres tipos de salidas: (i) un mapa de calor que identifica centros de candidatos, (ii) regresiones de tamaño que estiman las dimensiones del área de interés, y (iii) regresiones de desplazamiento que refinan la posición precisa. DRAFTS++ proporciona la infraestructura de software para ejecutar este modelo de manera eficiente y automática, procesando estas salidas para extraer las coordenadas físicas (DM, tiempo) de cada candidato detectado.
 
-El algoritmo de integración y ejecución de CenterNet en DRAFTS++ se implementa mediante los siguientes pasos:
+La integración de CenterNet en DRAFTS++ se estructura en cuatro etapas de procesamiento:
 
 \begin{enumerate}
-    \item \textbf{Preprocesamiento de imagen:} La imagen DM-tiempo se normaliza y redimensiona a 512×512 píxeles, aplicando normalización estadística y corrección de color para optimizar la entrada del modelo pre-entrenado.
-    \item \textbf{Carga y ejecución del modelo:} Se carga el modelo CenterNet pre-entrenado desde los checkpoints existentes en DRAFTS-main y se ejecuta la inferencia sobre la imagen preprocesada.
-    \item \textbf{Procesamiento de salidas:} El modelo genera tres mapas de salida: mapa de calor $H$ (centros de objetos), regresión de tamaño $WH$ (dimensiones), y regresión de desplazamiento $OFF$ (correcciones de posición).
-    \item \textbf{Post-procesamiento y extracción de candidatos:} Se aplica supresión no máxima adaptada y filtrado por confianza para generar las detecciones finales, extrayendo coordenadas DM-tiempo de los candidatos detectados.
+    \item \textbf{Preprocesamiento de imagen:} La imagen DM-tiempo se normaliza y redimensiona a 512×512 píxeles mediante transformaciones estándar de torchvision, optimizando la entrada para el modelo pre-entrenado.
+    \item \textbf{Carga y ejecución del modelo:} El sistema carga automáticamente los checkpoints del modelo CenterNet desde la ruta configurada y ejecuta la inferencia en GPU (con fallback a CPU si es necesario).
+    \item \textbf{Procesamiento de salidas:} Las salidas del modelo (mapas de calor, tamaños y desplazamientos) se post-procesan mediante detección de picos locales y filtrado por umbral de confianza.
+    \item \textbf{Conversión a coordenadas físicas:} Los píxeles detectados se convierten a coordenadas físicas (DM en pc cm$^{-3}$ y tiempo en segundos) mediante las transformaciones geométricas que mapean el espacio de imagen al espacio observacional.
 \end{enumerate}
 
-La formulación matemática del modelo CenterNet se basa en las siguientes ecuaciones:
-
-El mapa de calor se genera mediante:
-
-\[
-H_{x,y} = \sigma\left(\sum_{i=1}^{N} \exp\left(-\frac{(x - x_i)^2 + (y - y_i)^2}{2\sigma^2}\right)\right)
-\]
-
-donde:
-\begin{itemize}
-    \item $H_{x,y}$: Valor del mapa de calor en la posición $(x,y)$
-    \item $N$: Número de objetos en la imagen
-    \item $(x_i, y_i)$: Posición central del objeto $i$
-    \item $\sigma$: Parámetro de dispersión gaussiana (típicamente 2.0)
-    \item $\sigma(\cdot)$: Función de activación sigmoide
-\end{itemize}
-
-La regresión de tamaño predice las dimensiones del objeto mediante:
-
-\[
-(w, h) = f_{wh}(F_{x_c, y_c})
-\]
-
-donde $f_{wh}$ es una función aprendida que mapea las características locales $F_{x_c, y_c}$ a las dimensiones del objeto.
-
-La regresión de desplazamiento calcula la corrección de posición:
-
-\[
-(\Delta x, \Delta y) = f_{off}(F_{x_c, y_c})
-\]
-
-donde $f_{off}$ predice el desplazamiento respecto al centro del píxel más cercano.
-
 \begin{algorithm}[H]
-\caption{Detección de Candidatos FRB con CenterNet}
+\caption{Integración y Ejecución de CenterNet en DRAFTS++}
 \label{alg:centernet-detection}
 \begin{algorithmic}[1]
-\Require Imagen DM-tiempo $I$, modelo CenterNet entrenado
-\Ensure Lista de candidatos con coordenadas y confianza
+\Require Imagen DM-tiempo $I$ del slice actual, modelo CenterNet pre-entrenado
+\Ensure Lista de candidatos $\{(DM_i, t_i, \text{conf}_i)\}$ con coordenadas físicas
 
 \State \textbf{INICIO}
-\State Normalizar imagen: $I_{norm} = \text{normalize}(I)$
-\State Redimensionar a 512×512: $I_{resized} = \text{resize}(I_{norm})$
-\State Convertir a tensor: $T = \text{to\_tensor}(I_{resized})$
-
-\State \textbf{Inferencia del modelo}
-\State $H, WH, OFF = \text{model}(T)$ \Comment{Mapas de calor, tamaño y desplazamiento}
-\State Aplicar sigmoide al mapa de calor: $H = \sigma(H)$
-
-\State \textbf{Post-procesamiento}
-\State Extraer picos locales: $\text{peaks} = \text{find\_peaks}(H, \text{threshold}=\theta)$
-\For{cada pico $p$ en peaks}
-    \State $(x_c, y_c) = \text{coordenadas}(p)$
-    \State $(w, h) = WH[x_c, y_c]$ \Comment{Regresión de tamaño}
-    \State $(\Delta x, \Delta y) = OFF[x_c, y_c]$ \Comment{Regresión de desplazamiento}
-    \State Calcular caja delimitadora: $box = [x_c + \Delta x - w/2, y_c + \Delta y - h/2, x_c + \Delta x + w/2, y_c + \Delta y + h/2]$
-    \State Calcular DM y tiempo: $(DM, t) = \text{convert\_to\_physical}(box)$
-    \State Agregar candidato: $\text{candidates.append}(DM, t, \text{confidence}(p))$
-        \EndFor
-
-\State \textbf{RETORNAR} candidates
+\State \textbf{// Preprocesamiento de entrada}
+\State Aplicar transformaciones estándar: normalización, redimensionamiento a 512×512, conversión a tensor
+\State \textbf{// Inferencia con modelo pre-entrenado}
+\State Cargar checkpoint del modelo CenterNet desde ruta configurada
+\State Ejecutar inferencia en GPU: obtener mapas de salida (calor, tamaño, desplazamiento)
+\State \textbf{// Post-procesamiento de salidas}
+\State Detectar picos locales en mapa de calor con umbral de confianza $\theta$
+\State Para cada pico detectado: extraer coordenadas píxel $(x, y)$ y dimensiones
+\State \textbf{// Conversión a coordenadas físicas}
+\State Transformar píxeles a coordenadas astronómicas: $(DM, t) = \text{pixel\_to\_physical}(x, y)$
+\State \textbf{RETORNAR} lista de candidatos con $(DM, t, \text{confianza})$
 \State \textbf{FIN}
 \end{algorithmic}
 \end{algorithm}
 \paragraph{Orquestación Automatizada del Modelo ResNet18}
 
-El sistema de clasificación integra el modelo ResNet18 existente en DRAFTS-main, una arquitectura de red neuronal residual previamente entrenada para clasificación binaria de FRBs, que opera en tiempo real durante el procesamiento, evaluando cada candidato detectado por CenterNet para determinar si representa un FRB genuino o ruido. La contribución de DRAFTS++ radica en la automatización de la orquestación entre los modelos, eliminando la necesidad de procesamiento manual por lotes separado.
+El sistema de clasificación integra el modelo ResNet18 existente en DRAFTS-main, una arquitectura de red neuronal residual previamente entrenada para clasificación binaria de FRBs \citep{zhang2024drafts}. \textbf{La contribución de DRAFTS++ radica en la automatización de la orquestación entre los modelos CenterNet y ResNet18, eliminando la necesidad de procesamiento manual por lotes separado y habilitando un flujo de clasificación en tiempo real.}
 
-La clasificación binaria se basa en la extracción de características de patches dedispersados correspondientes a cada candidato detectado por CenterNet. El modelo ResNet18 utiliza una arquitectura residual previamente entrenada para procesar imágenes de FRBs, específicamente diseñada para distinguir entre transientes genuinos y artefactos instrumentales. DRAFTS++ proporciona la infraestructura de software para ejecutar este modelo de manera automatizada y en flujo continuo.
-
-El algoritmo de orquestación y ejecución de ResNet18 en DRAFTS++ opera mediante los siguientes pasos:
-
-\begin{enumerate}
-    \item \textbf{Extracción de patch:} Se extrae una región de interés (ROI) alrededor de cada candidato detectado por CenterNet en la imagen DM-tiempo.
-    \item \textbf{Dedispersión:} Se aplica dedispersión al patch utilizando el DM detectado para obtener la señal temporal integrada.
-    \item \textbf{Preprocesamiento:} Se normaliza el patch dedispersado aplicando corrección de tendencia y normalización estadística para optimizar la entrada del modelo pre-entrenado.
-    \item \textbf{Carga y ejecución del modelo:} Se carga el modelo ResNet18 pre-entrenado desde los checkpoints existentes en DRAFTS-main y se ejecuta la inferencia sobre el patch preprocesado.
-    \item \textbf{Interpretación de probabilidades:} Se interpreta la salida del modelo para obtener la probabilidad intrínseca de pertenencia a la clase FRB, tal como se visualiza en el workflow original de DRAFTS.
-    \item \textbf{Decisión automatizada:} Se aplica un umbral de confianza configurable para clasificar automáticamente el candidato como "BURST" o "NO BURST".
-\end{enumerate}
-
-La formulación matemática del proceso de clasificación se basa en las transformaciones exactas implementadas en el módulo 	exttt{model	extunderscore interface}. El preprocesamiento del patch sigue cuatro pasos determinísticos:
-
-\[
-P^{(1)} = P + \mathbf{1}, \qquad
-P^{(2)}_{i,j} = \frac{P^{(1)}_{i,j}}{\mu_j}, \qquad
-P^{(3)} = \operatorname{clip}\big(P^{(2)}, q_{5}, q_{95}\big),
-\]
-
-\[
-P_{\text{final}} = \frac{P^{(3)} - \min P^{(3)}}{\max P^{(3)} - \min P^{(3)}}
-\]
-
-donde:
-\begin{itemize}
-    \item $P$: Patch dedispersado original (tiempo \texttimes{} frecuencia).
-    \item $\mathbf{1}$: Matriz de unos con la misma forma que $P$, que desplaza la señal para evitar valores nulos.
-    \item $\mu_j = \frac{1}{N_t} \sum_i P^{(1)}_{i,j}$: Media de la columna $j$ (normalización por canal de frecuencia).
-    \item $q_{5}$ y $q_{95}$: Percentiles 5$^{\circ}$ y 95$^{\circ}$ calculados sobre todos los elementos de $P^{(2)}$.
-    \item $\operatorname{clip}(\cdot)$: Operador que limita cada valor al rango $[q_{5}, q_{95}]$ para mitigar outliers.
-    \item $\min P^{(3)}$ y $\max P^{(3)}$: Valores mínimo y máximo globales de $P^{(3)}$, usados para el escalado min--max final.
-\end{itemize}
-
-La probabilidad de clasificación se calcula mediante:
-
-\[
-p = \sigma(W \cdot \phi(P_{final}) + b)
-\]
-
-donde:
-\begin{itemize}
-    \item $p$: Probabilidad de pertenencia a la clase FRB
-    \item $\sigma$: Función de activación sigmoide
-    \item $W, b$: Pesos y sesgo de la capa de clasificación
-    \item $\phi(P_{final})$: Características extraídas por la red convolucional
-\end{itemize}
-
-La decisión de clasificación se realiza mediante:
-
-\[
-\text{Clase} = \begin{cases} 
-\text{BURST} & \text{si } p \geq \theta_{class} \\
-\text{NO BURST} & \text{si } p < \theta_{class}
-\end{cases}
-\]
-
-donde $\theta_{class}$ es el umbral de confianza configurable (típicamente 0.6).
+El pipeline de clasificación opera sobre cada candidato detectado por CenterNet, extrayendo un patch del espectro dinámico original, aplicando dedispersión coherente al DM detectado, y normalizando el resultado mediante técnicas estadísticas robustas (sustracción de tendencia, clipping de outliers, escalado min-max) antes de alimentarlo al modelo pre-entrenado. El modelo ResNet18 retorna una probabilidad $p \in [0,1]$ que indica la confianza de que el candidato sea un FRB real. DRAFTS++ automatiza esta secuencia completa y aplica un umbral de decisión configurable $\theta_{class}$ (típicamente 0.6) para clasificar automáticamente cada candidato como ``BURST'' o ``NO BURST''.
 
 \begin{algorithm}[H]
-\caption{Clasificación Binaria en Flujo}
+\caption{Orquestación de Clasificación Binaria con ResNet18}
 \label{alg:binary-classification}
 \begin{algorithmic}[1]
-\Require Candidato $(DM, t, box)$, modelo clasificador, datos originales
-\Ensure Probabilidad de FRB y clasificación final
+\Require Candidato $(DM, t)$ de CenterNet, espectro dinámico original, modelo ResNet18 pre-entrenado
+\Ensure Probabilidad $p$ y clasificación binaria (BURST / NO BURST)
 
 \State \textbf{INICIO}
-\State Extraer patch de la imagen DM-tiempo: $P = \text{extract\_patch}(box)$
-\State Aplicar dedispersión: $P_{dedisp} = \text{dedisperse}(P, DM)$
-\State Normalizar patch: $P_{norm} = \frac{P_{dedisp} - \mu}{\sigma} \cdot \frac{1}{\text{mean}(P_{dedisp})} + 1$
-\State Aplicar clipping: $v_{min}, v_{max} = \text{percentiles}(P_{norm}, [5, 95])$
-\State Normalización final: $P_{final} = \frac{\text{clip}(P_{norm}, v_{min}, v_{max}) - v_{min}}{v_{max} - v_{min}}$
-
-\State \textbf{Clasificación}
-\State Convertir a tensor: $T = \text{to\_tensor}(P_{final}[None, None, :, :])$
-\State Inferencia: $logits = \text{classifier\_model}(T)$
-\State Calcular probabilidad: $p = \text{softmax}(logits)[0, 1]$
-
+\State \textbf{// Extracción y dedispersión}
+\State Extraer patch frecuencia-tiempo centrado en coordenadas del candidato
+\State Aplicar dedispersión coherente al patch usando $DM$ detectado
+\State \textbf{// Preprocesamiento robusto}
+\State Normalizar patch mediante: sustracción de tendencia, clipping de outliers, escalado min-max
+\State \textbf{// Inferencia con modelo pre-entrenado}
+\State Cargar checkpoint del modelo ResNet18 desde ruta configurada
+\State Ejecutar inferencia en GPU: obtener probabilidad $p \in [0,1]$ de clase FRB
+\State \textbf{// Decisión automatizada}
 \If{$p \geq \theta_{class}$}
-    \State $\text{clase} = \text{BURST}$
+    \State Clasificar como BURST
 \Else
-    \State $\text{clase} = \text{NO BURST}$
+    \State Clasificar como NO BURST
 \EndIf
-
-\State \textbf{RETORNAR} $(p, \text{clase})$
+\State \textbf{RETORNAR} $(p, \text{clasificación})$
 \State \textbf{FIN}
 \end{algorithmic}
 \end{algorithm}
@@ -806,21 +717,23 @@ donde $\text{DM}_{max}$ es el máximo DM físicamente plausible (típicamente 20
 \end{algorithmic}
 \end{algorithm}
 
-Esta implementación integrada de detección, clasificación y validación representa una mejora arquitectónica fundamental que establece las bases para un sistema productivo robusto, capaz de procesar observaciones de larga duración con precisión científica y eficiencia computacional optimizada. La contribución clave de DRAFTS++ radica en la automatización y orquestación de los modelos existentes de DRAFTS, transformando un workflow conceptual en un sistema operativo que funciona tal como se visualizó originalmente en el diseño de DRAFTS, con detección y clasificación automatizadas y probabilidades intrínsecas integradas en el flujo de trabajo.
+Esta implementación integrada de detección, clasificación y validación representa una mejora arquitectónica fundamental que establece las bases para un sistema productivo robusto, capaz de procesar observaciones de larga duración con precisión científica y eficiencia computacional optimizada. \textbf{La contribución clave de DRAFTS++ no reside en el desarrollo de los modelos de deep learning (CenterNet y ResNet18 son modelos pre-entrenados existentes en DRAFTS), sino en la ingeniería de software necesaria para: (i) automatizar la orquestación entre modelos, (ii) integrarlos en un pipeline de streaming eficiente, (iii) gestionar la carga dinámica de checkpoints, (iv) implementar preprocesamiento robusto de datos astronómicos, (v) garantizar la continuidad temporal en procesamiento por chunks, y (vi) validar científicamente las detecciones mediante métricas físicas.} Este trabajo de ingeniería transforma un workflow conceptual en un sistema operativo end-to-end que funciona de manera autónoma en entornos observacionales reales.
 
 
 % =============================================================
-% Bloque 2: Sólo títulos y subtítulos (estructura)
+% Componente 2: Extensión a Alta Frecuencia
 % =============================================================
-\subsection{Bloque 2: Extensión a Alta Frecuencia - Cuatro Líneas de Investigación}
+\subsection{Componente 2: Extensión a Alta Frecuencia mediante Estrategias de Detección Adaptativas}
 
-Este bloque explora estrategias metodológicas para extender las capacidades de detección hacia regímenes de alta frecuencia (30-100 GHz), donde las firmas dispersivas tradicionales se atenúan significativamente. La detección de FRBs en el régimen milimétrico presenta desafíos fundamentales que requieren aproximaciones metodológicas diferenciadas.
+Este componente describe las \textbf{extensiones de ingeniería} implementadas en DRAFTS++ para operar en regímenes de alta frecuencia (30--100 GHz), donde las firmas dispersivas tradicionales se atenúan significativamente. \textbf{Importante: Este componente NO desarrolla nuevos modelos de deep learning}; utiliza los mismos modelos pre-entrenados (CenterNet y ResNet18) pero implementa \textbf{estrategias de detección alternativas} que se activan condicionalmente según las características físicas de la banda observacional.
 
-A estas frecuencias, la dispersión temporal se atenúa significativamente debido a la dependencia cuadrática inversa con la frecuencia, resultando en firmas dispersivas que pueden ser indistinguibles del ruido instrumental en resoluciones temporales típicas. Este bloque presenta cuatro líneas de investigación complementarias que abordan diferentes aspectos del desafío de detección en el espectro milimétrico.
+La detección de FRBs en el régimen milimétrico presenta desafíos fundamentales: a estas frecuencias, la dispersión temporal se atenúa significativamente ($\Delta t \propto \nu^{-2}$), resultando en firmas dispersivas que pueden ser indistinguibles del ruido instrumental. DRAFTS++ aborda esto mediante \textbf{ingeniería de pipeline adaptativo}: criterios físicos automáticos determinan qué estrategia de detección usar (DM-tiempo clásico vs. SNR-threshold), manteniendo el mismo backend de clasificación y validación.
 
-\subsubsection{Línea 1: Validación de DRAFTS++ sin modificaciones}
+Este componente presenta estrategias complementarias de detección que abordan diferentes aspectos del desafío milimétrico, todas implementadas como ramas condicionales dentro del pipeline unificado de DRAFTS++.
 
-Esta línea constituye una extensión natural del Bloque 1: se emplea \textbf{exactamente el mismo DRAFTS++ sin modificaciones}, preservando la arquitectura y el \emph{workflow} clásico (DM-tiempo para propuesta y red de clasificación para decisión), con el propósito de \textit{medir su capacidad base} en regímenes de alta frecuencia. El interés es doble: (i) establecer la sensibilidad y robustez mínima alcanzable sin introducir nuevas heurísticas ni rutas alternativas, y (ii) cuantificar objetivamente el punto a partir del cual las estrategias específicas de alta frecuencia (Línea 2) superan al flujo original en eficacia operativa. El criterio físico de resolubilidad se expresa mediante el retardo dispersivo máximo entre los extremos de banda,
+\subsubsection{Estrategia 1: Validación de DRAFTS++ sin modificaciones en Alta Frecuencia}
+
+Esta estrategia constituye una extensión natural del Componente 1: se emplea \textbf{exactamente el mismo DRAFTS++ sin modificaciones}, preservando la arquitectura y el \emph{workflow} clásico (detección en espacio DM-tiempo con CenterNet pre-entrenado y clasificación con ResNet18 pre-entrenado), con el propósito de \textit{medir su capacidad base} en regímenes de alta frecuencia. El objetivo es doble: (i) establecer la sensibilidad y robustez mínima alcanzable sin introducir nuevas estrategias de detección, y (ii) cuantificar objetivamente el punto a partir del cual las estrategias específicas de alta frecuencia (Estrategia 2) superan al flujo clásico en eficacia operativa. El criterio físico de resolubilidad se expresa mediante el retardo dispersivo máximo entre los extremos de banda,
 \[
 \Delta t_{\mathrm{ms}} = 4.148808 \times 10^{3}\,\, \mathrm{DM}\,\big(\nu_{\mathrm{low}}^{-2}-\nu_{\mathrm{high}}^{-2}\big),
 \]
@@ -836,9 +749,11 @@ Esta línea constituye una extensión natural del Bloque 1: se emplea \textbf{ex
 comparado con la resolución temporal efectiva $t_{\mathrm{samp}}$. Cuando $\Delta t_{\mathrm{ms}} > \alpha\, t_{\mathrm{samp}}$ (con $\alpha$ de seguridad en el rango 1.5–2.0), el \textit{bow–tie} permanece resoluble y la detección en DM-tiempo sigue siendo pertinente; si $\Delta t_{\mathrm{ms}} \le \alpha\, t_{\mathrm{samp}}$, la firma se comprime y el mapa DM-tiempo pierde contraste, anticipándose una disminución de sensibilidad. La validación consiste, por tanto, en aplicar el flujo sin modificaciones sobre ventanas en las que $\Delta t_{\mathrm{ms}}$ sea resoluble y medir sensibilidad, tasa de falsos positivos y estabilidad temporal del detector; este resultado sirve de referencia objetiva para las estrategias alternativas descritas a continuación.
 
 
-\subsubsection{Línea 2: Detección por SNR con clasificación binaria en flujo}
+\subsubsection{Estrategia 2: Detección por SNR con clasificación binaria (Modelos Pre-entrenados)}
 
-Cuando el retardo dispersivo se vuelve comparable o inferior a la resolución temporal, el patrón DM-tiempo pierde contraste y la representación más informativa pasa a ser el perfil temporal. Inspirada en el enfoque clásico de \textbf{PRESTO} \cite{2011ascl.soft07017R}, esta línea introduce una \textbf{rama SNR-threshold} dentro del \emph{workflow} original de DRAFTS++: la \textit{propuesta} deja de realizarse con un detector en DM–tiempo y pasa a ejecutarse con un umbral de SNR en la serie temporal; la \textit{decisión} final se mantiene en la red de clasificación binaria ya integrada. Arquitectónicamente, la rama se \textit{activa condicionalmente} cuando el módulo de análisis determina que $\Delta t_{\mathrm{ms}} \le \alpha\, t_{\mathrm{samp}}$ (pérdida de \textit{bow–tie}). Tras proponer con SNR, el flujo \textit{regresa} a la ruta estándar: dedispersión local coherente, clasificación binaria, validaciones físicas y emisión de artefactos estandarizados. Este diseño es atractivo porque (i) conserva el carácter E2E y la unificación de salidas, (ii) reduce el costo de exploración en dominios con poca separabilidad DM-tiempo, y (iii) reutiliza la misma infraestructura de clasificación, auditoría y trazabilidad.
+Cuando el retardo dispersivo se vuelve comparable o inferior a la resolución temporal, el patrón DM-tiempo pierde contraste y la representación más informativa pasa a ser el perfil temporal. Inspirada en el enfoque clásico de \textbf{PRESTO} \cite{2011ascl.soft07017R}, esta estrategia introduce una \textbf{rama SNR-threshold} dentro del \emph{workflow} de DRAFTS++: la \textit{propuesta de candidatos} se realiza mediante umbralización de SNR en la serie temporal (no mediante CenterNet); sin embargo, la \textit{clasificación final} se mantiene usando el mismo modelo ResNet18 pre-entrenado del Componente 1. 
+
+\textbf{Contribución de ingeniería:} La rama SNR se \textit{activa condicionalmente} mediante un criterio físico automatizado: cuando el módulo de análisis determina que $\Delta t_{\mathrm{ms}} \le \alpha\, t_{\mathrm{samp}}$ (pérdida de firma bow-tie), el sistema conmuta automáticamente a detección por SNR. Tras proponer candidatos, el flujo \textit{regresa a la ruta estándar} del Componente 1: dedispersión local coherente, clasificación con ResNet18 pre-entrenado, validaciones físicas y emisión de artefactos estandarizados. Este diseño preserva (i) el carácter E2E del pipeline, (ii) la unificación de salidas y trazabilidad, y (iii) la reutilización completa de la infraestructura de clasificación y validación ya implementada, simplemente cambiando el método de propuesta inicial según el régimen de frecuencia.
 
 Sea $s(t)$ la serie temporal (obtenida por integración en frecuencia y normalización robusta). La estimación de SNR por filtrado adaptado se define como
 \[
@@ -918,7 +833,7 @@ La detección primaria consiste en seleccionar instantes $t_i$ tales que $\mathr
 
 \subsection{Síntesis Comparativa: DRAFTS vs DRAFTS++}
 
-La Tabla~\ref{tab:drafts-comparison} sintetiza las diferencias arquitectónicas y operativas entre el prototipo DRAFTS original y el sistema productivo DRAFTS++ desarrollado en este trabajo.
+La Tabla~\ref{tab:drafts-comparison} sintetiza las diferencias arquitectónicas y operativas entre el prototipo DRAFTS original y el sistema productivo DRAFTS++ desarrollado en este trabajo. \textbf{Nota importante: Ambos sistemas utilizan los mismos modelos de deep learning pre-entrenados (CenterNet y ResNet18); las diferencias radican exclusivamente en la ingeniería de software, la arquitectura del pipeline y las capacidades operativas del sistema.}
 
 \begin{table}[H]
 \centering
@@ -928,6 +843,8 @@ La Tabla~\ref{tab:drafts-comparison} sintetiza las diferencias arquitectónicas 
 \begin{tabular}{|l|l|l|}
 \hline
 \textbf{Característica} & \textbf{DRAFTS (original)} & \textbf{DRAFTS++} \\
+\hline
+\multicolumn{3}{|c|}{\textbf{ARQUITECTURA DE SOFTWARE (Contribución de esta tesis)}} \\
 \hline
 Arquitectura & Scripts desacoplados & Pipeline modular E2E \\
 \hline
@@ -941,13 +858,9 @@ Decimación & Factores fijos & Adaptativa según instrumento \\
 \hline
 Continuidad temporal & Sin garantías & Contigüidad quirúrgica verificada \\
 \hline
-Detección + Clasificación & Etapas separadas, manual & Workflow integrado automatizado \\
+Orquestación de modelos & Etapas separadas, manual & Workflow integrado automatizado \\
 \hline
 Validación física & Ausente o mínima & SNR, DM, timestamps, coherencia \\
-\hline
-Bandas de frecuencia & 0.3-1.5 GHz (L-band) & 0.3-100 GHz (L + mm) \\
-\hline
-Estrategias HF & No implementadas & SNR-threshold implementado \\
 \hline
 Observabilidad & Logging básico & Logging estructurado + métricas \\
 \hline
@@ -955,12 +868,24 @@ Salidas & Informales & Artefactos estandarizados \\
 \hline
 Reproducibilidad & Limitada & Completa (semillas, versionado) \\
 \hline
-Tiempo (obs. 2h FAST) & $\sim$45 min & $\sim$25 min (44\% más rápido) \\
+Eficiencia (obs. 2h FAST) & $\sim$45 min & $\sim$25 min (44\% más rápido) \\
+\hline
+\multicolumn{3}{|c|}{\textbf{MODELOS DE DEEP LEARNING (Utilizados de DRAFTS, no desarrollados)}} \\
+\hline
+Detector de objetos & CenterNet pre-entrenado & CenterNet pre-entrenado (mismo) \\
+\hline
+Clasificador binario & ResNet18 pre-entrenado & ResNet18 pre-entrenado (mismo) \\
+\hline
+\multicolumn{3}{|c|}{\textbf{CAPACIDADES EXTENDIDAS (Contribución de esta tesis)}} \\
+\hline
+Bandas de frecuencia & 0.3--1.5 GHz (L-band) & 0.3--100 GHz (L-band + mm) \\
+\hline
+Estrategias HF & No implementadas & SNR-threshold + validación DM \\
 \hline
 \end{tabular}
 \end{table}
 
-Esta transformación establece a DRAFTS++ como un sistema operativo capaz de integrarse en flujos observacionales reales, superando las limitaciones del prototipo de investigación original y habilitando la detección multi-banda de transientes de radio.
+Esta transformación establece a DRAFTS++ como un sistema operativo capaz de integrarse en flujos observacionales reales, superando las limitaciones del prototipo de investigación original mediante mejoras de ingeniería de software y habilitando la detección multi-banda de transientes de radio sin modificar los modelos de deep learning subyacentes.
 
 % \subsubsection{Línea 3: Nuevos Plots Característicos}
 

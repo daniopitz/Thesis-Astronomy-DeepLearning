@@ -108,7 +108,96 @@ La extracción y validación de candidatos carecen de un esqueleto unificado. La
 
 En operación y extensibilidad, los modelos se cargan desde rutas relativas y su presencia es un prerrequisito tácito; si faltan, el programa simplemente falla sin orientación al usuario. No hay empaquetado ni instalación como librería, pruebas automatizadas, ni documentación de un flujo end–to–end; el entrenamiento existe, pero la integración con la búsqueda es manual. La compatibilidad multibanda y el tratamiento de polarización son limitados (se promedian canales y polarizaciones tempranamente), y no existe un mecanismo para seleccionar estrategias de búsqueda según condiciones físicas (resolución temporal, rango de frecuencias, SNR, disponibilidad de Stokes).
 
-En suma, a pesar de contar con modelos de detección y clasificación bien entrenados, el prototipo carece de un software de \textit{pipeline} que permita, con un único \textit{input}, obtener resultados directos, sencillos y trazables en un entorno observacional real.
+En suma, a pesar de contar con modelos de detección y clasificación bien entrenados, el prototipo carece de un software de \textit{pipeline} que permita, con un único \textit{input}, obtener resultados directos, sencillos y trazables en un entorno observacional real. La Figura~\ref{fig:drafts-arquitectura-problema} ilustra visualmente esta limitación arquitectónica fundamental.
+
+\begin{figure}[htbp]
+\centering
+\resizebox{0.98\textwidth}{!}{%
+\begin{tikzpicture}[
+    node distance=0.8cm and 1.2cm,
+    script/.style={rectangle, draw=red!70, thick, fill=red!10, text width=2.2cm, text centered, minimum height=0.7cm, font=\scriptsize},
+    module/.style={rectangle, draw=blue!70, thick, fill=blue!10, text width=2.2cm, text centered, minimum height=0.7cm, font=\scriptsize},
+    manual/.style={rectangle, draw=orange!70, thick, fill=orange!20, text width=2.0cm, text centered, minimum height=0.5cm, font=\tiny, dashed},
+    auto/.style={rectangle, draw=green!70, thick, fill=green!10, text width=2.0cm, text centered, minimum height=0.5cm, font=\tiny},
+    arrow/.style={-Stealth, thick},
+    manual_arrow/.style={-Stealth, thick, dashed, orange},
+    auto_arrow/.style={-Stealth, thick, green!70!black}
+]
+
+% ========== LADO IZQUIERDO: DRAFTS ORIGINAL ==========
+\node[font=\bfseries\normalsize, text=red!70!black] at (-5, 5.5) {DRAFTS Original (Prototipo)};
+
+% Scripts desacoplados
+\node[script] (s1) at (-7, 4) {Script 1:\\Leer FITS};
+\node[script] (s2) at (-5, 3) {Script 2:\\Dedispersión};
+\node[script] (s3) at (-3, 4) {Script 3:\\CenterNet};
+\node[script] (s4) at (-5, 1.5) {Script 4:\\ResNet18};
+\node[script] (s5) at (-7, 0.5) {Script 5:\\Guardar};
+
+% Intervenciones manuales
+\node[manual] (m1) at (-7, 2.5) {Editar\\rutas};
+\node[manual] (m2) at (-3, 2.5) {Configurar\\DM};
+\node[manual] (m3) at (-5, 0) {Mover\\archivos};
+
+% Conexiones manuales (discontinuas)
+\draw[manual_arrow] (s1) -- (m1);
+\draw[manual_arrow] (m1) -- (s2);
+\draw[manual_arrow] (s2) -- (m2);
+\draw[manual_arrow] (m2) -- (s3);
+\draw[manual_arrow] (s3) -- (s4);
+\draw[manual_arrow] (s4) -- (m3);
+\draw[manual_arrow] (m3) -- (s5);
+
+% Etiquetas de problemas
+\node[font=\tiny, text=red!70!black, align=center] at (-5, -0.8) {$\times$ Sin integración\\$\times$ Parámetros codificados\\$\times$ Sin trazabilidad};
+
+% ========== LADO DERECHO: DRAFTS++ PROPUESTO ==========
+\node[font=\bfseries\normalsize, text=blue!70!black] at (5, 5.5) {DRAFTS++ (Sistema Productivo)};
+
+% Pipeline modular
+\node[module] (p1) at (2.5, 4.2) {Ingesta\\Multi-formato};
+\node[module] (p2) at (5, 4.2) {Preproceso\\Adaptativo};
+\node[module] (p3) at (7.5, 4.2) {Modelos\\CenterNet/ResNet};
+\node[module] (p4) at (5, 2.5) {Validación\\Física};
+\node[module] (p5) at (5, 0.8) {Artefactos\\Estandarizados};
+
+% Servicios transversales
+\node[auto, rounded corners] (cfg) at (2.5, 1.5) {Config\\Auto};
+\node[auto, rounded corners] (mem) at (7.5, 2.5) {Memoria\\Dinámica};
+\node[auto, rounded corners] (log) at (7.5, 0.8) {Logging\\Completo};
+
+% Conexiones automatizadas (continuas, verdes)
+\draw[auto_arrow] (p1) -- (p2);
+\draw[auto_arrow] (p2) -- (p3);
+\draw[auto_arrow] (p3) -- (p4);
+\draw[auto_arrow] (p4) -- (p5);
+
+% Conexiones de servicios
+\draw[auto_arrow, dotted] (cfg) -- (p1);
+\draw[auto_arrow, dotted] (cfg) -- (p2);
+\draw[auto_arrow, dotted] (mem) -- (p3);
+\draw[auto_arrow, dotted] (mem) -- (p4);
+\draw[auto_arrow, dotted] (log) -- (p5);
+
+% Input/Output
+\node[rectangle, draw=black, thick, fill=gray!20, text width=1.8cm, text centered, font=\scriptsize] (in) at (2.5, 5.5) {Datos\\Astronómicos};
+\node[rectangle, draw=black, thick, fill=gray!20, text width=1.8cm, text centered, font=\scriptsize] (out) at (5, -0.5) {CSV + Plots\\+ Métricas};
+
+\draw[arrow] (in) -- (p1);
+\draw[arrow] (p5) -- (out);
+
+% Etiquetas de beneficios
+\node[font=\tiny, text=green!70!black, align=center] at (5, -1.3) {$\checkmark$ Flujo unificado\\$\checkmark$ Configuración externa\\$\checkmark$ Reproducible};
+
+% Separador vertical
+\draw[thick, gray, dashed] (0, -1.5) -- (0, 6);
+\node[font=\small, text=gray, rotate=90] at (0.5, 2.5) {vs.};
+
+\end{tikzpicture}%
+}
+\caption{Comparación arquitectónica entre DRAFTS original y DRAFTS++ propuesto. \textbf{Izquierda (DRAFTS original):} Conjunto de scripts independientes que requieren intervención manual para configuración, coordinación y transferencia de datos entre etapas. El flujo es discontinuo (flechas naranjas punteadas), con parámetros codificados en el código fuente y sin mecanismos de trazabilidad. \textbf{Derecha (DRAFTS++ propuesto):} Pipeline modular end-to-end con flujo automatizado (flechas verdes continuas), servicios transversales (configuración automática, gestión dinámica de memoria, logging estructurado) y artefactos estandarizados. Un único comando procesa datos astronómicos y genera salidas reproducibles sin intervención manual. Esta transformación arquitectónica constituye el núcleo del problema abordado en esta tesis: convertir un prototipo de investigación en un sistema operativo productivo.}
+\label{fig:drafts-arquitectura-problema}
+\end{figure}
 
 \subsection{Brecha específica: extensión a alta frecuencia}
 
