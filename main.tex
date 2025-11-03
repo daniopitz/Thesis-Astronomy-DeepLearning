@@ -9,8 +9,8 @@
 % @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@>
 
 % NOTE: Leer nota en el README sobre la font.
-
-\newcommand{\titulo}{Extensión del pipeline DRAFTS mediante DRAFTS++: detección de transitorios rápidos de radio en el dominio milimétrico con ALMA}
+\newcommand{\titulo}{DRAFTS++: Extensión Productiva del Sistema DRAFTS para Detección y Clasificación de Transientes de Radio desde Bajas hasta Altas Frecuencias}
+% \newcommand{\titulo}{Extensión del pipeline DRAFTS mediante DRAFTS++: detección de transitorios rápidos de radio en el dominio milimétrico con ALMA}
 \newcommand{\ciudad}{Valparaíso} % e.g. Valparaíso
 % TODO: Consultar el formato de los nombres:
 \newcommand{\nombrealumno}{Sebastian Salgado Polanco}
@@ -90,6 +90,8 @@ Corresponde a la traducción al idioma inglés de Palabras Clave anteriores.
 \usepackage{booktabs}  % Para comandos de tablas profesionales (\toprule, \midrule, \bottomrule)
 \usepackage[table]{xcolor}  % Para colorear filas y columnas en tablas
 \usepackage{tikz}       % Para diagramas y gráficos
+\usepackage{pgfplots}   % Para gráficos (e.g., curvas \nu^{-2})
+\pgfplotsset{compat=1.18}
 \usetikzlibrary{positioning,shapes.geometric,arrows.meta}
 \usepackage{adjustbox}  % Para redimensionar entornos (p.ej., TikZ) de forma segura
 \usepackage{algorithm}  % Para pseudocódigos
@@ -272,9 +274,9 @@ Corresponde a la traducción al idioma inglés de Palabras Clave anteriores.
 \input{introduccion}
 
 \newpage
-\input{definicion_del_problema}
-\newpage
 \input{marco_conceptual}
+\newpage
+\input{definicion_del_problema}
 \newpage
 \input{propuesta_de_solucion}
 \newpage

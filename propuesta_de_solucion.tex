@@ -42,11 +42,7 @@ La propuesta se organiza en dos componentes principales: (i) el desarrollo de DR
 
 Como se indicó en la introducción de este capítulo, este \textbf{componente} aborda la transición de \textbf{DRAFTS}, concebido originalmente como un prototipo de investigación, hacia un sistema \textbf{productivo y operativo} capaz de funcionar en entornos observacionales reales. Esta transición requiere una \textbf{reformulación arquitectónica profunda}, orientada a superar las limitaciones del código base original y a garantizar la escalabilidad, robustez y reproducibilidad necesarias para su integración en flujos astronómicos de detección de transientes.
 
-
-
-
 \subsubsection{Construccion de un pipeline end-to-end modular y escalable: DRAFTS++}
-
 
 El cambio arquitectónico central de DRAFTS++ consiste en la transición desde un conjunto de scripts independientes, sin integración coherente, hacia un pipeline modular y escalable. Mientras que el prototipo original estaba limitado por la ausencia de organización, reproducibilidad y trazabilidad, DRAFTS++ redefine el sistema como un flujo estructurado con etapas bien delimitadas y servicios transversales de soporte, constituyendo la base para su operación en entornos observacionales reales.
 
@@ -1010,31 +1006,6 @@ Esta transformación establece a DRAFTS++ como un sistema operativo capaz de int
 
 % Esta estrategia de ``engaño neuronal'' preserva la filosofía DM-centrada de DRAFTS mientras adapta la detección a regímenes donde la dispersión temporal es despreciable, manteniendo la capacidad discriminativa mediante representaciones alternativas que capturan aspectos fundamentales de la física de pulsos astrofísicos.
 
-% \subsubsection{Línea 4: Estrategias Alternativas del Autor de DRAFTS (PROBABLEMENTE LO ELIMINE)}
-
-% En respuesta a los desafíos específicos de detección de FRBs en frecuencias milimétricas, \textbf{Yong-Kun Zhang}, autor original de DRAFTS, ha propuesto dos estrategias complementarias para abordar la atenuación del retardo dispersivo en regímenes de alta frecuencia. Estas propuestas surgen directamente de la limitación fundamental del paradigma DM-centrado: cuando $\Delta t_{\mathrm{ms}} \ll t_{\mathrm{samp}}$, la firma dispersiva \textit{bow-tie} se comprime hasta volverse indistinguible del ruido, eliminando la capacidad discriminativa principal entre señales astrofísicas genuinas e interferencia de radiofrecuencia (RFI).
-
-% Las estrategias alternativas de Zhang se encuentran actualmente en implementación en una rama dedicada del repositorio de DRAFTS++ en GitHub. Esta línea de investigación está siendo desarrollada de forma aislada para permitir experimentación extensiva con los algoritmos de expansión de rejilla DM y validación DM-aware, sin afectar la estabilidad del pipeline principal. La integración completa en el sistema unificado se realizará tras la validación experimental de estas estrategias avanzadas.
-
-% La \textbf{Estrategia 1} propuesta por Zhang consiste en \textit{expandir el rango y granularidad de DM} mediante una exploración sistemática del plano tiempo-DM con parámetros adaptados a la compresión dispersiva. En lugar de mantener las rejillas DM estándar optimizadas para frecuencias bajas, se implementa un barrido con rangos ampliados y pasos más gruesos, forzando artificialmente la ``apertura'' de pulsos reales en formas \textit{bow-tie} detectables. Matemáticamente, esto se expresa como una transformación de la rejilla DM tradicional:
-
-% \[
-% \mathcal{D}_{\mathrm{traditional}} = \{d_i : d_i = d_{\min} + i \cdot \delta d, \; i \in [0, N_{\mathrm{DM}}]\}
-% \]
-
-% \[
-% \mathcal{D}_{\mathrm{expanded}} = \{d_j : d_j = d_{\min} + j \cdot \gamma \delta d, \; j \in [0, \lfloor N_{\mathrm{DM}}/\gamma \rfloor]\}
-% \]
-
-% donde $\gamma > 1$ es el factor de expansión del paso DM y $d_{\min}$ se extiende a valores más bajos para capturar señales de baja dispersión. La detección se realiza mediante la condición de que el centroide del \textit{bow-tie} expandido exhiba un offset significativamente mayor que cero:
-
-% \[
-% |\mathrm{offset}_{\mathrm{center}}| = \left|\frac{\sum_{t,f} t \cdot I_{\mathrm{dedispersed}}(t,f)}{\sum_{t,f} I_{\mathrm{dedispersed}}(t,f)} - t_{\mathrm{expected}}\right| > \sigma_{\mathrm{threshold}}
-% \]
-
-% Esta estrategia aprovecha el hecho de que los modelos de detección están entrenados en \textit{bow-ties} completamente desarrollados, y solo eventos extremadamente débiles se asemejan a líneas simples. La expansión artificial permite que pulsos reales recuperen su morfología dispersiva característica, mientras que la RFI mantiene su estructura no-dispersiva.
-
-% La \textbf{Estrategia 2} adopta un enfoque híbrido de ``pesca'' en DM $\approx$ 0 seguida de validación estricta. El clasificador se ejecuta directamente sobre datos sin dedispersión o con dedispersión mínima ($\mathrm{DM} \approx 0$), admitiendo deliberadamente un mayor número de falsos positivos de RFI de baja dispersión. Una vez identificados candidatos, se aplica una validación \textit{DM-aware} rigurosa que requiere:
 
 % \[
 % \mathrm{DM}_{\mathrm{best-fit}} = \arg\max_{\mathrm{DM}} \sum_{f} \mathrm{SNR}_f(\mathrm{DM}) > \epsilon_{\mathrm{DM}}

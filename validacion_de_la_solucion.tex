@@ -11,11 +11,11 @@ Esta sección valida empíricamente DRAFTS++ mediante casos de uso que demuestra
 La validación utiliza tres casos progresivos que ejercitan las siete etapas del pipeline (Figura~\ref{fig:workflow-src}) bajo complejidad creciente:
 
 \begin{enumerate}
-    \item \textbf{FAST-FREX}: Dataset de entrenamiento que valida flujo completo E2E con modelos CenterNet/ResNet18 integrados.
+    \item \textbf{FAST-FREX (Radiotelescopio FAST)}: Dataset de entrenamiento del Five-hundred-meter Aperture Spherical Telescope (FAST, China) que valida flujo completo E2E con modelos CenterNet/ResNet18 integrados. Formato PSRFITS, frecuencia central $\sim$1.25 GHz.
     
-    \item \textbf{Pulsar B0355+54}: 752 pulsos teóricos en 117s que valida streaming, continuidad temporal y trazabilidad (732/752 detectados, 97.3\%).
+    \item \textbf{Pulsar B0355+54 (Radiotelescopio FAST)}: Observación de 117s del radiotelescopio FAST conteniendo 752 pulsos teóricos del púlsar B0355+54 (periodo 0.156s) que valida streaming, continuidad temporal y trazabilidad (732/752 detectados, 97.3\%). Formato PSRFITS.
     
-    \item \textbf{FRB 121102}: Archivos multi-gigabyte que validan escalabilidad, gestión de memoria y descubrimiento científico (Recall 100\%, 2 nuevos bursts).
+    \item \textbf{FRB 121102 (Radiotelescopio Effelsberg)}: 6 archivos de observación del radiotelescopio Effelsberg de 100m (Alemania) en banda L ($\sim$1.4 GHz), cada uno de $\sim$4 GB, que validan escalabilidad, gestión de memoria y descubrimiento científico (Recall 100\%, 2 nuevos bursts). Datos reportados por \cite{cruces2020frb121102}.
 \end{enumerate}
 
 El éxito en los tres casos demuestra que todas las etapas del pipeline operan coordinadamente. Cualquier falla en etapas principales o módulos de soporte causaría fallos completos del sistema.
@@ -53,7 +53,7 @@ El éxito en los tres casos demuestra que todas las etapas del pipeline operan c
 
 \subsubsection{Caso 1 - FAST-FREX: Validación Funcional Básica del Flujo E2E}
 
-FAST-FREX valida el flujo completo E2E: ingesta multi-formato, análisis automático de headers, visualización científica y integración automatizada de modelos CenterNet/ResNet18.
+FAST-FREX es el dataset de entrenamiento del pipeline DRAFTS original, adquirido con el radiotelescopio FAST (Five-hundred-meter Aperture Spherical Telescope, China), el radiotelescopio de plato único más grande del mundo. Este caso valida el flujo completo E2E: ingesta multi-formato PSRFITS, análisis automático de headers, visualización científica y integración automatizada de modelos CenterNet/ResNet18. Las observaciones se realizaron en banda L ($\sim$1.25 GHz) con resolución temporal milisegundo.
 
 \begin{figure}[H]
     \centering
@@ -71,9 +71,9 @@ FAST-FREX valida el flujo completo E2E: ingesta multi-formato, análisis automá
 
 \subsubsection{Caso 2 - Pulsar B0355+54: Validación de Robustez Temporal y Procesamiento Secuencial}
 
-Este caso valida mejoras de preprocesamiento: contigüidad temporal quirúrgica, streaming por slices, trazabilidad temporal precisa, manejo de discontinuidades y validación física integrada.
+Este caso utiliza observaciones del púlsar B0355+54 adquiridas con el radiotelescopio FAST en banda L ($\sim$1.25 GHz) en formato PSRFITS. El dataset valida mejoras de preprocesamiento: contigüidad temporal quirúrgica, streaming por slices, trazabilidad temporal precisa, manejo de discontinuidades y validación física integrada.
 
-Pulsar B0355+54\_FB\_20220918 (periodo 0.156s, 117.23s duración, 752 pulsos esperados). Resultados: 732/752 pulsos detectados (97.3\%), 718 clasificados como BURSTS.
+Características del dataset: Pulsar B0355+54\_FB\_20220918, periodo 0.156s, 117.23s duración total, 752 pulsos esperados teóricamente. Resultados: 732/752 pulsos detectados (97.3\%), 718 clasificados como BURSTS.
 
 \begin{figure}[H]
     \centering
@@ -101,9 +101,9 @@ El resultado confirma continuidad temporal y precisión de las redes pre-entrena
 
 \subsubsection{Caso 3 - FRB 121102: Validación de Escalabilidad E2E y Descubrimiento Científico}
 
-FRB 121102 valida escalabilidad E2E con archivos multi-gigabyte que exceden memoria disponible, forzando operación integrada: ingesta masiva, chunking con solapamiento, gestión inteligente RAM/VRAM y procesamiento E2E sin intervención manual.
+FRB 121102 valida escalabilidad E2E con archivos multi-gigabyte del radiotelescopio Effelsberg que exceden memoria disponible, forzando operación integrada: ingesta masiva, chunking con solapamiento, gestión inteligente RAM/VRAM y procesamiento E2E sin intervención manual.
 
-Se procesaron 6 archivos Effelsberg (~4GB cada uno) reportados por \cite{cruces2020frb121102}, con ground truth de 24 eventos confirmados. Resultados: 41 eventos detectados, Recall=100\% (24/24 eventos conocidos recuperados), 17 candidatos nuevos identificados, 2 confirmados como genuinos (SNR 6.3$\sigma$ y 12.0$\sigma$, DM~564 pc cm$^{-3}$).
+Se procesaron 6 archivos observacionales del radiotelescopio Effelsberg de 100m (Alemania) en banda L ($\sim$1.4 GHz), cada uno de $\sim$4 GB en formato PSRFITS, reportados por \cite{cruces2020frb121102}, con ground truth de 24 eventos confirmados. Resultados: 41 eventos detectados, Recall=100\% (24/24 eventos conocidos recuperados), 17 candidatos nuevos identificados, 2 confirmados como genuinos (SNR 6.3$\sigma$ y 12.0$\sigma$, DM$\sim$564 pc cm$^{-3}$).
 
 % Las detecciones completas se documentan en Anexo A: bursts confirmados por literatura (Tabla \ref{tab:anexo_confirmed_bursts}), nuevos eventos confirmados (Tabla \ref{tab:anexo_new_confirmed_bursts}), y candidatos pendientes (Tabla \ref{tab:anexo_candidate_bursts}). El histograma de distribución temporal (Figura \ref{fig:frb121102_histogram}) muestra concentración de eventos en archivos 3098 y 3100, consistente con ventanas de actividad del repetidor.
 
@@ -134,7 +134,7 @@ Los resultados validan integralmente el Componente 1. El pipeline procesó exito
 
 La validación del Componente 2 examina la efectividad de DRAFTS++ en el régimen milimétrico (86 GHz), donde la firma dispersiva tradicional se comprime significativamente debido a la dependencia $\Delta t_{\mathrm{ms}} \propto \nu^{-2}$. En este régimen, el patrón bow-tie característico de FRBs en bajas frecuencias (1.4 GHz) colapsa, desafiando a detectores entrenados en firmas dispersivas desarrolladas.
 
-Para todas las líneas de investigación se valido utilizando observaciones del radiotelescopio ALMA del magnetar del Centro Galáctico PSR J1745-2900 a 86 GHz, proporcionadas por \cite{veracasanova2025}. Este dataset constituye ground truth mediante 8 pulsos confirmados independientemente con PRESTO (Tabla~\ref{tab:veracasanova_reference}), permitiendo evaluación objetiva de cada estrategia.
+Para todas las líneas de investigación se validó utilizando observaciones del Atacama Large Millimeter/submillimeter Array (ALMA, Chile) en modo \emph{phased array}, específicamente datos del magnetar del Centro Galáctico PSR J1745-2900 observados en Banda 3 ($\sim$86 GHz, ancho de banda 2 GHz) durante campañas de 2017, proporcionadas por \cite{veracasanova2025}. Este dataset constituye ground truth mediante 8 pulsos confirmados independientemente con PRESTO (Tabla~\ref{tab:veracasanova_reference}), permitiendo evaluación objetiva de cada estrategia. Los datos fueron adquiridos con resolución temporal de $\sim$8 $\mu$s y formato PSRFITS.
 
 \begin{table}[H]
     \centering
@@ -320,9 +320,9 @@ El enfoque híbrido demuestra capacidad para resolver estructura temporal fina, 
 
 % Esta línea se encuentra actualmente en implementación en rama separada del repositorio DRAFTS++ en GitHub. A la fecha no se incluyen resultados cuantitativos completos; se deja planteado el protocolo de evaluación para trabajo futuro con métricas de precisión/recobrado sobre banco de datos polarimétricos con ground truth curado por validación científica independiente.
 
-% \subsubsection{Línea 4: Validación de Estrategias Avanzadas de Zhang para Recuperación de Morfología Dispersiva y Fishing DM-Aware (PROBABLEMENTE LO ELIMINE)}
+% \subsubsection{Línea 4: Validación de Estrategias Avanzadas para Recuperación de Morfología Dispersiva y Fishing DM-Aware}
 
-% Esta línea valida dos estrategias complementarias propuestas por Yong-Kun Zhang (autor original de DRAFTS), diseñadas específicamente para abordar la compresión dispersiva en alta frecuencia mediante enfoques que preservan la filosofía DM-centrada del pipeline original. Las estrategias evaluadas son:
+% Esta línea valida dos estrategias complementarias diseñadas específicamente para abordar la compresión dispersiva en alta frecuencia mediante enfoques que preservan la filosofía DM-centrada del pipeline original. Las estrategias evaluadas son:
 
 % \begin{itemize}
 %     \item \textbf{Estrategia 1 - Expansión de rejilla DM}: Forzamiento de apertura morfológica del bow-tie mediante exploración sistemática con rangos DM ampliados y pasos más gruesos ($\gamma > 1$), permitiendo que modelos entrenados en bow-ties desarrollados recuperen sensibilidad en regímenes comprimidos
