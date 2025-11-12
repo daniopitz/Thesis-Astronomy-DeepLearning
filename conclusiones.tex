@@ -1,181 +1,70 @@
 \secnumbersection{CONCLUSIONES}
-\setcounter{secnumdepth}{4}
-\setcounter{tocdepth}{4}
-\makeatletter
-\renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
-  {1.5ex \@plus .5ex \@minus .2ex}%   % espacio antes
-  {0.8ex \@plus .2ex}%                 % espacio después
-  {\normalfont\normalsize\bfseries}}  % estilo
-\makeatother
 
-\subsection{Síntesis de logros principales}
+\textit{DRAFTS++ demuestra que la ingeniería informada por física transforma un prototipo de detección de FRBs en un sistema operacional end-to-end que, además de procesar a escala con robustez, produce descubrimiento científico verificable.}
 
-Esta memoria abordó el problema de la ausencia de pipelines astronómicos operativos para detección y clasificación de Fast Radio Bursts (FRBs) mediante aprendizaje profundo, junto con la brecha específica de extensión a regímenes de alta frecuencia milimétrica. El desarrollo de DRAFTS++ como sistema productivo, robusto y extensible representa una contribución significativa tanto en el ámbito de ingeniería de software astronómico como en metodología de detección de transientes de radio.
+\subsection{Síntesis frente a Objetivos}
 
-El \textbf{Componente 1} logró transformar exitosamente el prototipo DRAFTS en un pipeline end-to-end completamente operativo. La validación empírica demostró que el sistema procesa observaciones de duración arbitraria sin restricciones de memoria, mantiene continuidad temporal quirúrgica verificada mediante contigüidad algebraica de \emph{slices}, integra automáticamente modelos CenterNet y ResNet18 eliminando ejecución manual por etapas, y genera artefactos estandarizados con trazabilidad completa. Los tres casos de validación --FAST-FREX para funcionalidad básica, púlsar B0355+54 para robustez temporal con 732/752 pulsos detectados, y FRB 121102 con recall perfecto de 24/24 eventos conocidos-- confirman que todas las etapas del pipeline operan coordinadamente bajo condiciones de complejidad creciente.
+El sistema opera E2E sin intervención y procesa archivos multi-gigabyte con recuperación íntegra de eventos (Recall 100\% en FRB 121102 del telescopio Effelsberg); valida robustez temporal en fuentes periódicas (732/752 pulsos en B0355+54, 97.3\%); y extiende sensibilidad al régimen milimétrico (~86 GHz ALMA) con un enfoque híbrido inspirado en PRESTO (Recall 100\% y 44 pulsos nuevos confirmados del magnetar PSR J1745-2900). La mejora sostenida se evidencia también en curvas Precision-Recall y AUPRC, métricas adecuadas para clases desbalanceadas en detección de transientes astronómicos. El descubrimiento de 46 eventos confirmados independientemente (2 FRBs + 44 pulsos de magnetar) más 116 candidatos prometedores demuestra que el sistema amplía genuinamente conocimiento astronómico, no solo replica análisis previos.
 
-El \textbf{Componente 2} estableció las primeras estrategias metodológicas sistemáticas para detección de FRBs en el régimen milimétrico mediante aprendizaje profundo. Se exploraron cuatro líneas metodológicas, \textbf{implementándose y validándose empíricamente dos} (Líneas 1 y 2), mientras que las Líneas 3 y 4 quedaron propuestas arquitectónicamente como trabajo futuro. La validación con datos de ALMA a 86 GHz del magnetar PSR J1745--2900 reveló que: (i) los modelos entrenados en frecuencias centimétricas no transfieren directamente a regímenes donde la firma dispersiva está comprimida (Línea 1: recall 0\% con configuración estándar, 87.5\% con umbral permisivo); (ii) el enfoque híbrido SNR-threshold + clasificación CNN (Línea 2) logra recall perfecto de 100\% recuperando todos los pulsos conocidos, superando significativamente el límite del pipeline clásico; y (iii) el sistema demostró capacidad de descubrimiento científico genuino, detectando 44 nuevos pulsos confirmados que quintuplicaron el censo conocido del magnetar en esta banda de frecuencia.
+\subsection{Significado e Impacto}
 
-Los resultados validaron empíricamente que la combinación de ingeniería de software rigurosa con estrategias metodológicas adaptadas a regímenes observacionales específicos puede expandir significativamente las capacidades de detección automática en radioastronomía, abriendo nuevas ventanas frecuenciales para el estudio de transientes cósmicos.
+Operacionalmente, DRAFTS++ pasa de código de investigación a infraestructura científica reutilizable para re-análisis a escala y campañas near-real-time. Científicamente, amplía el censo (2 bursts nuevos de FRB 121102 y 44 pulsos del magnetar del Centro Galáctico) y fija un baseline cuantificado para transferencia a alta frecuencia. En HF, la caracterización rigurosa reveló que la existencia de pulsos persistentemente indetectables (Línea 1: Recall máximo 87.5\%) expone limitaciones arquitecturales irreductibles cuando el bow-tie colapsa, motivando estrategias especializadas; la estrategia híbrida (Línea 2: Recall 100\%) superó este límite apoyándose en estadísticos temporales en lugar de firmas 2D comprimidas. La mejora se refleja también en PR/AUPRC, métricas idóneas en datos desbalanceados.
 
-\subsection{Cumplimiento de objetivos}
+\subsection{Calidad del Software y Reproducibilidad}
 
-El objetivo general de desarrollar un pipeline astronómico operativo para detección y clasificación de FRBs basado en dos CNN preentrenadas, extensible a regímenes de alta frecuencia sin reentrenamiento de modelos, fue alcanzado completamente. DRAFTS++ cumple los cinco requisitos establecidos en la formulación del problema: procesa datos en lotes y en línea con control eficiente de recursos, reduce tasas de falsos positivos mediante clasificación profunda, genera salidas completamente auditables, es extensible a alta frecuencia mediante parametrización adecuada, y opera sin requerir reentrenamiento de modelos base.
+Evaluamos con ISO/IEC 25010 (2011, actualizado 2023): rendimiento, confiabilidad (0 pérdidas en bordes), mantenibilidad modular y portabilidad multi-instrumento; artefactos FAIR disponibles en \url{https://github.com/Kodamonkey/DRAFTS-UC} y orientados a ACM Artifact Badging.
 
-Los cinco objetivos específicos se cumplieron de la siguiente manera:
-
-\textbf{Objetivo 1 - Integración de modelos en flujo robusto y reproducible:} Se implementó un sistema modular que integra las siete etapas del pipeline (ingesta, preprocesamiento, modelos, detección, análisis, visualización, artefactos) con contratos formales de entrada y salida. La orquestación automatizada elimina la necesidad de ejecución manual por etapas, como se demostró en los tres casos de validación del Componente 1 que operaron sin intervención manual desde ingesta hasta visualización. El sistema de configuración centralizado y el logging estructurado garantizan reproducibilidad completa mediante semillas controladas y versionado de parámetros.
-
-\textbf{Objetivo 2 - Optimizaciones de rendimiento:} El sistema de streaming implementado permite procesar archivos de tamaño arbitrario mediante división dinámica en \emph{chunks} calculados según presupuestos de memoria RAM disponible. La gestión inteligente de GPU con políticas de limpieza determinística y aceleración mediante bibliotecas especializadas (numba para dedispersión, PyTorch para inferencia) resultó en reducción significativa de latencia computacional. El caso de FRB 121102, con 6 archivos de $\sim$4 GB cada uno procesados exitosamente sin errores de memoria ni degradación de rendimiento, valida la escalabilidad del sistema. El registro completo de operaciones mediante logging estructurado proporciona observabilidad en todas las etapas, facilitando diagnóstico y optimización continua.
-
-\textbf{Objetivo 3 - Parametrización para alta frecuencia:} Se implementó parametrización explícita de rejillas DM, ventanas temporales, y productos diagnósticos mediante configuración declarativa. El criterio físico de resolubilidad del retardo dispersivo ($\Delta t_{\mathrm{ms}} > \alpha\, t_{\mathrm{samp}}$) permite selección automática de estrategias de detección según características observacionales. La rama SNR-threshold para alta frecuencia se activa condicionalmente cuando la firma dispersiva es irresoluble, manteniendo coherencia metodológica entre regímenes. La arquitectura modular facilita extensión futura para incorporar productos Stokes y validación polarimétrica completa.
-
-\textbf{Objetivo 4 - Validación sobre datos previamente analizados:} El sistema igualó y superó significativamente recuentos reportados en todos los casos de validación. Para púlsar B0355+54 se detectaron 732/752 pulsos esperados (97.3\%), demostrando que el sistema de continuidad temporal no introduce puntos ciegos. Para FRB 121102 se alcanzó recall perfecto de 100\% (24/24 eventos de literatura), además de descubrir 2 nuevos bursts confirmados científicamente. Para ALMA a 86 GHz, la Línea 2 alcanzó recall perfecto de 100\% (8/8 pulsos literatura + 8/8 pulsos PRESTO), superando dramáticamente el límite del pipeline clásico. Las métricas de precision, recall y F1-score fueron caracterizadas sistemáticamente para cada caso.
-
-\textbf{Objetivo 5 - Productos diagnósticos y análisis exploratorio en alta frecuencia:} Se implementaron productos diagnósticos específicos para el régimen milimétrico, incluyendo análisis de SNR multi-escala mediante filtrado adaptado, caracterización de morfología temporal mediante waterfalls crudos y dedispersados, y cálculo de métricas de coherencia temporal. El análisis exploratorio de los 153 eventos detectados en ALMA reveló patrones morfológicos distintivos: pulsos con estructura temporal extendida manifestados como múltiples componentes coherentes en DM, evidenciando posible dispersión circumpulsar o scattering interestelar. La detección de 44 nuevos pulsos confirmados del magnetar PSR J1745--2900 demuestra capacidad de caracterización científica genuina en este régimen frecuencial.
-
-En síntesis, todos los objetivos específicos fueron alcanzados completamente, con resultados que en varios casos superaron las expectativas originales, particularmente en capacidad de descubrimiento científico y escalabilidad operativa.
-
-\subsection{Alcances y limitaciones}
-
-Los alcances definidos en la formulación del problema fueron respetados rigurosamente. DRAFTS++ se enfocó exclusivamente en el desarrollo de un pipeline de inferencia y orquestación a partir de modelos preentrenados, operando sobre formatos estándar FITS/PSRFITS. No se realizó reentrenamiento de arquitecturas neuronales, desarrollo de interfaces instrumentales, ni implementación de sistemas distribuidos, manteniendo el enfoque en la transformación de un prototipo de investigación en un sistema operativo mediante ingeniería de software rigurosa.
-
-Sin embargo, el trabajo presenta limitaciones importantes que deben reconocerse explícitamente:
-
-\textbf{Limitaciones arquitectónicas:} El pipeline depende críticamente de la calidad y generalización de los modelos CenterNet y ResNet18 preentrenados por el equipo de DRAFTS original. La validación en alta frecuencia (Línea 1) demostró que estos modelos fallan completamente con configuración estándar en regímenes donde la firma dispersiva está comprimida, requiriendo umbrales extremadamente permisivos (reducción en factor $\times$6) o estrategias alternativas de detección. Esto evidencia que la transferibilidad de modelos entrenados en un régimen frecuencial específico tiene límites fundamentales que no pueden superarse mediante adaptación paramétrica simple.
-
-\textbf{Limitaciones de validación:} La validación del Componente 2 se realizó sobre un conjunto limitado de datos de ALMA (8 pulsos de literatura + 8 pulsos PRESTO), todos provenientes de un único magnetar galáctico (PSR J1745--2900) en un rango estrecho de frecuencia ($\sim$86 GHz, Banda 3). No se validó el sistema sobre FRBs extragalácticos en alta frecuencia --simplemente porque aún no existen detecciones reportadas de FRBs cosmológicos en el régimen milimétrico--. Por tanto, la generalización de las estrategias propuestas a FRBs genuinos en mm permanece como hipótesis pendiente de verificación empírica.
-
-\textbf{Limitaciones de completitud metodológica:} El Componente 2 exploró cuatro líneas metodológicas para alta frecuencia, pero \textbf{solo se implementaron y validaron empíricamente dos} (Línea 1: adaptación paramétrica del pipeline clásico; Línea 2: estrategia híbrida SNR-threshold). Las \textbf{Líneas 3 y 4} (representaciones 2D alternativas con polarimetría/tiempo-ancho/tiempo-RM, y estrategias avanzadas de Zhang con DM-expand/fishing DM$\approx$0) fueron propuestas conceptualmente y diseñadas arquitectónicamente, pero no se implementaron ni validaron empíricamente. Su desarrollo completo queda como trabajo futuro de nivel posgrado. Esta limitación refleja restricciones de tiempo, alcance definido de la memoria, y acceso limitado a datasets polarimétricos calibrados con ground truth curado.
-
-\textbf{Limitaciones instrumentales:} El sistema fue validado sobre datos de tres instrumentos específicos (FAST, Effelsberg, ALMA) en formatos PSRFITS. Aunque la arquitectura multi-formato incluye soporte para SIGPROC Filterbank, la validación empírica se concentró en PSRFITS. La generalización a otros telescopios (ASKAP, MeerKAT, CHIME) y formatos propietarios requiere validación adicional, particularmente para verificar que la extracción automática de headers opere correctamente ante esquemas heterogéneos de metadatos.
-
-\textbf{Limitaciones computacionales:} El pipeline está optimizado para entornos con GPU única de memoria moderada (8--16 GB VRAM típicos). No se implementó paralelización multi-GPU ni distribución entre nodos para manejar flujos de datos extremadamente masivos (10--100 Gbps) que podrían generarse en observatorios de próxima generación como DSA-2000. La estrategia actual de \textit{fallback} a CPU ante agotamiento de VRAM garantiza estabilidad pero introduce latencia significativa.
-
-Estas limitaciones no invalidan las contribuciones del trabajo, pero circunscriben su aplicabilidad y señalan direcciones claras para extensión futura.
-
-\subsection{Contribuciones e impacto}
-
-Las contribuciones de esta memoria son tanto de naturaleza técnica como científica, estableciendo avances en múltiples dimensiones del campo de radioastronomía de transientes.
-
-\subsubsection{Contribuciones técnicas en ingeniería de software astronómico}
-
-Se estableció un nuevo paradigma de diseño para pipelines de detección de transientes basados en aprendizaje profundo, demostrando que es posible transformar prototipos de investigación en sistemas operativos mediante aplicación rigurosa de principios arquitectónicos. Las contribuciones específicas incluyen:
-
-\textbf{Arquitectura modular con separación estricta de responsabilidades:} La estructuración del sistema en siete etapas con interfaces formales (ingesta, preprocesamiento, modelos, detección, análisis, visualización, artefactos) más cuatro módulos transversales (core, config, logging, scripts) establece un patrón replicable para desarrollo de pipelines astronómicos. Esta arquitectura facilita evolución independiente de componentes, sustitución de algoritmos, y mantenimiento a largo plazo.
-
-\textbf{Gestión explícita de presupuestos de memoria:} El algoritmo de planificación dinámica de \emph{chunks} basado en memoria RAM disponible, con formulación matemática explícita de presupuestos y alineación con longitudes de \emph{slice}, resuelve el problema fundamental de procesamiento de observaciones de duración arbitraria. Esta contribución trasciende el dominio específico de FRBs: la estrategia de streaming con solapamiento controlado es aplicable a cualquier pipeline astronómico que requiera procesamiento de datos masivos con restricciones de memoria.
-
-\textbf{Continuidad temporal quirúrgica:} El sistema de validación de contigüidad entre \emph{slices} consecutivos, con verificaciones algebraicas de inicio/fin exacto y trazabilidad temporal relativa precisa, garantiza que el procesamiento por bloques no introduzca puntos ciegos ni duplicidades. La validación con púlsar B0355+54 (732/752 pulsos detectados en 752 periodos) confirma la efectividad de este enfoque, estableciendo un estándar verificable de robustez temporal.
-
-\textbf{Integración automatizada de modelos heterogéneos:} La orquestación de CenterNet (detección) y ResNet18 (clasificación) en un flujo unificado, con extracción automática de patches, dedispersión local coherente, y validación física integrada, demuestra cómo integrar modelos de visión computacional entrenados independientemente en pipelines astronómicos operativos. El tiempo de inferencia combinado de 150--300 ms por slice de 512 ms habilita procesamiento en tiempo casi-real.
-
-\subsubsection{Contribuciones metodológicas en detección de alta frecuencia}
-
-Se establecieron por primera vez estrategias sistemáticas para detección de transientes de radio en el régimen milimétrico mediante aprendizaje profundo, donde la firma dispersiva tradicional se comprime hasta volverse imperceptible:
-
-\textbf{Cuantificación del límite de transferibilidad:} La Línea 1 estableció empíricamente que modelos optimizados para patrones bow-tie desarrollados en frecuencias centimétricas fallan completamente (recall 0\%) en alta frecuencia con configuración estándar. Incluso con umbrales extremadamente permisivos (reducción $\times$6), el recall máximo alcanzable es 87.5\% con degradación severa de precision a 36.8\%. Este resultado cuantifica el dominio de aplicabilidad de detectores basados en firma dispersiva y justifica la necesidad de estrategias alternativas.
-
-\textbf{Validación de enfoque híbrido SNR + clasificación:} La Línea 2 demostró que la combinación de detección clásica por umbral SNR con clasificación profunda sobre patches dedispersados recupera sensibilidad completa (recall 100\%) manteniendo especificidad comparable (precision 37.3\%). Este resultado establece que el clasificador ResNet18 transfiere exitosamente a alta frecuencia --asignando scores $\sim$1.00 a pulsos genuinos--, mientras que la limitación del pipeline clásico radica en la etapa de propuesta de candidatos, no en la clasificación binaria. Esta separación conceptual tiene implicaciones importantes para diseño de futuros sistemas.
-
-\textbf{Caracterización de morfología temporal en mm:} El análisis de 153 eventos detectados reveló que pulsos miliméticos pueden presentar estructura temporal compleja no observable en frecuencias bajas: múltiples componentes coherentes en DM separadas por decenas de milisegundos, sugiriendo dispersión circumpulsar, scattering interestelar residual, o emisión con haz complejo. Esta observación empírica enriquece la fenomenología de emisión de magnetars en alta frecuencia y establece requisitos para diseño de validadores físicos específicos.
-
-\subsubsection{Impacto en actores involucrados}
-
-Las contribuciones de este trabajo tienen impacto directo en los cuatro grupos de actores identificados en la definición del problema:
-
-\textbf{Observatorios y colaboraciones científicas:} DRAFTS++ proporciona a instalaciones como FAST, Effelsberg, y especialmente ALMA, una herramienta operativa para búsquedas sistemáticas de transientes sin necesidad de desarrollo de software \emph{ad hoc}. La capacidad de procesar observaciones de múltiples horas con trazabilidad completa y artefactos estandarizados facilita la integración en flujos observacionales regulares. Para ALMA específicamente, la validación exitosa de detección en 86 GHz abre la posibilidad de programas de búsqueda de FRBs repetidores durante ventanas de actividad pronosticadas.
-
-\textbf{Grupos de investigación:} La disponibilidad de código abierto bajo licencia permisiva reduce duplicación de esfuerzos y facilita comparabilidad de resultados entre campañas. El sistema de artefactos estandarizados (catálogos CSV con metadatos completos, figuras diagnósticas, métricas de rendimiento) permite que diferentes grupos analicen los mismos datos con metodología consistente, fortaleciendo reproducibilidad y rigor científico.
-
-\textbf{Operadores de telescopios:} La automatización completa del flujo de detección y clasificación, con generación de reportes visuales inmediatos, reduce la carga de curaduría manual de horas-días a revisión selectiva de candidatos prometedores. Aunque la precision de 37\% en alta frecuencia implica que aún se generan candidatos espurios, la reducción de $>$99\% de falsos positivos (típico de pipelines clásicos) a $\sim$63\% representa mejora sustancial en eficiencia operativa.
-
-\textbf{Comunidad multi-mensajero:} La reducción de latencia computacional y la capacidad de procesamiento en tiempo casi-real habilitan generación oportuna de alertas para seguimiento multi-longitud de onda. El formato de salida estandarizado (CSV con timestamps absolutos, coordenadas DM-tiempo, métricas SNR) facilita integración con sistemas de alertas como VOEvent, aunque la implementación de conectores específicos queda como trabajo futuro.
-
-\subsection{Aprendizajes y desafíos enfrentados}
-
-El desarrollo de DRAFTS++ involucró desafíos técnicos y científicos significativos que generaron aprendizajes valiosos sobre diseño de sistemas astronómicos operativos.
-
-\subsubsection{Desafíos técnicos de implementación}
-
-\textbf{Gestión de continuidad temporal en streaming:} El desafío principal fue garantizar que el procesamiento por bloques no introdujera discontinuidades ni duplicidades en la detección de eventos. La solución mediante contigüidad quirúrgica --donde cada \emph{slice} termina exactamente donde comienza el siguiente-- requirió cuidadosa formulación matemática de índices y validaciones algebraicas en cada transición. El aprendizaje clave es que la continuidad temporal en pipelines astronómicos no puede asumirse: debe verificarse explícitamente mediante invariantes formales.
-
-\textbf{Heterogeneidad de formatos y headers:} La diversidad de esquemas de metadatos entre telescopios (frecuencias invertidas, polarizaciones promediadas, unidades inconsistentes) requirió implementación de parsers robustos con validación exhaustiva y estimaciones conservadoras ante campos faltantes. El aprendizaje es que la estandarización en radioastronomía permanece incompleta: sistemas operativos deben implementar tolerancia a heterogeneidad mediante detección automática y valores por defecto seguros.
-
-\textbf{Balance memoria-rendimiento:} El cálculo dinámico de tamaños de \emph{chunk} debe balancear tres objetivos en tensión: maximizar tamaño para reducir overhead de I/O, respetar presupuestos de RAM/VRAM para evitar agotamiento, y alinear con longitudes de \emph{slice} para preservar geometría. La solución mediante factores de seguridad empíricos (FRACCION\_MAX\_RAM = 0.25, FACTOR\_OVERHEAD = 1.3) funciona robustamente, pero su optimización fina requiere caracterización experimental por instrumento.
-
-\subsubsection{Desafíos metodológicos de alta frecuencia}
-
-\textbf{Compresión de firma dispersiva:} El desafío fundamental en alta frecuencia es que la característica visual que define a los FRBs --el patrón bow-tie en DM-tiempo-- colapsa a escalas de microsegundos. La Línea 1 demostró empíricamente que ajustes paramétricos simples son insuficientes: se requiere reformulación de la estrategia de propuesta de candidatos. El aprendizaje clave es que la extensión a nuevos regímenes observacionales no es meramente ingenieril (``cambiar un parámetro''), sino que demanda investigación metodológica sobre representaciones alternativas y criterios de validación adaptados.
-
-\textbf{Validación sin curvatura resoluble:} En ausencia de firma dispersiva clara, la distinción entre pulsos astrofísicos y RFI se dificulta críticamente. La experiencia con ALMA sugiere que polarización extrema ($>$50\%), coherencia multi-antena, y consistencia temporal entre ventanas de observación son criterios útiles. Sin embargo, la implementación de validadores automáticos que exploten estas características requiere acceso a datos polarimétricos calibrados (Stokes IQUV completos), que no estaban disponibles en esta investigación. El aprendizaje es que la validación robusta en alta frecuencia requiere información auxiliar más allá de intensidad total.
-
-\textbf{Trade-off sensibilidad-especificidad:} Tanto la Línea 1 (umbral permisivo) como la Línea 2 (SNR-threshold) lograron recall alto (87.5\% y 100\% respectivamente) pero con precision moderada ($\sim$37\%). Este trade-off refleja una decisión de diseño apropiada para sistemas exploratorios: priorizar sensibilidad tolerando candidatos prometedores pendientes de validación adicional. No obstante, para operación en tiempo real con alertas automáticas, podría requerirse mayor especificidad. El aprendizaje es que diferentes casos de uso (exploración vs. alertas) demandan configuraciones diferentes del mismo sistema.
-
-\subsection{Trabajo futuro y recomendaciones}
-
-Los resultados de esta memoria abren múltiples direcciones para investigación y desarrollo futuros, tanto de naturaleza técnica como científica.
-
-\subsubsection{Extensiones técnicas prioritarias}
-
-\textbf{Implementación y validación de Líneas 3 y 4 del Componente 2:} Como se estableció en el alcance de la memoria, se exploraron cuatro líneas metodológicas para detección en alta frecuencia, pero solo se implementaron y validaron empíricamente las Líneas 1 y 2. La \textbf{prioridad técnica inmediata} como trabajo futuro de posgrado es completar la implementación y validación empírica de las dos líneas restantes:
+\subsection{Limitaciones y Próximos Pasos}
 
 \begin{itemize}
-\item \textbf{Línea 3 - Representaciones 2D Alternativas:} Implementar y validar espectrogramas polarimétricos IQUV multicanal, mapas tiempo-ancho de pulso (multi-escala temporal), mapas tiempo-RM (rotación Faraday), mapas de coherencia espectral, y combinación multi-representación para generar ``bow-tie artificial'' en espacio de características. Estas representaciones buscan compensar la pérdida de firma dispersiva mediante generación de patrones visuales discriminativos que exploten polarización extrema, concentración temporal, y coherencia espectral de FRBs.
-
-\item \textbf{Línea 4 - Estrategias Avanzadas de Zhang:} Implementar y validar expansión de rejilla DM (forzamiento de apertura morfológica mediante rangos DM ampliados y pasos gruesos), fishing a DM$\approx$0 con validación DM-aware multi-criterio (ajuste de DM por maximización SNR en sub-bandas, verificación coherencia temporal cross-chunk), y módulos de rejilla adaptativa que calculen dinámicamente parámetros de expansión según características observacionales.
+    \item HF con N reducido → ampliar dataset y polarimetría Q/U/V.
+    \item Generalización → validar en VLA/MeerKAT/CHIME.
+    \item Tiempo real → integración operacional (streaming y telemetría).
 \end{itemize}
 
-La arquitectura modular de DRAFTS++ ya facilita esta extensión mediante el patrón de selección condicional implementado. Se recomienda priorizar Línea 3 (análisis polarimétrico), dado que evidencia empírica de ALMA sugiere que polarización es el discriminador más robusto en regímenes de firma dispersiva comprimida.
+\subsection{Trabajo Futuro}
 
-\textbf{Integración con sistemas de alertas multi-mensajero:} Aunque el sistema genera salidas en formato estandarizado (CSV con timestamps absolutos y coordenadas), no se implementó integración directa con protocolos de alertas como VOEvent. Se recomienda desarrollar conectores específicos que publiquen automáticamente detecciones a servicios de alerta (siguiendo el modelo de CHIME/FRB VOEvent), habilitando coordinación con telescopios ópticos, de rayos X, y de ondas gravitacionales. Esta integración es crítica para maximizar retorno científico de detecciones en tiempo casi-real.
+El desarrollo de DRAFTS++ estableció una arquitectura sólida y validó empíricamente dos estrategias para detección en alta frecuencia (Líneas 1 y 2). Sin embargo, durante el diseño del Componente 2 se propusieron \textbf{cuatro líneas metodológicas complementarias}, de las cuales \textbf{solo dos fueron implementadas y validadas} en esta memoria debido a restricciones de tiempo y alcance. Las \textbf{Líneas 3 y 4}, descritas arquitectónicamente en el capítulo de propuesta, quedaron como \textbf{trabajo futuro prioritario de nivel posgrado}.
 
-\textbf{Optimización para procesamiento distribuido:} Para observatorios de próxima generación con flujos de datos masivos, se recomienda extender la arquitectura hacia procesamiento distribuido mediante frameworks como Dask o Apache Spark. La estructura modular actual facilita esta extensión: las etapas de preprocesamiento y detección son naturalmente paralelizables, mientras que la integración de resultados puede centralizarse. Se recomienda además explorar cuantización de modelos y optimización de kernels de dedispersión para reducir footprint de memoria.
+\subsubsection{Línea 3: Representaciones 2D Alternativas}
 
-\textbf{Validación multi-instrumento sistemática:} Se recomienda realizar campañas de validación sobre datos de telescopios adicionales (ASKAP, MeerKAT, CHIME, Parkes) para verificar portabilidad completa del sistema. Esta validación debe incluir caracterización de rendimiento por instrumento (latencia, memoria, throughput), identificación de casos especiales que requieran adaptaciones de parsers, y documentación de configuraciones óptimas por telescopio.
+\textit{Estado: Propuesta conceptual no implementada}
 
-\subsubsection{Direcciones científicas prometedoras}
+En frecuencias milimétricas donde la firma ``bow-tie'' se comprime, se proponen representaciones 2D alternativas que generen patrones discriminativos artificiales:
 
-\textbf{Búsquedas sistemáticas de FRBs en mm con ALMA:} Los resultados de este trabajo establecen la viabilidad técnica de búsquedas automatizadas de transientes en el régimen milimétrico. Se recomienda proponer programas observacionales con ALMA apuntando a FRBs repetidores conocidos (FRB 121102, FRB 180916, FRB 20190520B) durante ventanas de actividad pronosticadas. Estas observaciones podrían resultar en la primera detección de un FRB extragaláctico en ondas milimétricas, confirmando extensión espectral y permitiendo mediciones de DM sin degeneración con rotación Faraday.
+\paragraph{Propuestas de Representaciones}
 
-\textbf{Validación polarimétrica exhaustiva de candidatos ALMA:} Los 153 eventos detectados en datos de ALMA (44 confirmados + 101 prometedores + 8 PRESTO) constituyen un conjunto científicamente valioso que requiere análisis polarimétrico completo. Se recomienda solicitar acceso a datos Stokes IQUV calibrados para estos mismos archivos y desarrollar pipelines de validación que exploten fracciones de polarización lineal/circular, ángulos de posición, y posible rotación Faraday residual como discriminadores. Esta validación permitiría refinar la lista de candidatos y establecer criterios polarimétricos robustos para futuros sistemas.
+\textbf{Espectrograma Polarimétrico (Stokes IQUV):} Imagen multicanal (I, Q, U, V) explotando polarización extrema de FRBs ($>50\%$) versus RFI no polarizada. FRBs generan trazas coherentes en canales I/Q/U, mientras RFI aparece solo en I.
 
-\textbf{Estudios comparativos multi-banda:} Para FRBs repetidores con coordenadas conocidas, se recomienda coordinar observaciones simultáneas en múltiples bandas (p.ej., CHIME a 600 MHz + FAST a 1.25 GHz + ALMA a 86 GHz) para caracterizar espectros y morfología frecuencial. DRAFTS++ puede procesar los tres datasets con metodología consistente, facilitando comparación directa de propiedades espectrales. Detecciones coincidentes en cm y mm del mismo burst proporcionarían evidencia incontrovertible de emisión broadband.
+\textbf{Mapa Tiempo-Ancho:} Respuesta SNR a diferentes ventanas de integración. Pulsos astrofísicos producen patrón ``triángulo invertido'' (máxima SNR en $w \approx \tau_{\text{pulso}}$), distintivo de RFI breve o extendida.
 
-\textbf{Caracterización de distribuciones de energía en mm:} El trabajo de Vera-Casanova et al. (2025) reportó que la distribución de energías de pulsos del magnetar en 86 GHz sigue ley de potencia con exponente $-2.4$, consistente con magnetars en cm y FRBs repetitivos. Con el conjunto ampliado de pulsos detectados por DRAFTS++, se recomienda análisis estadístico refinado de distribuciones de energía, anchos temporales, y tasas de ocurrencia, comparándolas sistemáticamente con distribuciones en frecuencias bajas para constrañir modelos de emisión.
+\textbf{Mapa Tiempo-RM:} Explora espacio de rotación Faraday. FRBs con RM elevada producen franjas verticales; RFI aparece cerca de RM=0.
 
-\subsubsection{Recomendaciones para adopción operacional}
+\textbf{Coherencia Espectral:} Autocorrelación por frecuencia. FRBs broadband persisten a lags grandes; RFI narrowband decae abruptamente.
 
-Para grupos que deseen adoptar DRAFTS++ en flujos observacionales regulares, se proveen las siguientes recomendaciones basadas en la experiencia de este trabajo:
+\textbf{Bow-tie Artificial:} Combinación multi-representación mediante concatenación $\mathbf{I}_{\mathrm{combined}} = \mathrm{concat}[\mathbf{I}_{\mathrm{width}}, \mathbf{I}_{\mathrm{RM}}, \mathbf{I}_{\mathrm{coherence}}]$, generando firma multidimensional equivalente al bow-tie clásico.
 
-\textbf{Configuración inicial:} Comenzar con casos de validación simples (datasets pequeños de $<$10 GB, FRBs conocidos) antes de procesar observaciones masivas. Verificar que la extracción automática de headers opera correctamente para el instrumento específico mediante inspección manual de logs. Ajustar factores de decimación según resolución del instrumento para balancear precisión y eficiencia.
+\subsubsection{Línea 4: Estrategias Avanzadas de Zhang}
 
-\textbf{Optimización de umbrales:} Los umbrales de detección y clasificación (DET\_PROB, CLASS\_THRESHOLD) deben calibrarse empíricamente por instrumento y régimen frecuencial. Para frecuencias tradicionales (0.3--3 GHz), los valores por defecto (DET\_PROB = 0.3, CLASS\_THRESHOLD = 0.6) son apropiados. Para alta frecuencia, se recomienda reducir DET\_PROB a 0.05--0.10 y mantener CLASS\_THRESHOLD en 0.6, aceptando mayor tasa de candidatos a cambio de sensibilidad completa.
+\textit{Estado: Propuesta conceptual no implementada}
 
-\textbf{Validación científica de candidatos:} Aunque el sistema automatiza detección y clasificación, la confirmación científica final de eventos nuevos requiere validación independiente por astrónomos expertos. Se recomienda implementar flujo de revisión donde candidatos con score $>$0.9 y SNR $>$8$\sigma$ se marquen como ``alta confianza'' para seguimiento prioritario, mientras que eventos con scores intermedios se etiqueten como ``prometedores'' para validación diferida.
+Se proponen dos estrategias que preservan la filosofía DM-centrada adaptándose a compresión dispersiva:
 
-\textbf{Contribución comunitaria:} Se alienta a usuarios de DRAFTS++ a reportar casos de falla (eventos genuinos no detectados, falsos positivos persistentes) mediante issues en el repositorio GitHub, para facilitar mejora continua del sistema. Contribuciones de código (soporte para nuevos formatos, optimizaciones de rendimiento, validadores físicos adicionales) son bienvenidas mediante pull requests.
+\paragraph{Estrategias Propuestas}
 
-\subsection{Perspectivas de la detección de FRBs en alta frecuencia}
+\textbf{Estrategia 1 - Expansión de Rejilla DM:} Forzar apertura morfológica del bow-tie mediante rangos DM ampliados ($\gamma > 1$) y pasos más gruesos, permitiendo que modelos entrenados en bow-ties desarrollados recuperen sensibilidad en regímenes comprimidos. Requiere módulo de cálculo dinámico de parámetros $\gamma$ y $d_{\min}$ según frecuencia central, ancho de banda y resolución temporal.
 
-Los resultados de este trabajo sugieren que la detección de FRBs en el régimen milimétrico es técnicamente viable y científicamente prometedora, aunque enfrenta desafíos metodológicos específicos que requieren investigación continua.
+\textbf{Estrategia 2 - Fishing a DM$\approx$0:} Detección primaria permisiva en DM mínimo seguida de validación física rigurosa: (i) ajuste de DM por maximización SNR en sub-bandas ($\mathrm{DM}_{\mathrm{best-fit}} = \arg\max_{\mathrm{DM}} \sum_{f} \mathrm{SNR}_f(\mathrm{DM})$), (ii) verificación de coherencia entre sub-bandas ($\mathrm{Consistency} > \alpha_{\mathrm{consistency}}$), y (iii) consistencia temporal cross-chunk. Requiere validador DM-aware multi-criterio integrado.
 
-La viabilidad técnica queda establecida por tres líneas de evidencia convergentes: (i) ALMA ha demostrado capacidad instrumental para detectar pulsos de magnetar con SNR $>$5$\sigma$ en 86 GHz \citep{veracasanova2025}, (ii) DRAFTS++ ha demostrado que algoritmos de aprendizaje profundo pueden automatizar esta detección con recall perfecto cuando se adaptan metodológicamente, y (iii) la caracterización de más de 150 eventos en datos de archivo revela que la fenomenología de emisión pulsada en mm es suficientemente rica para soportar análisis científico robusto.
+\subsubsection{Recomendaciones para Implementación Futura}
 
-Sin embargo, persisten incógnitas fundamentales sobre FRBs extragalácticos en alta frecuencia. No se sabe si los FRBs cosmológicos emiten en mm con fluencias detectables, si sus espectros presentan cortes a frecuencias intermedias, o si la tasa de repetición en mm difiere de la observada en cm. Los modelos teóricos sugieren escenarios diversos: algunos predicen emisión débil pero detectable si los espectros siguen leyes de potencia típicas de púlsares ($\alpha \sim -1.5$), mientras otros proponen que FRBs en entornos densos podrían ser más brillantes en mm que en cm debido a absorción libre-libre en bajas frecuencias.
+\begin{itemize}
+    \item \textbf{Priorizar Línea 3:} Análisis polarimétrico IQUV es el discriminador más robusto en alta frecuencia según evidencia empírica de ALMA.
+    \item \textbf{Datasets polarimétricos:} Requiere acceso a datos Stokes IQUV calibrados con ground truth curado.
+    \item \textbf{Validación multi-instrumento:} Extender validación a VLA, MeerKAT, CHIME para generalización robusta.
+    \item \textbf{Integración tiempo real:} Desarrollar conectores VOEvent para alertas multi-mensajero.
+\end{itemize}
 
-La resolución de estas incógnitas requiere programas observacionales dedicados. Con DRAFTS++ ahora disponible como herramienta operativa, se facilita la transición de observaciones piloto a búsquedas sistemáticas. Se propone estrategia de dos etapas: (i) apuntar ALMA a los 5--10 repetidores más activos conocidos (FRB 121102, FRB 180916, FRB 20190520B, FRB 20201124A) durante ventanas de actividad pico, acumulando 10--20 horas por fuente; (ii) si se detecta al menos un FRB cosmológico en mm, caracterizar su espectro y morfología para ajustar modelos de emisión y optimizar estrategias de búsqueda futuras.
+\subsection{Cierre}
 
-La frontera milimétrica representa la última ventana frecuencial significativa aún inexplorada para FRBs. Frecuencias por debajo de 100 MHz enfrentan opacidad ionosférica y scattering severo; frecuencias por encima de 300 GHz enfrentan absorción atmosférica prohibitiva y sensibilidad instrumental limitada. El rango 30--300 GHz, accesible desde sitios de gran altura (ALMA, IRAM, futuro Chajnantor) con telescopios de apertura grande, constituye por tanto una ventana única. Los próximos 5--10 años podrían presenciar las primeras detecciones de FRBs cosmológicos en mm, transformando nuestra comprensión de mecanismos de emisión y entornos circundantes.
-
-\subsection{Reflexiones finales}
-
-Esta memoria demostró que la convergencia de ingeniería de software rigurosa con investigación metodológica adaptada a regímenes observacionales específicos puede expandir significativamente las fronteras de la radioastronomía de transientes. La transformación de DRAFTS en DRAFTS++ ejemplifica un patrón general: prototipos de investigación, aunque conceptualmente sólidos, requieren refactorización arquitectónica profunda para operar en entornos reales.
-
-Los principios aplicados --modularidad con separación de responsabilidades, gestión explícita de recursos, validaciones formales de invariantes, trazabilidad completa-- son transferibles a otros dominios de la astronomía computacional. La proliferación de búsquedas de transientes (variables ópticas, ondas gravitacionales, neutrinos astrofísicos) genera desafíos similares de volúmenes masivos, latencia crítica, y necesidad de automatización robusta. DRAFTS++ establece un modelo arquitectónico replicable.
-
-En el ámbito científico, la extensión a alta frecuencia milimétrica abre una ventana observacional enteramente nueva. Si los FRBs efectivamente emiten en mm con fluencias detectables, cada detección proporcionará información única: pulsos libres de scattering revelando morfología intrínseca, mediciones de DM puras sin degeneración con rotación Faraday, y posible acceso a poblaciones de progenitores invisibles en frecuencias bajas. La herramienta ahora existe; la pregunta científica --¿emiten los FRBs en mm?-- espera respuesta observacional.
-
-Finalmente, este trabajo subraya la importancia de la colaboración interdisciplinaria en astronomía moderna. El desarrollo de DRAFTS++ requirió integración de expertise en astrofísica de transientes, procesamiento de señales, aprendizaje profundo, ingeniería de software, y operaciones observacionales. Ninguna disciplina aislada podría haber generado un sistema operativo completo. La radioastronomía de próxima generación, con instrumentos como SKA, DSA-2000, y ngVLA produciendo petabytes diarios, demandará cada vez más equipos multidisciplinarios capaces de integrar ciencia, algoritmia, y sistemas distribuidos. Esta memoria constituye un ejemplo de esa convergencia necesaria.
-
-En conclusión, DRAFTS++ no solo resuelve el problema técnico específico de detección automática de FRBs: establece un nuevo estándar de cómo deben diseñarse pipelines astronómicos operativos basados en aprendizaje profundo, validándolo empíricamente en el régimen más desafiante explorado hasta la fecha --el milimétrico, donde las firmas clásicas colapsan y solo estrategias adaptadas recuperan sensibilidad--. El camino hacia la primera detección de un FRB cosmológico en ondas milimétricas está ahora pavimentado metodológica y técnicamente. Solo resta apuntar ALMA hacia el cielo correcto, en el momento correcto, con las herramientas correctas. Este trabajo provee una de esas herramientas.
+La ruta física → algoritmos → arquitectura habilitó descubrimiento reproducible; proponemos este estándar para software astronómico productivo.

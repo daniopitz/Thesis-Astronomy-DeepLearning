@@ -25,7 +25,62 @@ Adicionalmente, la propuesta extiende la arquitectura hacia el régimen de frecu
 La propuesta se organiza en dos componentes principales: (i) el desarrollo de DRAFTS++ como pipeline productivo end-to-end con ingesta multi-formato, streaming eficiente y orquestación automatizada de modelos, y (ii) su extensión al régimen milimétrico mediante estrategias de detección basadas en SNR y validación física robusta. De aquí en adelante, el término DRAFTS++ se utilizará para referirse a esta propuesta, que constituye el núcleo central de la presente memoria.
 
 \vspace{0.3cm}
-\noindent\textbf{Contexto de Implementación:} DRAFTS++ está implementado en Python 3.9+ utilizando PyTorch y torchvision (inferencia de modelos CenterNet y ResNet18), Astropy (lectura y escritura de archivos FITS/PSRFITS), NumPy (procesamiento numérico de arreglos multidimensionales tiempo-frecuencia), psutil (cálculo dinámico de presupuestos de memoria RAM disponible), fitsio y struct nativo (parseo eficiente de headers Filterbank), y librerías auxiliares como scipy (filtrado y convoluciones SNR), matplotlib/seaborn (generación de plots diagnósticos), y numba (aceleración de operaciones de dedispersión). El sistema está diseñado para procesar observaciones continuas de larga duración (típicamente 1-8 horas) provenientes de radiotelescopios como FAST (Fast Radio Burst Survey con archivos de 50-200 GB) y Parkes (observaciones de seguimiento de 2-4 horas con resoluciones temporales de 64-256 $\mu$s).
+\noindent\textbf{Contexto de Implementación:} DRAFTS++\footnote{\href{https://github.com/Kodamonkey/DRAFTS-UC}{Repositorio de DRAFTS++ en GitHub: https://github.com/Kodamonkey/DRAFTS-UC}} está implementado en Python 3.9+ utilizando PyTorch y torchvision (inferencia de modelos CenterNet y ResNet18), Astropy (lectura y escritura de archivos FITS/PSRFITS), NumPy (procesamiento numérico de arreglos multidimensionales tiempo-frecuencia), psutil (cálculo dinámico de presupuestos de memoria RAM disponible), fitsio y struct nativo (parseo eficiente de headers Filterbank), y librerías auxiliares como scipy (filtrado y convoluciones SNR), matplotlib/seaborn (generación de plots diagnósticos), y numba (aceleración de operaciones de dedispersión). El sistema está diseñado para procesar observaciones continuas de larga duración (típicamente 1-8 horas) provenientes de radiotelescopios como FAST (Fast Radio Burst Survey con archivos de 50-200 GB) y Parkes (observaciones de seguimiento de 2-4 horas con resoluciones temporales de 64-256 $\mu$s).
+
+\vspace{0.3cm}
+
+La Tabla~\ref{tab:drafts-comparison} sintetiza las diferencias fundamentales entre el prototipo DRAFTS original y el sistema productivo DRAFTS++ propuesto en esta memoria, evidenciando la transformación arquitectónica que motiva cada componente descrito en este capítulo.
+
+\begin{table}[H]
+\centering
+\scriptsize
+\renewcommand{\arraystretch}{1.3}
+\caption{Comparación arquitectónica y operativa entre DRAFTS y DRAFTS++. \textbf{Nota}: Ambos utilizan los mismos modelos pre-entrenados (CenterNet y ResNet18); la contribución de esta tesis es exclusivamente ingeniería de software y arquitectura del pipeline.}
+\label{tab:drafts-comparison}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Característica} & \textbf{DRAFTS (original)} & \textbf{DRAFTS++} \\
+\hline
+\multicolumn{3}{|c|}{\textbf{ARQUITECTURA DE SOFTWARE (Contribución de esta tesis)}} \\
+\hline
+Arquitectura & Scripts desacoplados & Pipeline modular E2E \\
+\hline
+Gestión de memoria & Carga completa (límite 30 GB) & Streaming dinámico (ilimitado) \\
+\hline
+Ingesta de datos & Manual, PSRFITS únicamente & Automática, multi-formato \\
+\hline
+Configuración & Valores codificados fijos & Extracción automática de headers \\
+\hline
+Decimación & Factores fijos & Adaptativa según instrumento \\
+\hline
+Continuidad temporal & Sin garantías & Contigüidad quirúrgica verificada \\
+\hline
+Orquestación de modelos & Etapas separadas, manual & Workflow integrado automatizado \\
+\hline
+Validación física & Ausente o mínima & SNR, DM, timestamps, coherencia \\
+\hline
+Observabilidad & Logging básico & Logging estructurado + métricas \\
+\hline
+Salidas & Informales & Artefactos estandarizados \\
+\hline
+Reproducibilidad & Limitada & Completa (semillas, versionado) \\
+\hline
+Eficiencia (obs. 2h FAST) & $\sim$45 min & $\sim$25 min (44\% más rápido) \\
+\hline
+\multicolumn{3}{|c|}{\textbf{MODELOS DE DEEP LEARNING (Utilizados de DRAFTS, no desarrollados)}} \\
+\hline
+Detector de objetos & CenterNet pre-entrenado & CenterNet pre-entrenado (mismo) \\
+\hline
+Clasificador binario & ResNet18 pre-entrenado & ResNet18 pre-entrenado (mismo) \\
+\hline
+\multicolumn{3}{|c|}{\textbf{CAPACIDADES EXTENDIDAS (Contribución de esta tesis)}} \\
+\hline
+Bandas de frecuencia & 0.3--1.5 GHz (L-band) & 0.3--100 GHz (L-band + mm) \\
+\hline
+Estrategias HF & No implementadas & SNR-threshold + validación DM \\
+\hline
+\end{tabular}
+\end{table}
 
 %De ahora en adelante, a esta nueva versión de DRAFTS le llamaremos DRAFTS++, que es básicamente toda esta memoria.
 
@@ -64,11 +119,11 @@ La Figura~\ref{fig:workflow-src} proporciona una representación esquemática de
 \begin{figure}[H]
 \centering
 \begingroup\shorthandoff{<>}% desactivar atajos de babel para < y > dentro de TikZ
-\resizebox{\textwidth}{!}{%
+\resizebox{0.98\textwidth}{!}{%
 \begin{tikzpicture}[
-    node distance=1.0cm and 1.6cm,
-    stage/.style={rectangle, draw, fill=blue!20, text width=2.7cm, text centered, minimum height=0.7cm, font=\small},
-    support/.style={rectangle, draw, fill=gray!20, text width=2.7cm, text centered, minimum height=0.6cm, font=\small, rounded corners},
+    node distance=1.2cm and 1.8cm,
+    stage/.style={rectangle, draw, fill=blue!20, text width=2.7cm, text centered, minimum height=0.8cm, font=\small},
+    support/.style={rectangle, draw, fill=gray!20, text width=2.7cm, text centered, minimum height=0.7cm, font=\small, rounded corners},
     arrow/.style={-Stealth, thick, shorten >=2pt}
 ]
 
@@ -314,9 +369,9 @@ Esta implementación integrada elimina las limitaciones del prototipo original y
 
 \begin{figure}[H]
 \centering 
-\resizebox{\textwidth}{!}{%
+\resizebox{0.95\textwidth}{!}{%
 \begin{tikzpicture}[
-    node distance=0.8cm,
+    node distance=1.0cm,
     chunk/.style={rectangle, draw, fill=green!20, text width=1.8cm, text centered, minimum height=0.8cm, font=\scriptsize},
     slice/.style={rectangle, draw, fill=blue!20, text width=1.4cm, text centered, minimum height=0.5cm, font=\tiny},
     memory/.style={rectangle, draw, fill=red!20, text width=1.8cm, text centered, minimum height=0.7cm, font=\scriptsize},
@@ -513,12 +568,12 @@ El tiempo de inferencia combinado (CenterNet + ResNet18) es de $\sim$150--300 ms
 
 \begin{figure}[H]
 \centering
-\resizebox{\textwidth}{!}{%
+\resizebox{0.95\textwidth}{!}{%
 \begin{tikzpicture}[
-    node distance=0.8cm and 1.4cm,
+    node distance=1.0cm and 1.6cm,
     stage/.style={rectangle, draw, fill=blue!20, text width=2.0cm, text centered, minimum height=0.7cm, font=\scriptsize},
-    model/.style={rectangle, draw, fill=green!20, text width=1.8cm, text centered, minimum height=0.6cm, font=\scriptsize},
-    validation/.style={rectangle, draw, fill=orange!20, text width=1.8cm, text centered, minimum height=0.6cm, font=\scriptsize},
+    model/.style={rectangle, draw, fill=green!20, text width=1.8cm, text centered, minimum height=0.7cm, font=\scriptsize},
+    validation/.style={rectangle, draw, fill=orange!20, text width=1.8cm, text centered, minimum height=0.7cm, font=\scriptsize},
     arrow/.style={-Stealth, thick},
     dataflow/.style={-Stealth, thick, dashed, blue}
 ]
@@ -577,16 +632,21 @@ La integración de CenterNet en DRAFTS++ se estructura en cuatro etapas de proce
 \Ensure Lista de candidatos $\{(DM_i, t_i, \text{conf}_i)\}$ con coordenadas físicas
 
 \State \textbf{INICIO}
-\State \textbf{// Preprocesamiento de entrada}
+\State
+\State \textit{Preprocesamiento de entrada:}
 \State Aplicar transformaciones estándar: normalización, redimensionamiento a 512×512, conversión a tensor
-\State \textbf{// Inferencia con modelo pre-entrenado}
+\State
+\State \textit{Inferencia con modelo pre-entrenado:}
 \State Cargar checkpoint del modelo CenterNet desde ruta configurada
 \State Ejecutar inferencia en GPU: obtener mapas de salida (calor, tamaño, desplazamiento)
-\State \textbf{// Post-procesamiento de salidas}
+\State
+\State \textit{Post-procesamiento de salidas:}
 \State Detectar picos locales en mapa de calor con umbral de confianza $\theta$
 \State Para cada pico detectado: extraer coordenadas píxel $(x, y)$ y dimensiones
-\State \textbf{// Conversión a coordenadas físicas}
+\State
+\State \textit{Conversión a coordenadas físicas:}
 \State Transformar píxeles a coordenadas astronómicas: $(DM, t) = \text{pixel\_to\_physical}(x, y)$
+\State
 \State \textbf{RETORNAR} lista de candidatos con $(DM, t, \text{confianza})$
 \State \textbf{FIN}
 \end{algorithmic}
@@ -605,20 +665,25 @@ El pipeline de clasificación opera sobre cada candidato detectado por CenterNet
 \Ensure Probabilidad $p$ y clasificación binaria (BURST / NO BURST)
 
 \State \textbf{INICIO}
-\State \textbf{// Extracción y dedispersión}
+\State
+\State \textit{Extracción y dedispersión:}
 \State Extraer patch frecuencia-tiempo centrado en coordenadas del candidato
 \State Aplicar dedispersión coherente al patch usando $DM$ detectado
-\State \textbf{// Preprocesamiento robusto}
+\State
+\State \textit{Preprocesamiento robusto:}
 \State Normalizar patch mediante: sustracción de tendencia, clipping de outliers, escalado min-max
-\State \textbf{// Inferencia con modelo pre-entrenado}
+\State
+\State \textit{Inferencia con modelo pre-entrenado:}
 \State Cargar checkpoint del modelo ResNet18 desde ruta configurada
 \State Ejecutar inferencia en GPU: obtener probabilidad $p \in [0,1]$ de clase FRB
-\State \textbf{// Decisión automatizada}
+\State
+\State \textit{Decisión automatizada:}
 \If{$p \geq \theta_{class}$}
     \State Clasificar como BURST
 \Else
     \State Clasificar como NO BURST
 \EndIf
+\State
 \State \textbf{RETORNAR} $(p, \text{clasificación})$
 \State \textbf{FIN}
 \end{algorithmic}
@@ -749,48 +814,147 @@ Esta estrategia constituye una extensión natural del Componente 1: se emplea \t
 comparado con la resolución temporal efectiva $t_{\mathrm{samp}}$. Cuando $\Delta t_{\mathrm{ms}} > \alpha\, t_{\mathrm{samp}}$ (con $\alpha$ de seguridad en el rango 1.5–2.0), el \textit{bow–tie} permanece resoluble y la detección en DM-tiempo sigue siendo pertinente; si $\Delta t_{\mathrm{ms}} \le \alpha\, t_{\mathrm{samp}}$, la firma se comprime y el mapa DM-tiempo pierde contraste, anticipándose una disminución de sensibilidad. La validación consiste, por tanto, en aplicar el flujo sin modificaciones sobre ventanas en las que $\Delta t_{\mathrm{ms}}$ sea resoluble y medir sensibilidad, tasa de falsos positivos y estabilidad temporal del detector; este resultado sirve de referencia objetiva para las estrategias alternativas descritas a continuación.
 
 
-\subsubsection{Estrategia 2: Detección por SNR con clasificación binaria (Modelos Pre-entrenados)}
+\subsubsection{Estrategia 2: Pipeline HF Multi-Fase con Matched Filtering y Validación Polarimétrica}
 
-Cuando el retardo dispersivo se vuelve comparable o inferior a la resolución temporal, el patrón DM-tiempo pierde contraste y la representación más informativa pasa a ser el perfil temporal. Inspirada en el enfoque clásico de \textbf{PRESTO} \cite{2011ascl.soft07017R}, esta estrategia introduce una \textbf{rama SNR-threshold} dentro del \emph{workflow} de DRAFTS++: la \textit{propuesta de candidatos} se realiza mediante umbralización de SNR en la serie temporal (no mediante CenterNet); sin embargo, la \textit{clasificación final} se mantiene usando el mismo modelo ResNet18 pre-entrenado del Componente 1. 
+Cuando el retardo dispersivo se vuelve comparable o inferior a la resolución temporal ($\Delta t_{\mathrm{ms}} \le \alpha\, t_{\mathrm{samp}}$), el patrón DM-tiempo pierde contraste y la representación más informativa pasa a ser el perfil temporal. Esta estrategia implementa un \textbf{pipeline de cuatro fases} inspirado en métodos consolidados (PRESTO, CHIME/FRB) pero adaptado al régimen de alta frecuencia ($\geq 8$ GHz) donde: (i) la dispersión se atenúa drásticamente ($\Delta t \propto \nu^{-2}$), (ii) el scattering decrece ($\tau_{\mathrm{sc}} \propto \nu^{-\alpha}$ con $\alpha \approx 3.9$--4.4), y (iii) la polarización lineal extrema de FRBs ($>50\%$ en 4--8 GHz, cercana a 100\% en FRB 121102) permite validación robusta contra RFI.
 
-\textbf{Contribución de ingeniería:} La rama SNR se \textit{activa condicionalmente} mediante un criterio físico automatizado: cuando el módulo de análisis determina que $\Delta t_{\mathrm{ms}} \le \alpha\, t_{\mathrm{samp}}$ (pérdida de firma bow-tie), el sistema conmuta automáticamente a detección por SNR. Tras proponer candidatos, el flujo \textit{regresa a la ruta estándar} del Componente 1: dedispersión local coherente, clasificación con ResNet18 pre-entrenado, validaciones físicas y emisión de artefactos estandarizados. Este diseño preserva (i) el carácter E2E del pipeline, (ii) la unificación de salidas y trazabilidad, y (iii) la reutilización completa de la infraestructura de clasificación y validación ya implementada, simplemente cambiando el método de propuesta inicial según el régimen de frecuencia.
+\paragraph{Motivación Física y Decisiones de Diseño}
 
-Sea $s(t)$ la serie temporal (obtenida por integración en frecuencia y normalización robusta). La estimación de SNR por filtrado adaptado se define como
+En alta frecuencia, la firma bow-tie se comprime hasta volverse imperceptible, pero los pulsos se vuelven más agudos por reducción de scattering, favoreciendo detección por \textbf{matched filtering temporal} sobre heurísticas morfológicas en imágenes DM-tiempo. La alta fracción de polarización lineal observada en FRBs ($\sim$100\% en algunos repetidores) justifica usar coincidencia en Stokes I y L como criterio de validación física, descartando RFI que típicamente se manifiesta solo en una componente.
+
+\paragraph{Fase 1: Boxcar Matched Filtering y SNR Tipo PRESTO}
+
+El núcleo de detección emplea un banco de plantillas boxcar aplicado a la serie temporal integrada en frecuencia $s(t)$, replicando la práctica consolidada en PRESTO y CHIME/FRB. La métrica SNR se calcula mediante:
+
 \[
-\mathrm{SNR}(t) = \max_{w\in\mathcal{W}} \frac{\big(s * b_w\big)(t)}{\sqrt{w}},
+\mathrm{SNR}(t) = \max_{w\in\mathcal{W}} \frac{\big(s * b_w\big)(t)}{\sqrt{w}}
 \]
-\noindent donde:
+
+donde $s(t)$ es la serie temporal tras detrending y normalización robusta local, $b_w$ es el kernel boxcar de anchura $w$, y $\mathcal{W} = \{1, 2, 3, 4, 6, 9, 14, 20, 30\}$ muestras cubre desde pulsos agudos hasta extendidos. La normalización por $\sqrt{w}$ es estándar en teoría de detección (matched filter óptimo en ruido gaussiano aditivo), y la plantilla rectangular aproxima el óptimo teórico con pérdida $<10\%$ respecto a plantillas gaussianas pero con complejidad computacional muy inferior, crítico en procesamiento streaming. 
+
+Se extraen picos $\{t_i\}$ donde $\mathrm{SNR}(t_i) \geq T$ (umbral típico 5--7$\sigma$) y $|t_i - t_j| \geq \Delta t_{\min}$ para evitar duplicidades. Este esquema es compatible operacionalmente con pipelines de referencia (PRESTO/CHIME) y maximiza sensibilidad en el dominio temporal donde la información decisiva se concentra en ventanas estrechas debido a la compresión dispersiva.
+
+\paragraph{Fase 2: Validación por Polarización Lineal (Opcional)}
+
+Para cada pico detectado en tiempo $t_i$, si el dataset incluye productos Stokes completos (I, Q, U, V), se calcula la polarización lineal $L = \sqrt{Q^2 + U^2}$ y se compara:
+
+\[
+\mathrm{SNR}_{\mathrm{L}}(t_i) \geq \beta \cdot \mathrm{SNR}_{\mathrm{I}}(t_i)
+\]
+
+con $\beta \approx 0.5$--0.7 como umbral de consistencia. Esta validación explota la evidencia observacional de alta linealidad en FRBs (p.ej., FRB 121102 con $>90\%$ en 4--8 GHz, RM extrema $\sim 1.4 \times 10^5$ rad m$^{-2}$) versus RFI que típicamente aparece solo en I o con firmas asimétricas en Q/U. La fase es \textbf{conmutable} (ON/OFF) para mantener compatibilidad con datasets de intensidad total únicamente.
+
+\paragraph{Fase 3a: Estimación Local de DM y Clasificación en Intensidad}
+
+Alrededor de cada candidato $t_i$ validado, se extrae un parche tiempo-frecuencia y se evalúa una rejilla local de DMs $\{\mathrm{DM}_k\}$ para obtener:
+
+\[
+\mathrm{DM}^* = \arg\max_{\mathrm{DM}_k} \mathrm{SNR}_{\mathrm{dedis}}(\mathrm{DM}_k, t_i)
+\]
+
+mediante maximización de coherencia temporal tras dedispersión. El parche dedispersado a $\mathrm{DM}^*$ se normaliza (sustracción de tendencia, clipping de outliers, escalado min-max) y se somete al mismo clasificador \textbf{ResNet18 pre-entrenado} del Componente 1, obteniendo probabilidad $p_{\mathrm{I}} \in [0,1]$ de clase FRB.
+
+\paragraph{Fase 3b: Clasificación Dual en Polarización Lineal (Opcional)}
+
+Si disponible, el parche en polarización lineal L (construido análogamente al de I, dedispersado al mismo $\mathrm{DM}^*$ y normalizado) se evalúa con ResNet18, obteniendo $p_{\mathrm{L}} \in [0,1]$. El esquema de decisión implementa dos modos:
+
 \begin{itemize}
-    \item $s(t)$: serie temporal integrada en frecuencia y normalizada robustamente.
-    \item $b_w$: función \textit{boxcar} de anchura temporal $w$.
-    \item $\mathcal{W}$: conjunto discreto de anchos de \textit{boxcar} para filtrado adaptado.
-    \item $\mathrm{SNR}(t)$: relación señal-ruido estimada en el instante $t$.
-    \item $T$: umbral de detección SNR (típicamente 6-10).
-    \item $t_i$: instantes candidatos que superan el umbral SNR.
-    \item $\Delta t_{\min}$: separación temporal mínima entre candidatos para evitar duplicidades.
-    \item $\mathrm{DM}^*$: medida de dispersión óptima local estimada por maximización de coherencia temporal.
-
-La detección primaria consiste en seleccionar instantes $t_i$ tales que $\mathrm{SNR}(t_i)\ge T$ y $|t_i-t_j|\ge \Delta t_{\min}$ para todo $j\ne i$, lo que evita duplicidades y reagregaciones espurias. Alrededor de cada $t_i$ se construye un parche tiempo-frecuencia centrado en $t_i$ y se evalúa una rejilla local de medidas de dispersión para obtener $\mathrm{DM}^*$ como el valor que maximiza la coherencia temporal dedispersada. Este parche, dedispersado a $\mathrm{DM}^*$ y preprocesado, se somete a la red de clasificación binaria para estimar la probabilidad intrínseca de pertenencia a la clase FRB. Finalmente, se exige consistencia física mínima (por ejemplo, $\mathrm{DM}^*>0$ con incertidumbre acotada y anchura temporal finita) antes de emitir el candidato.
-
+    \item \textbf{STRICT}: Requiere $p_{\mathrm{I}} \geq \theta_{\mathrm{class}}$ Y $p_{\mathrm{L}} \geq \theta_{\mathrm{class}}$ (máxima especificidad, reduce falsos positivos).
+    \item \textbf{PERMISSIVE}: Acepta $p_{\mathrm{I}} \geq \theta_{\mathrm{class}}$ O $p_{\mathrm{L}} \geq \theta_{\mathrm{class}}$ (máxima sensibilidad, tolera degradación en una componente).
 \end{itemize}
 
+Esta doble inferencia aporta evidencia probabilística ortogonal al matched filtering, útil para distinguir FRB vs. RFI/ruido en el dominio imagen (512×$N_{\mathrm{freq}}$) manteniendo coherencia física (mismo DM y tiempo).
+
+\paragraph{Justificación Teórica y Compatibilidad Operacional}
+
+\begin{itemize}
+    \item \textbf{Ajuste al régimen físico:} La reducción de $\Delta t$ con frecuencia y el menor scattering hacen más eficaces decisiones basadas en picos SNR locales y ventanas estrechas; el banco de boxcars capta bien esa variación de escala temporal sin inflar el costo.
+    \item \textbf{Óptimo práctico:} El matched filtering es óptimo en AWGN; el boxcar aproxima bien el óptimo con pérdida $<10\%$ frente a plantillas gaussianas pero con complejidad muy inferior y fácil vectorización/streaming, clave en HF donde se exploran muchos DMs y slices.
+    \item \textbf{Robustez a RFI:} La coincidencia I--L se alinea con evidencia observacional de alta linealidad en múltiples FRBs (4--8 GHz), mejorando especificidad sin degradar sensibilidad cuando la física de emisión favorece L alta.
+    \item \textbf{Compatibilidad operacional:} Uso de box-car filters y umbrales SNR estándar en PRESTO/CHIME respalda el diseño y facilita comparación/validación externa.
+\end{itemize}
+
+\paragraph{Contribución de Ingeniería}
+
+La rama SNR se \textit{activa condicionalmente} mediante criterio físico automatizado: cuando $\Delta t_{\mathrm{ms}} \le \alpha\, t_{\mathrm{samp}}$ (pérdida de firma bow-tie), el sistema conmuta automáticamente de CenterNet (Componente 1) a matched filtering temporal (Fase 1). Tras proponer candidatos, el flujo integra validación polarimétrica (Fase 2, si disponible), estimación de DM y clasificación CNN dual (Fases 3a-3b), antes de regresar a la ruta estándar de validación física y emisión de artefactos estandarizados. Este diseño preserva: (i) carácter E2E del pipeline, (ii) unificación de salidas y trazabilidad, (iii) reutilización completa de infraestructura de clasificación ResNet18 pre-entrenada, y (iv) modularidad que permite activar/desactivar validación polarimétrica según disponibilidad de productos Stokes.
+
+\begin{table}[H]
+\centering
+\small
+\renewcommand{\arraystretch}{1.3}
+\caption{Hiperparámetros del Pipeline HF Multi-Fase (Estrategia 2)}
+\label{tab:hf-hyperparameters}
+\begin{tabular}{|l|c|l|}
+\hline
+\textbf{Fase} & \textbf{Parámetro} & \textbf{Valor Típico} \\
+\hline
+\multicolumn{3}{|c|}{\textbf{Fase 1: Boxcar Matched Filtering}} \\
+\hline
+Banco de anchos & $\mathcal{W}$ & $\{1, 2, 3, 4, 6, 9, 14, 20, 30\}$ muestras \\
+\hline
+Umbral SNR & $T$ & 5--7$\sigma$ \\
+\hline
+Separación mínima & $\Delta t_{\min}$ & 10--20 muestras \\
+\hline
+\multicolumn{3}{|c|}{\textbf{Fase 2: Validación Polarimétrica}} \\
+\hline
+Factor consistencia & $\beta$ & 0.5--0.7 \\
+\hline
+\multicolumn{3}{|c|}{\textbf{Fases 3a-3b: Clasificación Dual}} \\
+\hline
+Umbral clasificación & $\theta_{\mathrm{class}}$ & 0.6 \\
+\hline
+Modo decisión & STRICT/PERMISSIVE & PERMISSIVE (por defecto) \\
+\hline
+Rejilla DM local & $|\mathrm{DM}_k|$ & 20--50 valores \\
+\hline
+\end{tabular}
+\end{table}
+
 \begin{algorithm}[H]
-\caption{Detección híbrida HF: SNR $\rightarrow$ parche dedispersado $\rightarrow$ clasificación}
+\caption{Pipeline HF Multi-Fase: Matched Filtering + Validación Polarimétrica + Clasificación Dual}
 \label{alg:hf-snr-class}
 \begin{algorithmic}[1]
-\Require Serie temporal $s(t)$, umbral $T$, separación $\Delta t_{\min}$, conjunto de anchos $\mathcal{W}$, rejilla local de DM
-\Ensure Candidatos validados con $\{t_{\mathrm{evt}},\, \mathrm{SNR},\, \mathrm{DM}^*,\, p\}$
+\Require Serie temporal $s(t)$, productos Stokes (I, Q, U) si disponibles, umbral $T$, separación $\Delta t_{\min}$, conjunto de anchos $\mathcal{W}$, rejilla local de DM, modo de decisión (STRICT/PERMISSIVE)
+\Ensure Candidatos validados con $\{t_{\mathrm{evt}},\, \mathrm{SNR},\, \mathrm{DM}^*,\, p_{\mathrm{I}},\, p_{\mathrm{L}}\}$
 
-\State Normalizar $s(t)$ de forma robusta (tendencia y escala)
-\State Calcular $\mathrm{SNR}(t)=\max_{w\in\mathcal{W}} (s*b_w)(t)/\sqrt{w}$
-\State Extraer picos $\{t_i\}$ con $\mathrm{SNR}(t_i)\ge T$ y distancia mínima $\Delta t_{\min}$
-\For{cada $t_i$}
-    \State Construir un parche tiempo–frecuencia centrado en $t_i$
-    \State Evaluar la rejilla local de DM y obtener $\mathrm{DM}^*$ por máxima coherencia
-    \State Dedispersar y preprocesar el parche a $\mathrm{DM}^*$
-    \State Estimar probabilidad binaria $p$ con el clasificador en flujo
-    \If{$p$ suficientemente alto y $\mathrm{DM}^*>0$ con anchura temporal finita}
-        \State Emitir candidato con $(t_{\mathrm{evt}}\!=\!t_i,\, \mathrm{SNR}(t_i),\, \mathrm{DM}^*,\, p)$
+\State \textbf{FASE 1: Boxcar Matched Filtering}
+\State Normalizar $s(t)$ mediante detrending y normalización robusta local
+\State Calcular $\mathrm{SNR}(t) = \max_{w\in\mathcal{W}} (s * b_w)(t) / \sqrt{w}$ con $\mathcal{W} = \{1,2,3,4,6,9,14,20,30\}$
+\State Extraer picos $\{t_i\}$ donde $\mathrm{SNR}(t_i) \geq T$ y $|t_i - t_j| \geq \Delta t_{\min}$
+
+\For{cada candidato $t_i$}
+    \State \textbf{FASE 2: Validación Polarimétrica (si disponible)}
+    \If{productos Stokes Q, U disponibles}
+        \State Calcular $L(t) = \sqrt{Q^2(t) + U^2(t)}$
+        \State Calcular $\mathrm{SNR}_{\mathrm{L}}(t_i)$ en polarización lineal
+        \If{$\mathrm{SNR}_{\mathrm{L}}(t_i) < \beta \cdot \mathrm{SNR}_{\mathrm{I}}(t_i)$ con $\beta \approx 0.5$--0.7}
+            \State \textbf{continue} \Comment{Descartar por baja coherencia polarimétrica}
+        \EndIf
+    \EndIf
+    
+    \State \textbf{FASE 3a: Estimación de DM y Clasificación en Intensidad}
+    \State Extraer parche tiempo-frecuencia centrado en $t_i$
+    \State Evaluar rejilla local $\{\mathrm{DM}_k\}$ y obtener $\mathrm{DM}^* = \arg\max_{\mathrm{DM}_k} \mathrm{SNR}_{\mathrm{dedis}}(\mathrm{DM}_k, t_i)$
+    \State Dedispersar parche a $\mathrm{DM}^*$ y normalizar (sustracción tendencia, clipping, escalado min-max)
+    \State Inferir con ResNet18: $p_{\mathrm{I}} = \text{classify}(\text{patch}_{\mathrm{I}})$
+    
+    \State \textbf{FASE 3b: Clasificación en Polarización Lineal (si disponible)}
+    \If{productos Stokes Q, U disponibles}
+        \State Construir parche L dedispersado a $\mathrm{DM}^*$ y normalizar
+        \State Inferir con ResNet18: $p_{\mathrm{L}} = \text{classify}(\text{patch}_{\mathrm{L}})$
+        
+        \If{modo STRICT}
+            \State $\text{valid} = (p_{\mathrm{I}} \geq \theta_{\mathrm{class}}) \land (p_{\mathrm{L}} \geq \theta_{\mathrm{class}})$
+        \ElsIf{modo PERMISSIVE}
+            \State $\text{valid} = (p_{\mathrm{I}} \geq \theta_{\mathrm{class}}) \lor (p_{\mathrm{L}} \geq \theta_{\mathrm{class}})$
+        \EndIf
+    \Else
+        \State $\text{valid} = (p_{\mathrm{I}} \geq \theta_{\mathrm{class}})$ \Comment{Solo intensidad disponible}
+    \EndIf
+    
+    \If{$\text{valid}$ y $\mathrm{DM}^* > 0$ y anchura temporal finita}
+        \State Emitir candidato validado: $(t_{\mathrm{evt}} = t_i,\, \mathrm{SNR}(t_i),\, \mathrm{DM}^*,\, p_{\mathrm{I}},\, p_{\mathrm{L}})$
     \EndIf
 \EndFor
 \end{algorithmic}
@@ -798,233 +962,46 @@ La detección primaria consiste en seleccionar instantes $t_i$ tales que $\mathr
 
 \begin{figure}[H]
 \centering
-\resizebox{\textwidth}{!}{%
+\resizebox{0.98\textwidth}{!}{%
 \begin{tikzpicture}[
-    node distance=0.9cm and 1.6cm,
-    stage/.style={rectangle, draw, fill=blue!20, text width=2.3cm, text centered, minimum height=0.7cm, font=\scriptsize},
-    decision/.style={diamond, draw, fill=yellow!20, aspect=2, text width=2.4cm, text centered, inner sep=1pt, font=\scriptsize},
+    node distance=1.1cm and 1.9cm,
+    stage/.style={rectangle, draw, fill=blue!20, text width=2.4cm, text centered, minimum height=0.8cm, font=\scriptsize},
+    decision/.style={diamond, draw, fill=yellow!20, aspect=2.5, text width=2.5cm, text centered, inner sep=2pt, font=\scriptsize},
+    phase/.style={rectangle, draw, fill=green!20, text width=2.4cm, text centered, minimum height=0.8cm, font=\scriptsize},
     arrow/.style={-Stealth, thick}
 ]
 
 % Nodos principales
 \node[stage] (input) {Archivo\\HF};
 \node[decision, right=of input] (cond) {$\Delta t_{\mathrm{ms}} > \alpha\,t_{\mathrm{samp}}$?};
-\node[stage, below right=of cond] (snr) {Propuesta por SNR};
-\node[stage, above right=of cond] (dmmap) {Propuesta DM--tiempo};
-\node[stage, right=3.0cm of snr] (dedisp) {Dedispersión local};
-\node[stage, right=of dedisp] (clf) {Clasificación Binaria};
-\node[stage, right=of clf] (val) {Validación Física};
+\node[phase, below right=of cond] (fase1) {FASE 1:\\Boxcar Matching};
+\node[stage, above right=of cond] (dmmap) {Pipeline\\Clásico};
+\node[decision, right=of fase1] (fase2check) {¿Stokes\\Q, U?};
+\node[phase, below=0.6cm of fase2check] (fase2) {FASE 2:\\Valid. Polar.};
+\node[phase, right=of fase2check] (fase3a) {FASE 3a:\\Clasif. I};
+\node[phase, below=0.6cm of fase3a] (fase3b) {FASE 3b:\\Clasif. L};
+\node[stage, right=of fase3a] (val) {Validación\\Física};
 \node[stage, right=of val] (out) {Artefactos\\Estandarizados};
 
 % Flujo
 \draw[arrow] (input) -- (cond);
-\draw[arrow] (cond) -- node[above] {Sí} (dmmap);
-\draw[arrow] (cond) -- node[below] {No} (snr);
-\draw[arrow] (snr) -- (dedisp);
-\draw[arrow] (dmmap) |- (dedisp);
-\draw[arrow] (dedisp) -- (clf);
-\draw[arrow] (clf) -- (val);
+\draw[arrow] (cond) -- node[above, font=\tiny] {Sí} (dmmap);
+\draw[arrow] (cond) -- node[below, font=\tiny] {No} (fase1);
+\draw[arrow] (fase1) -- (fase2check);
+\draw[arrow] (fase2check) -- node[left, font=\tiny] {Sí} (fase2);
+\draw[arrow] (fase2check) -- node[above, font=\tiny] {No} (fase3a);
+\draw[arrow] (fase2) -- (fase3a);
+\draw[arrow] (fase3a) -- node[left, font=\tiny] {Si Q,U} (fase3b);
+\draw[arrow] (fase3a) -- (val);
+\draw[arrow] (fase3b) -- (val);
+\draw[arrow] (dmmap) |- (val);
 \draw[arrow] (val) -- (out);
 
 \end{tikzpicture}}
-\caption[Rama SNR en el workflow HF]{Rama SNR-threshold para alta frecuencia integrada en el workflow de DRAFTS++: la condición física activa la propuesta por SNR cuando el \textit{bow–tie} no es resoluble; el flujo vuelve a la ruta estándar para dedispersión local, clasificación y validación.}
+\caption[Pipeline HF Multi-Fase]{Pipeline HF multi-fase integrado en DRAFTS++: activación condicional según criterio físico $\Delta t_{\mathrm{ms}} \le \alpha\,t_{\mathrm{samp}}$. La rama HF implementa 4 fases (matched filtering boxcar, validación polarimétrica opcional, clasificación dual ResNet18 en I y L) antes de regresar a validación física unificada. Los módulos polariméticos (Fases 2 y 3b) son conmutables según disponibilidad de productos Stokes.}
 \label{fig:hf-snr-branch}
 \end{figure}
 
-\subsubsection{Línea 3: Representaciones 2D Alternativas (Propuesta No Implementada)}
+\vspace{0.5cm}
 
-\textit{Nota: Esta línea fue propuesta conceptualmente pero NO implementada ni validada en esta memoria. Constituye trabajo futuro de nivel posgrado.}
-
-\medskip
-
-En frecuencias milimétricas donde la firma ``bow-tie'' se comprime, se proponen representaciones 2D alternativas que generen patrones discriminativos artificiales:
-
-\paragraph{Propuestas de Representaciones}
-
-\textbf{Espectrograma Polarimétrico (Stokes IQUV):} Imagen multicanal (I, Q, U, V) explotando polarización extrema de FRBs ($>50\%$) versus RFI no polarizada. FRBs generan trazas coherentes en canales I/Q/U, mientras RFI aparece solo en I.
-
-\textbf{Mapa Tiempo-Ancho:} Respuesta SNR a diferentes ventanas de integración. Pulsos astrofísicos producen patrón ``triángulo invertido'' (máxima SNR en $w \approx \tau_{\text{pulso}}$), distintivo de RFI breve o extendida.
-
-\textbf{Mapa Tiempo-RM:} Explora espacio de rotación Faraday. FRBs con RM elevada producen franjas verticales; RFI aparece cerca de RM=0.
-
-\textbf{Coherencia Espectral:} Autocorrelación por frecuencia. FRBs broadband persisten a lags grandes; RFI narrowband decae abruptamente.
-
-\textbf{Bow-tie Artificial:} Combinación multi-representación mediante concatenación $\mathbf{I}_{\mathrm{combined}} = \mathrm{concat}[\mathbf{I}_{\mathrm{width}}, \mathbf{I}_{\mathrm{RM}}, \mathbf{I}_{\mathrm{coherence}}]$, generando firma multidimensional equivalente al bow-tie clásico.
-
-
-\subsubsection{Línea 4: Estrategias Avanzadas de Zhang (Propuesta No Implementada)}
-
-\textit{Nota: Esta línea fue propuesta conceptualmente pero NO implementada ni validada en esta memoria. Constituye trabajo futuro de nivel posgrado.}
-
-\medskip
-
-Se proponen dos estrategias que preservan la filosofía DM-centrada adaptándose a compresión dispersiva:
-
-\paragraph{Estrategias Propuestas}
-
-\textbf{Estrategia 1 - Expansión de Rejilla DM:} Forzar apertura morfológica del bow-tie mediante rangos DM ampliados ($\gamma > 1$) y pasos más gruesos, permitiendo que modelos entrenados en bow-ties desarrollados recuperen sensibilidad en regímenes comprimidos. Requiere módulo de cálculo dinámico de parámetros $\gamma$ y $d_{\min}$ según frecuencia central, ancho de banda y resolución temporal.
-
-\textbf{Estrategia 2 - Fishing a DM$\approx$0:} Detección primaria permisiva en DM mínimo seguida de validación física rigurosa: (i) ajuste de DM por maximización SNR en sub-bandas ($\mathrm{DM}_{\mathrm{best-fit}} = \arg\max_{\mathrm{DM}} \sum_{f} \mathrm{SNR}_f(\mathrm{DM})$), (ii) verificación de coherencia entre sub-bandas ($\mathrm{Consistency} > \alpha_{\mathrm{consistency}}$), y (iii) consistencia temporal cross-chunk. Requiere validador DM-aware multi-criterio integrado.
-
-\subsection{DRAFTS++: Síntesis Final del Sistema Unificado}
-
-Esta sección presenta DRAFTS++\footnote{\href{https://github.com/Kodamonkey/DRAFTS-UC}{Repositorio de DRAFTS++ en GitHub}}, sistema operativo que integra las mejoras de ingeniería del Bloque 1 con las estrategias de detección del Bloque 2, habilitando procesamiento multi-banda end-to-end sin modificar los modelos de deep learning pre-entrenados.
-
-\subsubsection{Transformación Arquitectónica y Operativa}
-
-La Tabla~\ref{tab:drafts-comparison} sintetiza las diferencias entre el prototipo DRAFTS y el sistema productivo DRAFTS++. \textbf{Nota crítica: Ambos utilizan los mismos modelos pre-entrenados (CenterNet y ResNet18); la contribución de esta tesis es exclusivamente ingeniería de software y arquitectura del pipeline.}
-
-\begin{table}[H]
-\centering
-\scriptsize
-\caption{Comparación arquitectónica y operativa entre DRAFTS y DRAFTS++}
-\label{tab:drafts-comparison}
-\begin{tabular}{|l|l|l|}
-\hline
-\textbf{Característica} & \textbf{DRAFTS (original)} & \textbf{DRAFTS++} \\
-\hline
-\multicolumn{3}{|c|}{\textbf{ARQUITECTURA DE SOFTWARE (Contribución de esta tesis)}} \\
-\hline
-Arquitectura & Scripts desacoplados & Pipeline modular E2E \\
-\hline
-Gestión de memoria & Carga completa (límite 30 GB) & Streaming dinámico (ilimitado) \\
-\hline
-Ingesta de datos & Manual, PSRFITS únicamente & Automática, multi-formato \\
-\hline
-Configuración & Valores codificados fijos & Extracción automática de headers \\
-\hline
-Decimación & Factores fijos & Adaptativa según instrumento \\
-\hline
-Continuidad temporal & Sin garantías & Contigüidad quirúrgica verificada \\
-\hline
-Orquestación de modelos & Etapas separadas, manual & Workflow integrado automatizado \\
-\hline
-Validación física & Ausente o mínima & SNR, DM, timestamps, coherencia \\
-\hline
-Observabilidad & Logging básico & Logging estructurado + métricas \\
-\hline
-Salidas & Informales & Artefactos estandarizados \\
-\hline
-Reproducibilidad & Limitada & Completa (semillas, versionado) \\
-\hline
-Eficiencia (obs. 2h FAST) & $\sim$45 min & $\sim$25 min (44\% más rápido) \\
-\hline
-\multicolumn{3}{|c|}{\textbf{MODELOS DE DEEP LEARNING (Utilizados de DRAFTS, no desarrollados)}} \\
-\hline
-Detector de objetos & CenterNet pre-entrenado & CenterNet pre-entrenado (mismo) \\
-\hline
-Clasificador binario & ResNet18 pre-entrenado & ResNet18 pre-entrenado (mismo) \\
-\hline
-\multicolumn{3}{|c|}{\textbf{CAPACIDADES EXTENDIDAS (Contribución de esta tesis)}} \\
-\hline
-Bandas de frecuencia & 0.3--1.5 GHz (L-band) & 0.3--100 GHz (L-band + mm) \\
-\hline
-Estrategias HF & No implementadas & SNR-threshold + validación DM \\
-\hline
-\end{tabular}
-\end{table}
-
-\subsubsection{Arquitectura Unificada: Principios y Flujo Operativo}
-
-DRAFTS++ se fundamenta en tres principios arquitectónicos: \textbf{(1) Modularidad Estratégica} mediante patrón Strategy para intercambiar algoritmos según régimen observacional, \textbf{(2) Validación Física Unificada} mediante validador común aplicando criterios consistentes (DM válido, SNR umbral, coherencia temporal), y \textbf{(3) Visualización Desacoplada} generando artefactos estándar (CSV, plots, métricas).
-
-El flujo operativo implementa selección automática de estrategia según criterio físico de resolubilidad dispersiva: cuando $\Delta t_{\mathrm{ms}} > \alpha t_{\mathrm{samp}}$, utiliza DM-Time/CenterNet (bow-tie resoluble); cuando $\Delta t_{\mathrm{ms}} \leq \alpha t_{\mathrm{samp}}$, activa SNR-threshold (implementado y validado en esta memoria). El diseño permite incorporar estrategias adicionales (Líneas 3-4 propuestas) mediante extensión del patrón Strategy sin modificar infraestructura base.
-
-La Figura~\ref{fig:pipeline-end-to-end} ilustra el flujo completo: inicialización $\to$ selección de estrategia $\to$ procesamiento streaming por chunks $\to$ propuesta de candidatos (DM-Time/CenterNet o SNR-threshold según régimen) $\to$ clasificación ResNet18 $\to$ validación física $\to$ artefactos estandarizados.
-
-\begin{figure}[H]
-\centering
-\resizebox{0.5\textwidth}{!}{%
-\begin{tikzpicture}[
-    node distance=1.0cm and 1.5cm,
-    box/.style={rectangle, draw, fill=blue!20, text width=2.0cm, text centered, minimum height=0.6cm, font=\tiny},
-    decision/.style={diamond, draw, fill=yellow!20, text width=1.6cm, text centered, minimum height=0.6cm, font=\tiny},
-    process/.style={rectangle, draw, fill=green!20, text width=2.0cm, text centered, minimum height=0.6cm, font=\tiny},
-    output/.style={rectangle, draw, fill=orange!20, text width=2.0cm, text centered, minimum height=0.6cm, font=\tiny},
-    arrow/.style={-Stealth, thick}
-]
-
-% FLUJO SIMPLIFICADO
-\node[box] (A) {main.py};
-\node[box, below=of A] (B) {run\_pipeline};
-\node[box, below=of B] (C) {Cargar Modelos};
-
-% ENTRADA DE DATOS
-\node[box, right=of B] (D) {find\_data\_files};
-\node[decision, below=of D] (E) {Tipo Archivo?};
-\node[box, below left=of E] (F) {fits\_handler};
-\node[box, below right=of E] (G) {filterbank\_handler};
-
-% PROCESAMIENTO
-\node[box, below=of E] (H) {streaming\_orchestrator};
-\node[box, below=of H] (I) {Procesar Chunk};
-\node[decision, below=of I] (J) {Frecuencia $\geq$ 8GHz?};
-
-% PIPELINES
-\node[box, below left=of J] (K) {Pipeline Alta Frecuencia};
-\node[box, below right=of J] (L) {Pipeline Clásico};
-
-% DETECCIÓN
-\node[decision, below=of K] (M) {representaciones 2D alternativas simulan el bow tie?};
-\node[box, below left=of M] (N) {Mapa característico alternativo + CenterNet};
-\node[box, below right=of M] (O) {SNR Tradicional};
-\node[process, below=of L] (P) {CenterNet DM-Time};
-
-% CLASIFICACIÓN
-\node[process, below=of N] (Q) {classify\_patch};
-\node[process, below=of O] (R) {classify\_patch};
-\node[process, below=of P] (S) {classify\_patch};
-
-% RESULTADOS
-\node[output, below=of Q] (T) {Guardar Candidatos};
-\node[output, below=of R] (U) {Guardar Candidatos};
-\node[output, below=of S] (V) {Guardar Candidatos};
-
-% VISUALIZACIÓN
-\node[output, below=of T] (W) {Plots + CSV};
-\node[output, below=of U] (X) {Plots + CSV};
-\node[output, below=of V] (Y) {Plots + CSV};
-
-% Conexiones principales
-\draw[arrow] (A) -- (B);
-\draw[arrow] (B) -- (C);
-\draw[arrow] (B) -- (D);
-\draw[arrow] (D) -- (E);
-\draw[arrow] (E) -- node[left] {FITS} (F);
-\draw[arrow] (E) -- node[right] {Filterbank} (G);
-\draw[arrow] (F) -- (H);
-\draw[arrow] (G) -- (H);
-\draw[arrow] (H) -- (I);
-\draw[arrow] (I) -- (J);
-\draw[arrow] (J) -- node[left] {Sí} (K);
-\draw[arrow] (J) -- node[right] {No} (L);
-
-% Detección
-\draw[arrow] (K) -- (M);
-\draw[arrow] (M) -- node[left] {Sí} (N);
-\draw[arrow] (M) -- node[right] {No} (O);
-\draw[arrow] (L) -- (P);
-
-% Clasificación
-\draw[arrow] (N) -- (Q);
-\draw[arrow] (O) -- (R);
-\draw[arrow] (P) -- (S);
-
-% Resultados
-\draw[arrow] (Q) -- (T);
-\draw[arrow] (R) -- (U);
-\draw[arrow] (S) -- (V);
-
-% Visualización
-\draw[arrow] (T) -- (W);
-\draw[arrow] (U) -- (X);
-\draw[arrow] (V) -- (Y);
-
-\end{tikzpicture}}
-\caption[Diagrama end-to-end DRAFTS++]{Diagrama end-to-end de DRAFTS++: Integración de Bloques 1 y 2, mostrando flujo desde inicialización hasta artefactos finales. La selección de estrategias en el diagrama incluye las 4 líneas exploratorias del Componente 2, aunque solo Líneas 1-2 están implementadas en esta memoria (Líneas 3-4 son extensiones arquitectónicas para trabajo futuro). \textit{Fuente: Elaboración propia}.}
-\label{fig:pipeline-end-to-end}
-\end{figure}
-
-\medskip
-
-\textit{Nota: Los diagramas detallados de flujo para Líneas 3 y 4 se omiten dado que estas líneas no fueron implementadas en esta memoria. Su diseño arquitectónico completo se desarrollará como parte del trabajo futuro de posgrado.}
+% \noindent\textit{Nota: Durante el diseño del Componente 2 se propusieron cuatro líneas metodológicas complementarias. Las Líneas 3 y 4 (Representaciones 2D Alternativas y Estrategias Avanzadas de Zhang) fueron propuestas conceptualmente pero no implementadas debido a restricciones de tiempo y alcance. Su descripción detallada se presenta en la sección Trabajo Futuro del capítulo de Conclusiones.}
