@@ -1,71 +1,99 @@
-% \secnumberlesssection{GLOSARIO}
+\secnumberlesssection{GLOSARIO}
 
-% {\setlength{\parskip}{0cm} % Evita saltos extra entre elementos.
+\small % Tamaño de fuente más pequeño
 
-% ALMA: \textit{Atacama Large Millimeter/submillimeter Array}. Interferómetro de 66 antenas operando en 0.32–3.6\,mm; en modo \textit{phased} suma coherentemente su área efectiva para funcionar como un “plato” único de gran diámetro. \citep{veracasanova2025}
+\textit{Nota sobre Terminología:} En esta tesis, \textbf{pipeline} se refiere a la arquitectura de software completa DRAFTS++; \textbf{flujo de trabajo} (o \textit{workflow}) denota la secuencia de etapas de procesamiento; \textbf{sistema} es sinónimo de pipeline cuando se refiere a DRAFTS++; \textbf{arquitectura} se refiere a la estructura y organización del pipeline; \textbf{componente} se refiere a las dos partes principales de esta tesis (Componente 1: ingeniería de software; Componente 2: extensión a alta frecuencia).
 
-% AMBER: \textit{A Modular GPU-Based Real-time} pipeline para búsqueda de pulsos individuales y transientes rápidos. \citep{Sclocco_2020_AMBER}
+\vspace{0.2cm}
 
-% APS: \textit{ALMA Phased Sum} (ALMA en modo \textit{phased}). Suma coherente de señales que permite \textit{baseband} y VLBI.
+\setlength{\itemsep}{0.05cm}
+\setlength{\parsep}{0.05cm}
+\setlength{\topsep}{0.1cm}
+\setlength{\partopsep}{0pt}
+\setlength{\leftmargin}{0.8cm}
 
-% Baseband: Voltajes complejos sin detectar (\textit{raw complex voltages}) alrededor del evento, útiles para reprocesado fino y localización interferométrica.
+\begin{enumerate}
+    \item \textbf{ALMA:} \textit{Atacama Large Millimeter/submillimeter Array}. Interferómetro de 66 antenas operando en 0.32--3.6\,mm; en modo \textit{phased} suma coherentemente su área efectiva para funcionar como un ``plato'' único de gran diámetro. \citep{veracasanova2025}
+    
+    \item \textbf{AMBER:} \textit{A Modular GPU-Based Real-time} pipeline para búsqueda de pulsos individuales y transientes rápidos.
+    
+    \item \textbf{APS:} \textit{ALMA Phased Sum} (ALMA en modo \textit{phased}). Suma coherente de señales que permite \textit{baseband} y VLBI.
+    
+    \item \textbf{Baseband:} Voltajes complejos sin detectar (\textit{raw complex voltages}) alrededor del evento, útiles para reprocesado fino y localización interferométrica.
+    
+    \item \textbf{Boxcar:} Filtro promediador rectangular usado en \textit{matched filtering} para cubrir anchos de pulso diversos. \citep{Rajwade_2024_Review}
+    
+    \item \textbf{CenterNet:} Detector de objetos que representa objetos como centros (picos) en mapas de calor; usado en DRAFTS para detectar la firma en el plano tiempo--DM. \citep{Zhou2019}
+    
+    \item \textbf{CHIME/FRB:} Backend de FRBs del radiotelescopio CHIME; produce catálogos uniformes y, con \textit{Outriggers}, localizaciones precisas. \citep{CHIME2021}
+    
+    \item \textbf{CNN:} \textit{Convolutional Neural Network}. Arquitecturas profundas para clasificación de candidatos FRB vs.\ RFI. \citep{Agarwal2020}
+    
+    \item \textbf{DADA / PSRDADA:} \textit{Distributed Acquisition and Data Analysis}. Formato y \textit{ring buffers} en memoria compartida para adquisición/flujo de datos en tiempo real.
+    
+    \item \textbf{DD:} \textit{Dedispersión}. Corrección del retardo por plasma ($\propto \nu^{-2}$) para concentrar la señal al DM óptimo; puede ser incoherente (tiempo) o en dominio de Fourier. \citep{Rajwade_2024_Review}
+    
+    \item \textbf{DM:} \textit{Dispersion Measure} (Medida de Dispersión). Integral de la densidad de electrones libres a lo largo de la línea de visión hasta la fuente, expresada en pc\,cm$^{-3}$. La DM determina el retardo temporal entre frecuencias según $\Delta t \propto \text{DM} \cdot \nu^{-2}$, siendo el indicador clave para distinguir FRBs de RFI en frecuencias centimétricas. \citep{LorimerKramer2004}
+    
+    \item \textbf{DRAFTS:} \textit{Deep learning-based Radio Fast Transient Search}. Pipeline que integra dedispersión acelerada, detección (CenterNet) y clasificación (ResNet) en un flujo unificado. \citep{zhang2024drafts}
+    
+    \item \textbf{DRAFTS++:} Extensión modular de DRAFTS propuesta en esta memoria: I/O estandarizado, dedispersión acelerada, \textit{chunking}, clasificación y rutas especializadas mm, con \textit{logging} y \textit{alerting}.
+    
+    \item \textbf{E2E:} \textit{End-to-End} (Extremo a Extremo). Característica de un pipeline que procesa datos desde la ingesta hasta la generación de artefactos finales sin intervención manual entre etapas. DRAFTS++ implementa un flujo E2E automatizado que integra todas las etapas de procesamiento en un único sistema operativo.
+    
+    \item \textbf{EVN:} \textit{European VLBI Network}. Red VLBI para localización de alta precisión en radio.
+    
+    \item \textbf{FAST:} \textit{Five-hundred-meter Aperture Spherical Telescope}. Radiotelescopio de plato único más grande del mundo, ubicado en China, utilizado para búsquedas de FRBs y estudios de pulsares.
+    
+    \item \textbf{FAST-FREX:} Dataset de entrenamiento del pipeline DRAFTS original, adquirido con el radiotelescopio FAST. Incluye observaciones en banda L con frecuencia central de aproximadamente 1.25 GHz y resolución temporal milisegundo, utilizadas para validación funcional del flujo E2E.
+    
+    \item \textbf{FDMT:} \textit{Fast Dispersion Measure Transform}. Algoritmo óptimo en sensibilidad con menor complejidad que \textit{brute force} para dedispersión incoherente. \citep{ZackayOfek2017}
+    
+    \item \textbf{FDD:} \textit{Fourier-Domain Dedispersion}. Implementa los retardos como rotaciones de fase en el dominio de Fourier; computacionalmente afín a GPU cuando se requieren muchos DMs.
+    
+    \item \textbf{FETCH:} Clasificador automatizado basado en \textit{transfer learning} (CNNs) para candidatos de FRB y RFI. \citep{Agarwal2020}
+    
+    \item \textbf{FITS / PSRFITS:} Formato estándar astronómico; PSRFITS es el perfil para pulsar/transientes adoptado por \textsc{PSRCHIVE}.
+    
+    \item \textbf{FRB:} \textit{Fast Radio Burst}. Ráfaga de radio de duración milisegundos, altamente dispersa y de origen extragaláctico. \citep{Petroff_2022,Zhang2020}
+    
+    \item \textbf{Heimdall:} Software de búsqueda de pulsos individuales acelerado en GPU; admite \texttt{SIGPROC filterbank} y \texttt{PSRDADA}. \citep{Heimdall_Barsdell}
+    
+    \item \textbf{HF:} \textit{High Frequency} (Alta Frecuencia). Régimen milimétrico (30--100 GHz) donde la firma dispersiva tradicional se comprime hasta volverse imperceptible, requiriendo estrategias de detección adaptativas. En esta tesis, HF se refiere específicamente al régimen de alta frecuencia donde DRAFTS++ implementa estrategias especializadas de detección.
+    
+    \item \textbf{IQRM:} \textit{Inter-Quartile Range Mitigation}. Enmascaramiento adaptativo de RFI por detección robusta de \textit{outliers} en bloques cortos; apto para \textit{streaming}.
+    
+    \item \textbf{Matched Filtering:} Correlación con una familia de plantillas (p.ej., \textit{boxcars}) y \textit{downsampling} multi-escala para maximizar S/N en distintos anchos. \citep{Rajwade_2024_Review}
+    
+    \item \textbf{Outriggers (CHIME/FRB):} Estaciones remotas que permiten localizaciones $\sim$mas--decenas de mas mediante VLBI sin depender de redes tradicionales.
+    
+    \item \textbf{PRESTO:} \textit{PulsaR Exploration and Search TOolkit}. Conjunto de herramientas para búsqueda de pulsos periódicos/simples y diagnóstico. \citep{2011ascl.soft07017R}
+    
+    \item \textbf{PSRCHIVE:} Conjunto de bibliotecas y aplicaciones para análisis de datos de pulsar/transientes; base de PSRFITS y estándares de polarización/Stokes.
+    
+    \item \textbf{ResNet:} \textit{Residual Network}. CNN profunda (bloques residuales) usada como columna vertebral de clasificación en DRAFTS. En esta tesis se utiliza ResNet18, una variante con 18 capas. \citep{he2016deep}
+    
+    \item \textbf{RFI:} \textit{Radio Frequency Interference}. Contaminación por señales de origen humano/natural que degrada sensibilidad y genera falsos positivos.
+    
+    \item \textbf{RM:} \textit{Rotation Measure}. Medida de rotación de Faraday (rad\,m$^{-2}$) que integra densidad electrónica y campo magnético a lo largo de la línea de visión. \citep{Petroff_2022}
+    
+    \item \textbf{S/N (SNR):} \textit{Signal-to-Noise Ratio} (Relación señal-ruido). Métrica para umbralado de detección y ranking de candidatos. Se calcula como la relación entre la amplitud de la señal y el nivel de ruido de fondo.
+    
+    \item \textbf{SIGPROC filterbank:} Formato de serie tiempo--frecuencia muy usado en búsquedas de pulsos únicos; ampliamente soportado por herramientas de búsqueda. \citep{Heimdall_Barsdell}
+    
+    \item \textbf{SK:} \textit{Spectral Kurtosis}. Estadístico de no-gaussianidad para detección/mitigación de RFI sin degradar la señal astrofísica.
+    
+    \item \textbf{VOEvent:} Estándar IVOA para describir y distribuir alertas de eventos transitorios (contenido, transporte y red de distribución). \citep{CHIMEFRBVOEvent2021}
+    
+    \item \textbf{VLBI:} \textit{Very Long Baseline Interferometry}. Interferometría con líneas de base continentales que permite localizaciones de sub-arco-segundo a milisegundos de arco.
+    
+    \item \textbf{Zero-DM filter:} Sustracción del promedio por canal en la dinámica no dedispersada para atenuar RFI de banda ancha; debe aplicarse con cautela para no suprimir señales de DM baja o muy anchas. \citep{Rajwade_2024_Review}
+\end{enumerate}
 
-% Boxcar: Filtro promediador rectangular usado en \textit{matched filtering} para cubrir anchos de pulso diversos. \citep{Rajwade_2024_Review}
+\setlength{\itemsep}{0.3em}
+\setlength{\parsep}{0pt}
+\setlength{\topsep}{0.5em}
+\setlength{\partopsep}{0pt}
+\setlength{\leftmargin}{2.5em}
 
-% CenterNet: Detector de objetos que representa objetos como centros (picos) en mapas de calor; usado en DRAFTS para detectar la firma en el plano tiempo–DM. \citep{Zhou_2019_CenterNet}
-
-% CHIME/FRB: Backend de FRBs del radiotelescopio CHIME; produce catálogos uniformes y, con \textit{Outriggers}, localizaciones precisas. \citep{CHIMEFRB_2021_Catalog1,CHIME_Outriggers_Overview}
-
-% CNN: \textit{Convolutional Neural Network}. Arquitecturas profundas para clasificación de candidatos FRB vs.\ RFI. \citep{Agarwal_2020}
-
-% DADA / PSRDADA: \textit{Distributed Acquisition and Data Analysis}. Formato y \textit{ring buffers} en memoria compartida para adquisición/flujo de datos en tiempo real. \citep{PSRDADA_ascl,DSPSR_DADA_Header}
-
-% DD: \textit{Dedispersión}. Corrección del retardo por plasma ($\propto \nu^{-2}$) para concentrar la señal al DM óptimo; puede ser incoherente (tiempo) o en dominio de Fourier. \citep{Rajwade_2024_Review}
-
-% DRAFTS: \textit{Deep learning-based Radio Fast Transient Search}. Pipeline que integra dedispersión acelerada, detección (CenterNet) y clasificación (ResNet) en un flujo unificado. \citep{zhang2024drafts}
-
-% DRAFTS++: Extensión modular de DRAFTS propuesta en esta memoria: I/O estandarizado, dedispersión acelerada, \textit{chunking}, clasificación y rutas especializadas mm, con \textit{logging} y \textit{alerting}.
-
-% EVN: \textit{European VLBI Network}. Red VLBI para localización de alta precisión en radio.
-
-% FDMT: \textit{Fast Dispersion Measure Transform}. Algoritmo óptimo en sensibilidad con menor complejidad que \textit{brute force} para dedispersión incoherente. \citep{Zackay_2014_FDMT}
-
-% FDD: \textit{Fourier-Domain Dedispersion}. Implementa los retardos como rotaciones de fase en el dominio de Fourier; computacionalmente afín a GPU cuando se requieren muchos DMs. \citep{Bassa_2021_FDD}
-
-% FETCH: Clasificador automatizado basado en \textit{transfer learning} (CNNs) para candidatos de FRB y RFI. \citep{Agarwal_2020}
-
-% FITS / PSRFITS: Formato estándar astronómico; PSRFITS es el perfil para pulsar/transientes adoptado por \textsc{PSRCHIVE}. \citep{Hotan_2004_PSRFITS}
-
-% FRB: \textit{Fast Radio Burst}. Ráfaga de radio de duración milisegundos, altamente dispersa y de origen extragaláctico. \citep{Petroff_2022,Zhang_2020}
-
-% Heimdall: Software de búsqueda de pulsos individuales acelerado en GPU; admite \texttt{SIGPROC filterbank} y \texttt{PSRDADA}. \citep{Heimdall_Use}
-
-% IQRM: \textit{Inter-Quartile Range Mitigation}. Enmascaramiento adaptativo de RFI por detección robusta de \textit{outliers} en bloques cortos; apto para \textit{streaming}. \citep{Morello_2021_IQRM}
-
-% Matched Filtering: Correlación con una familia de plantillas (p.ej., \textit{boxcars}) y \textit{downsampling} multi-escala para maximizar S/N en distintos anchos. \citep{Rajwade_2024_Review}
-
-% Outriggers (CHIME/FRB): Estaciones remotas que permiten localizaciones $\sim$mas–decenas de mas mediante VLBI sin depender de redes tradicionales. \citep{Lanman_2024_Outrigger,CHIME_Outriggers_Overview}
-
-% PRESTO: \textit{PulsaR Exploration and Search TOolkit}. Conjunto de herramientas para búsqueda de pulsos periódicos/simples y diagnóstico. \citep{2011ascl.soft07017R}
-
-% PSRCHIVE: Conjunto de bibliotecas y aplicaciones para análisis de datos de pulsar/transientes; base de PSRFITS y estándares de polarización/Stokes. \citep{Hotan_2004_PSRFITS}
-
-% ResNet: \textit{Residual Network}. CNN profunda (bloques residuales) usada como columna vertebral de clasificación en DRAFTS. \citep{He_2015_ResNet}
-
-% RFI: \textit{Radio Frequency Interference}. Contaminación por señales de origen humano/natural que degrada sensibilidad y genera falsos positivos.
-
-% RM: \textit{Rotation Measure}. Medida de rotación de Faraday (rad\,m$^{-2}$) que integra densidad electrónica y campo magnético a lo largo de la línea de visión. \citep{Petroff_2022}
-
-% S/N (SNR): Relación señal-ruido. Métrica para umbralado de detección y ranking de candidatos.
-
-% SIGPROC filterbank: Formato de serie tiempo–frecuencia muy usado en búsquedas de pulsos únicos; ampliamente soportado por herramientas de búsqueda. \citep{Heimdall_Use}
-
-% SK: \textit{Spectral Kurtosis}. Estadístico de no-gaussianidad para detección/mitigación de RFI sin degradar la señal astrofísica. \citep{Nita_2010_SK}
-
-% VOEvent: Estándar IVOA para describir y distribuir alertas de eventos transitorios (contenido, transporte y red de distribución). \citep{VOEvent_2_0,VOEvent_Transport}
-
-% VLBI: \textit{Very Long Baseline Interferometry}. Interferometría con líneas de base continentales que permite localizaciones de sub-arco-segundo a milisegundos de arco.
-
-% Zero-DM filter: Sustracción del promedio por canal en la dinámica no dedispersada para atenuar RFI de banda ancha; debe aplicarse con cautela para no suprimir señales de DM baja o muy anchas. \citep{Rajwade_2024_Review}
-
-% }
+\normalsize % Restaurar tamaño de fuente normal

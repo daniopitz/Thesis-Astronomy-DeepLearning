@@ -1,0 +1,104 @@
+\secnumbersection{CONCLUSIONES}
+
+\textit{DRAFTS++ demuestra que la ingeniería informada por física transforma un prototipo de detección de FRBs en un sistema operacional end-to-end que, además de procesar a escala con robustez, produce descubrimiento científico verificable.}
+
+\subsection{Síntesis frente a Objetivos}
+
+Esta tesis ha demostrado que la detección de transitorios en el régimen milimétrico requiere un enfoque híbrido, físico-informado que combina técnicas clásicas de detección de señales (matched filtering) con clasificación mediante deep learning en dominios físicos ortogonales (intensidad y polarización lineal). La metodología propuesta (Línea 2b, modo HF-PoL) permitió el descubrimiento de \textbf{46 nuevos eventos astronómicos confirmados independientemente}: 2 nuevos bursts del FRB repetidor 121102 y 44 nuevos pulsos del magnetar PSR J1745-2900 en el Centro Galáctico, ampliando genuinamente el conocimiento astronómico en lugar de simplemente replicar análisis previos. Estos descubrimientos, combinados con 116 candidatos prometedores adicionales, demuestran que el sistema no solo cumple objetivos técnicos, sino que produce ciencia verificable.
+
+El sistema cumple los objetivos establecidos mediante dos contribuciones complementarias. Primero, la \textbf{extensión metodológica al régimen milimétrico (Componente 2)} mediante estrategia híbrida que combina matched filtering temporal con clasificación dual CNN en intensidad y polarización lineal, logrando Recall 100\% en detección de pulsos conocidos y descubriendo 44 pulsos nuevos confirmados del magnetar PSR J1745-2900, sin reentrenamiento de modelos. Segundo, la \textbf{infraestructura de software robusta (Componente 1)} que opera E2E sin intervención y procesa archivos multi-gigabyte con recuperación íntegra de eventos (Recall 100\% en FRB 121102 del telescopio Effelsberg), validando robustez temporal en fuentes periódicas (732/752 pulsos en B0355+54, 97.3\%). Esta infraestructura constituye el habilitador técnico esencial que permitió materializar las estrategias metodológicas en un sistema operativo reproducible, pero el valor científico fundamental radica en los descubrimientos metodológicos y astronómicos, no en la infraestructura per se.
+
+\subsection{Significado e Impacto}
+
+\textbf{La contribución metodológica de mayor impacto científico} de esta tesis es el descubrimiento sobre transfer learning en radioastronomía: \textbf{los modelos CNN (ResNet18) entrenados en morfologías de baja frecuencia no generalizan bien a la intensidad (Stokes I) en alta frecuencia, pero sí generalizan exitosamente a la morfología de la polarización lineal (Stokes L)}. Esta demostración empírica se establece mediante la comparación directa entre Línea 2a (matched filtering + clasificación solo en I) y Línea 2b (clasificación dual I+L). La Línea 2a logró Recall 100\% pero Precision 37.3\%, revelando que el transfer learning falla en intensidad cuando se opera en régimen milimétrico. En contraste, la Línea 2b (clasificación dual I+L) redujo falsos positivos en 94.1\% (102 $\rightarrow$ 6 candidatos) alcanzando Precision $\sim$100\%, demostrando que el mismo modelo ResNet18 pre-entrenado que no logra especificidad en Stokes I sí la logra en Stokes L. Este hallazgo valida que los pulsos astrofísicos genuinos exhiben coherencia morfológica entre polarizaciones mientras que RFI muestra discrepancia, y demuestra que explotar propiedades físicas conocidas (polarización extrema de FRBs) mediante clasificación morfológica CNN en un dominio ortogonal permite superar las limitaciones del transfer learning en el dominio original (intensidad), sin requerir reentrenamiento.
+
+El diseño y validación del pipeline híbrido HF-PoL constituye la segunda contribución metodológica principal. Se demuestra que la combinación de matched filtering clásico (para sensibilidad) con clasificación CNN dual (para especificidad) es un método efectivo para detección en régimen milimétrico, alcanzando $\sim$100\% de precisión en datos de ALMA. Científicamente, esta metodología permitió ampliar significativamente el censo de transientes milimétricos: \textbf{2 nuevos bursts del FRB repetidor 121102} (confirmados independientemente por astrónomos colaboradores) y \textbf{44 nuevos pulsos del magnetar PSR J1745-2900} (5.5 veces el censo conocido previamente), estableciendo un baseline cuantificado para transferencia a alta frecuencia. Estos descubrimientos no son meros artefactos del procesamiento, sino eventos astronómicos genuinos que amplían nuestro conocimiento sobre la emisión de alta frecuencia de objetos compactos, validando que el sistema produce ciencia verificable y reproducible.
+
+Operacionalmente, la implementación del pipeline de software DRAFTS++ de grado productivo (Componente 1) constituye el habilitador técnico necesario para materializar estas estrategias metodológicas en un sistema operativo robusto y reproducible. La ingeniería rigurosa (modularidad, gestión de memoria, trazabilidad completa) permite procesar archivos multi-gigabyte mediante streaming con contigüidad temporal quirúrgica verificada (97.3\% de recuperación de pulsos), transformando un prototipo de investigación en infraestructura científica reutilizable para re-análisis a escala y campañas near-real-time. Sin embargo, el valor científico fundamental radica en el descubrimiento metodológico sobre transfer learning, no en la infraestructura per se.
+
+\subsection{Calidad del Software y Reproducibilidad}
+
+Evaluamos con ISO/IEC 25010 (2011, actualizado 2023): rendimiento, confiabilidad (0 pérdidas en bordes), mantenibilidad modular y portabilidad multi-instrumento; artefactos FAIR disponibles en \url{https://github.com/Kodamonkey/DRAFTS-UC} y orientados a ACM Artifact Badging.
+
+\subsection{Limitaciones y Próximos Pasos}
+
+\begin{itemize}
+    \item \textbf{Limitación principal: Dependencia del clasificador ResNet18 entrenado en baja frecuencia.} El recall del 62.5\% obtenido por Línea 2b en el ground truth canónico refleja limitaciones del transfer learning: el modelo ResNet18 pre-entrenado en waterfalls de Stokes I (baja frecuencia, dispersos) puede tener dificultades al generalizar a patches de Stokes L (alta frecuencia, no dispersos). Un reentrenamiento específico del clasificador utilizando el pequeño dataset de alta frecuencia disponible (52 eventos confirmados: 8 del ground truth + 44 nuevos descubrimientos) podría mejorar significativamente el recall sin comprometer la especificidad, permitiendo recuperar los 3 pulsos rechazados que exhiben características atípicas en polarización.
+    
+    \item \textbf{Validación de los 3 pulsos rechazados del ground truth.} Los 3 pulsos del ground truth canónico rechazados por Línea 2b requieren validación experta independiente para determinar si corresponden a: (i) RFI erróneamente catalogado en la literatura original, (ii) pulsos genuinos sin polarización lineal significativa (definiendo una limitación fundamental del método propuesto), o (iii) eventos con datos corruptos o degradación instrumental. Esta validación es crítica para caracterizar completamente las limitaciones del enfoque de clasificación dual I+L.
+    
+    \item \textbf{Generalización multi-instrumento.} La validación actual se limita a ALMA en modo phased array (86 GHz). Extender la validación a otros instrumentos (VLA, MeerKAT, CHIME) en diferentes regímenes frecuenciales permitiría evaluar la robustez del método ante variaciones instrumentales y condiciones observacionales diversas.
+    
+    \item \textbf{Integración tiempo real.} El pipeline actual opera en modo batch. La integración operacional para detección en tiempo real requiere desarrollo de conectores VOEvent para alertas multi-mensajero, optimización de latencia mediante procesamiento incremental, y telemetría en tiempo real para monitoreo de rendimiento.
+\end{itemize}
+
+\subsection{Trabajo Futuro}
+
+El desarrollo de DRAFTS++ estableció una arquitectura sólida y validó empíricamente dos estrategias para detección en alta frecuencia (Líneas 1 y 2), produciendo descubrimientos científicos verificables. Sin embargo, los resultados obtenidos generan preguntas críticas que requieren investigación adicional y constituyen el trabajo futuro más urgente y directamente conectado con los hallazgos de esta tesis.
+
+\subsubsection{Validación de Resultados Ambiguos y Pendientes}
+
+\textbf{Análisis de los 101 candidatos filtrados por Línea 2b.} La Línea 2a generó 101 candidatos prometedores que fueron filtrados por Línea 2b mediante clasificación dual I+L, reduciendo el conjunto a 6 eventos finales de alta confianza. La pregunta crítica es: ¿son todos los 95 candidatos filtrados (101 - 6) falsos positivos (RFI o artefactos), o algunos corresponden a pulsos genuinos con características polarimétricas atípicas? Un análisis sistemático de estos 101 candidatos mediante inspección experta manual, análisis polarimétrico detallado, y validación cruzada con otros métodos de detección permitiría: (i) caracterizar completamente la especificidad del filtro polarimétrico, (ii) identificar posibles pulsos genuinos no polarizados que escapan al método propuesto, y (iii) refinar los umbrales de decisión para optimizar el balance sensibilidad-especificidad. Este análisis es crítico para validar completamente la metodología y determinar si la reducción de 102 a 6 candidatos representa un filtrado perfecto o una pérdida de sensibilidad.
+
+\textbf{Validación de los 3 pulsos rechazados del ground truth.} La Línea 2b rechazó 3 de los 8 pulsos del ground truth canónico (62.5\% recall), mientras que la Línea 2a los había aceptado correctamente (100\% recall). Esta discrepancia genera una pregunta fascinante: ¿estaba el ground truth original equivocado (RFI erróneamente catalogado), o es la Línea 2b demasiado estricta (pulsos genuinos sin polarización lineal significativa)? La validación experta independiente de estos 3 pulsos mediante análisis polarimétrico detallado, inspección de morfología temporal, y verificación de coherencia espectral permitiría: (i) determinar si el ground truth requiere revisión, (ii) caracterizar las limitaciones fundamentales del método propuesto (pulsos no polarizados), o (iii) identificar si los datos presentan degradación instrumental. Este análisis es esencial para comprender completamente las limitaciones del enfoque de clasificación dual I+L y determinar si el recall del 62.5\% representa un fallo del sistema o un funcionamiento correcto bajo criterios estrictos de coherencia física.
+
+\textbf{Validación científica y publicación de descubrimientos.} Los 46 nuevos eventos descubiertos (2 FRBs + 44 pulsos de magnetar) requieren validación científica completa y publicación en revistas especializadas. Para los 2 nuevos bursts de FRB 121102, se requiere: análisis temporal detallado, caracterización de propiedades dispersivas, y comparación con el catálogo conocido del repetidor. Para los 44 nuevos pulsos del magnetar PSR J1745-2900, se requiere: análisis de periodicidad, caracterización de propiedades espectrales y polarimétricas, y comparación con modelos teóricos de emisión de magnetares en alta frecuencia. La publicación de estos descubrimientos no solo validaría científicamente la metodología propuesta, sino que contribuiría significativamente al conocimiento sobre la emisión de alta frecuencia de objetos compactos, estableciendo DRAFTS++ como una herramienta de descubrimiento científico verificable.
+
+\textbf{Refinamiento del clasificador mediante reentrenamiento.} El recall del 62.5\% obtenido por Línea 2b en el ground truth canónico refleja limitaciones del transfer learning: el modelo ResNet18 pre-entrenado en waterfalls de Stokes I (baja frecuencia, dispersos) puede tener dificultades al generalizar a patches de Stokes L (alta frecuencia, no dispersos). Un reentrenamiento específico del clasificador utilizando el dataset de alta frecuencia disponible (52 eventos confirmados: 8 del ground truth + 44 nuevos descubrimientos) podría mejorar significativamente el recall sin comprometer la especificidad, permitiendo recuperar los 3 pulsos rechazados que exhiben características atípicas en polarización. Este refinamiento permitiría optimizar el balance sensibilidad-especificidad y validar si el transfer learning puede mejorarse mediante entrenamiento específico en el régimen de alta frecuencia.
+
+\subsubsection{Líneas Metodológicas Adicionales (Líneas 3 y 4)}
+
+Durante el diseño del Componente 2 se propusieron \textbf{cuatro líneas metodológicas complementarias}, de las cuales \textbf{solo dos fueron implementadas y validadas} en esta memoria debido a restricciones de tiempo y alcance. Las \textbf{Líneas 3 y 4}, descritas arquitectónicamente en el capítulo de propuesta, quedan como \textbf{trabajo futuro adicional de nivel posgrado}:
+
+\paragraph{Línea 3: Representaciones 2D Alternativas}
+
+\textit{Estado: Propuesta conceptual no implementada}
+
+En frecuencias milimétricas donde la firma ``bow-tie'' se comprime, se proponen representaciones 2D alternativas que generen patrones discriminativos artificiales:
+
+\paragraph{Propuestas de Representaciones}
+
+\textbf{Espectrograma Polarimétrico (Stokes IQUV):} Imagen multicanal (I, Q, U, V) explotando polarización extrema de FRBs ($>50\%$) versus RFI no polarizada. FRBs generan trazas coherentes en canales I/Q/U, mientras RFI aparece solo en I.
+
+\textbf{Mapa Tiempo-Ancho:} Respuesta SNR a diferentes ventanas de integración. Pulsos astrofísicos producen patrón ``triángulo invertido'' (máxima SNR en $w \approx \tau_{\text{pulso}}$), distintivo de RFI breve o extendida.
+
+\textbf{Mapa Tiempo-RM:} Explora espacio de rotación Faraday. FRBs con RM elevada producen franjas verticales; RFI aparece cerca de RM=0.
+
+\textbf{Coherencia Espectral:} Autocorrelación por frecuencia. FRBs broadband persisten a lags grandes; RFI narrowband decae abruptamente.
+
+\textbf{Bow-tie Artificial:} Combinación multi-representación mediante concatenación $\mathbf{I}_{\mathrm{combined}} = \mathrm{concat}[\mathbf{I}_{\mathrm{width}}, \mathbf{I}_{\mathrm{RM}}, \mathbf{I}_{\mathrm{coherence}}]$, generando firma multidimensional equivalente al bow-tie clásico.
+
+\subsubsection{Línea 4: Estrategias Avanzadas de Zhang}
+
+\textit{Estado: Propuesta conceptual no implementada}
+
+Se proponen dos estrategias que preservan la filosofía DM-centrada adaptándose a compresión dispersiva:
+
+\paragraph{Estrategias Propuestas}
+
+\textbf{Estrategia 1 - Expansión de Rejilla DM:} Forzar apertura morfológica del bow-tie mediante rangos DM ampliados ($\gamma > 1$) y pasos más gruesos, permitiendo que modelos entrenados en bow-ties desarrollados recuperen sensibilidad en regímenes comprimidos. Requiere módulo de cálculo dinámico de parámetros $\gamma$ y $d_{\min}$ según frecuencia central, ancho de banda y resolución temporal.
+
+\textbf{Estrategia 2 - Fishing a DM$\approx$0:} Detección primaria permisiva en DM mínimo seguida de validación física rigurosa: (i) ajuste de DM por maximización SNR en sub-bandas ($\mathrm{DM}_{\mathrm{best-fit}} = \arg\max_{\mathrm{DM}} \sum_{f} \mathrm{SNR}_f(\mathrm{DM})$), (ii) verificación de coherencia entre sub-bandas ($\mathrm{Consistency} > \alpha_{\mathrm{consistency}}$), y (iii) consistencia temporal cross-chunk. Requiere validador DM-aware multi-criterio integrado.
+
+\subsubsection{Recomendaciones para Implementación Futura}
+
+Las recomendaciones prioritarias para trabajo futuro se organizan en dos niveles:
+
+\textbf{Prioridad Alta (Directamente conectado con resultados de esta tesis):}
+\begin{itemize}
+    \item \textbf{Validación de resultados ambiguos:} Análisis sistemático de los 101 candidatos filtrados y los 3 pulsos rechazados del ground truth para caracterizar completamente las limitaciones del método.
+    \item \textbf{Publicación científica:} Validación completa y publicación de los 46 nuevos eventos descubiertos en revistas especializadas.
+    \item \textbf{Refinamiento del clasificador:} Reentrenamiento del ResNet18 con el dataset de alta frecuencia disponible para mejorar recall sin comprometer especificidad.
+\end{itemize}
+
+\textbf{Prioridad Media (Extensión metodológica):}
+\begin{itemize}
+    \item \textbf{Priorizar Línea 3:} Análisis polarimétrico IQUV es el discriminador más robusto en alta frecuencia según evidencia empírica de ALMA.
+    \item \textbf{Datasets polarimétricos:} Requiere acceso a datos Stokes IQUV calibrados con ground truth curado.
+    \item \textbf{Validación multi-instrumento:} Extender validación a VLA, MeerKAT, CHIME para generalización robusta.
+    \item \textbf{Integración tiempo real:} Desarrollar conectores VOEvent para alertas multi-mensajero.
+\end{itemize}
+
+\subsection{Cierre}
+
+La ruta física → algoritmos → arquitectura habilitó descubrimiento reproducible; proponemos este estándar para software astronómico productivo.

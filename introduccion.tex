@@ -1,4 +1,4 @@
-\secnumbersection{INTRODUCCIÓN}
+\secnumbersection{Introducción}
 \setcounter{secnumdepth}{4}
 \setcounter{tocdepth}{4}
 \makeatletter
@@ -10,50 +10,64 @@
 
 \subsection{Contexto y motivación}
 
-Los Fast Radio Bursts (FRBs) son pulsos de radio transitorios de duración milisegundo y origen extragaláctico, descubiertos en 2007 \citep{Lorimer2007}, que representan uno de los fenómenos astronómicos más enigmáticos de las últimas dos décadas. Con energías isotrópicas de $10^{38}$--$10^{40}$ J y medidas de dispersión que evidencian orígenes cosmológicos \citep{Petroff_2022,Bochenek2020}, constituyen sondas del medio intergaláctico y ventanas hacia la física de magnetars \citep{Masui2015,Tendulkar2017}.
+Los Fast Radio Bursts (FRBs) son pulsos de radio transitorios de duración milisegundo y origen extragaláctico que representan uno de los fenómenos astronómicos más enigmáticos de la astronomía moderna. Constituyen sondas del medio intergaláctico y ventanas hacia la física de objetos compactos, pero su detección y caracterización enfrentan desafíos metodológicos críticos.
 
-El descubrimiento de FRB repetidor (2016) \citep{Spitler2016} y la ráfaga del magnetar galáctico SGR 1935+2154 (2020) \citep{Bochenek2020,CHIME_SGR2020} establecieron conexiones directas con objetos compactos conocidos. Catálogos masivos como CHIME/FRB (miles de eventos desde 2018 \citep{Amiri2021,CHIMECat2_2024}) permiten estudios estadísticos de morfología, periodicidad y distribuciones energéticas.
+El avance observacional enfrenta un cuello de botella metodológico: pipelines tradicionales (dedispersión exhaustiva + umbrales SNR\footnote{SNR: \textit{Signal-to-Noise Ratio}, relación señal-ruido.}) generan miles de candidatos con $>99\%$ falsos positivos, haciendo la curaduría manual inviable ante los volúmenes masivos de datos producidos por observatorios modernos. El aprendizaje profundo ha emergido como solución prometedora, y DRAFTS combina detección (CenterNet) con clasificación (ResNet18), pero permanece como prototipo de investigación: carece de integración coherente, gestión robusta de memoria, y generación de artefactos estandarizados.
 
-El avance enfrenta un cuello de botella metodológico: pipelines tradicionales (dedispersión exhaustiva + umbrales SNR \citep{Ransom2011_PRESTO,Heimdall_Barsdell}) generan miles de candidatos con $>99\%$ falsos positivos \citep{Rajwade_2024_Review,Agarwal2020}, haciendo la curaduría manual inviable. El aprendizaje profundo ha emergido como solución \citep{Wagstaff2016,Connor2018,Agarwal2020}. DRAFTS combina detección (CenterNet) con clasificación (ResNet18) \citep{Zhang2024_DRAFTS}, pero permanece como prototipo: carece de integración coherente, gestión robusta de memoria, y generación de artefactos estandarizados.
-
-Paralelamente, la frontera observacional se expande a frecuencias milimétricas. La detección de pulsos del magnetar PSR J1745--2900 con ALMA a $\sim$86 GHz \citep{veracasanova2025} demuestra viabilidad donde el scattering es despreciable \citep{Yang2020,Omand2022}. Sin embargo, a estas frecuencias el retardo dispersivo (patrón ``bow-tie'') se comprime a microsegundos, volviéndose imperceptible y eliminando la firma que sustenta algoritmos convencionales \citep{veracasanova2025,Torne2021}.
+Paralelamente, la frontera observacional se expande a frecuencias milimétricas (30--100 GHz), donde el retardo dispersivo característico (patrón ``bow-tie'') se comprime hasta volverse imperceptible, eliminando la firma que sustenta algoritmos convencionales desarrollados para frecuencias centimétricas. Esta brecha metodológica requiere estrategias de detección adaptadas específicamente para el régimen de alta frecuencia.
 
 \subsection{Naturaleza y alcance del problema}
 
 El problema abordado es doble. Primero, la \textbf{ausencia de pipelines astronómicos operativos} que integren modelos de aprendizaje profundo en flujos reproducibles y auditables. DRAFTS demuestra viabilidad conceptual pero carece de infraestructura operacional: gestión robusta de memoria, manejo multi-formato, continuidad temporal verificada, y artefactos con metadatos completos.
 
-Segundo, la \textbf{brecha de extensión a alta frecuencia} (30--100 GHz). Pipelines existentes detectan firmas dispersivas en frecuencias centimétricas (0.3--3 GHz) donde el retardo temporal es resoluble. En régimen milimétrico, esta firma se comprime hasta volverse imperceptible, requiriendo estrategias diferenciadas: adaptación de rejillas DM, validación por polarización/coherencia multi-antena, y productos diagnósticos específicos \citep{veracasanova2025}.
+Segundo, la \textbf{brecha de extensión a alta frecuencia}, donde la firma dispersiva característica se comprime hasta volverse imperceptible, requiriendo estrategias de detección adaptadas específicamente para este régimen.
 
-\textbf{Alcance:} desarrollo de pipeline de inferencia y orquestación con modelos pre-entrenados, operando sobre formatos estándar (FITS/PSRFITS). No se contempla reentrenamiento, interfaces de telescopios, ni almacenamiento distribuido. Objetivo: transformar prototipo en sistema operativo extensible a alta frecuencia mediante parametrización.
+\textbf{Alcance:} Esta memoria se enfoca en dos aspectos complementarios: (1) el desarrollo de un pipeline de inferencia y orquestación end-to-end con modelos pre-entrenados (CenterNet y ResNet18), operando sobre formatos estándar (FITS/PSRFITS/Filterbank), que transforma el prototipo DRAFTS en un sistema productivo con gestión robusta de memoria, procesamiento en streaming y orquestación automatizada; y (2) la extensión metodológica al régimen milimétrico mediante un pipeline híbrido que combina matched filtering temporal con clasificación CNN dual (intensidad y polarización lineal) cuando el retardo dispersivo se vuelve irresoluble. No se contempla reentrenamiento de modelos, desarrollo de interfaces de telescopios en tiempo real, ni almacenamiento distribuido. El objetivo es proporcionar un sistema operativo robusto y reproducible que funcione tanto en frecuencias bajas (modo DRAFTS-clásico) como en alta frecuencia (modo HF-PoL), con selección automática del modo según criterios físicos.
 
 \subsection{Propuesta de solución}
 
-Esta memoria propone \textbf{DRAFTS++}, evolución de DRAFTS hacia un pipeline astronómico productivo, robusto y extensible, estructurado en dos componentes complementarios.
-
-\textbf{Componente 1:} Pipeline end-to-end mediante ingeniería rigurosa: modularización con interfaces definidas, procesamiento en \textit{streaming} con gestión inteligente de memoria, integración automatizada de modelos CenterNet/ResNet18, ingesta multi-formato con análisis automático de headers, y generación de artefactos estandarizados.
-
-\textbf{Componente 2:} Extensión a alta frecuencia mediante estrategias metodológicas adaptadas. Cuando el retardo dispersivo se vuelve irresoluble, el sistema activa detección alternativa: propuesta por umbral SNR con filtrado adaptado, seguida de clasificación binaria sobre patches dedispersados. Esta arquitectura híbrida mantiene coherencia metodológica mediante selección automática según características observacionales.
+Esta memoria propone \textbf{DRAFTS++}, evolución de DRAFTS hacia un pipeline astronómico productivo, robusto y extensible, estructurado en dos componentes complementarios. El \textbf{Componente 1} desarrolla un pipeline E2E\footnote{E2E: \textit{End-to-End}, extremo a extremo.} mediante ingeniería de software: modularización con interfaces definidas, procesamiento en \textit{streaming} con gestión inteligente de memoria, integración automatizada de modelos DL, ingesta multi-formato con análisis automático de archivos astronómicos, entre otros. Este componente constituye el habilitador técnico necesario para materializar las estrategias metodológicas en un sistema operativo robusto y reproducible. El \textbf{Componente 2} extiende el sistema al régimen milimétrico mediante estrategias metodológicas adaptadas que activan detección alternativa cuando el retardo dispersivo se vuelve irresoluble, combinando matched filtering con clasificación CNN y validación polarimétrica para abordar el gap crítico de detección en alta frecuencia.
 
 \subsection{Metodología general}
 
-La metodología combina desarrollo de software, validación empírica y análisis científico en cinco fases: (1) análisis del prototipo DRAFTS identificando limitaciones arquitectónicas, (2) diseño de DRAFTS++ aplicando modularidad y separación de responsabilidades, (3) implementación en Python (PyTorch, Astropy), (4) validación mediante casos progresivos: datasets de entrenamiento (funcionalidad básica), observaciones de púlsares (robustez temporal), FRBs repetidores (escalabilidad), y ALMA a 86 GHz (estrategias de alta frecuencia), y (5) análisis de resultados con métricas estándar y confirmación científica independiente.
-
-La metodología prioriza: portabilidad (operación multi-instrumento sin modificaciones), validez científica (precisión temporal, trazabilidad, coherencia física), y eficiencia operacional (procesamiento en tiempo casi-real).
+La metodología combina desarrollo de software, validación empírica y análisis científico mediante análisis del prototipo DRAFTS, diseño e implementación de DRAFTS++, validación mediante casos progresivos, y análisis de resultados con métricas estándar y confirmación científica independiente. La metodología prioriza portabilidad, validez científica y eficiencia operacional.
 
 \subsection{Estructura del documento}
 
-La memoria sigue progresión lógica desde fundamentos hasta validación. \textbf{Capítulo 2 (Marco Conceptual):} FRBs, propiedades físicas, magnetars, alta frecuencia, métodos tradicionales, y aprendizaje automático. \textbf{Capítulo 3 (Definición del Problema):} contexto operacional, limitaciones de DRAFTS, brechas de alta frecuencia, y objetivos. \textbf{Capítulo 4 (Propuesta de Solución):} diseño e implementación de DRAFTS++ en dos componentes. \textbf{Capítulo 5 (Validación):} casos de uso progresivos y análisis comparativo. \textbf{Capítulo 6 (Conclusiones):} logros, implicaciones, limitaciones, y trabajo futuro. \textbf{Anexos:} tablas de detecciones, código representativo, y glosario técnico.
+El documento se organiza en 6 capítulos, desde la definición del problema y marco teórico, pasando por la metodología propuesta, hasta resultados, conclusiones y anexos.
 
-\subsection{Aportes de la memoria}
+\subsection{Objetivos de la memoria}
 
-Las contribuciones principales son:
+Esta memoria se propone los siguientes objetivos específicos y verificables:
 
-\begin{itemize}
-\item Transformación de prototipo de investigación en pipeline astronómico operativo mediante ingeniería rigurosa: modularidad, streaming con gestión explícita de memoria, y trazabilidad completa.
+\begin{enumerate}
+\item \textbf{Desarrollar infraestructura de software productiva y escalable:} Transformar el prototipo DRAFTS en un sistema operativo robusto (DRAFTS++) capaz de procesar datos astronómicos desde archivos pequeños ($\sim$100K muestras) hasta archivos masivos ($>$600M muestras) sin errores de memoria (OOM), con gestión automatizada de recursos, procesamiento en streaming, y continuidad temporal verificada. Criterio de éxito: procesamiento exitoso de datasets multi-gigabyte (4+ órdenes de magnitud) con recall $\geq$95\% y 0 errores OOM.
 
-\item Establecimiento de estrategias metodológicas para detección en régimen milimétrico, donde la firma dispersiva tradicional se comprime hasta volverse imperceptible.
+\item \textbf{Extender capacidad de detección al régimen milimétrico:} Diseñar y validar un pipeline híbrido (HF-PoL) que supere las limitaciones del baseline clásico en alta frecuencia (30--100 GHz), donde la compresión dispersiva elimina la firma característica. Criterio de éxito: lograr recall en detección $\geq$90\% en datos ALMA (86 GHz) vs. baseline $\leq$87.5\%, mediante combinación de matched filtering, clasificación CNN dual (Intensidad + Polarización Lineal), y validación polarimétrica.
 
-\item Validación empírica demostrando capacidad de descubrimiento científico genuino en alta frecuencia, expandiendo el censo de pulsos miliméticos.
+\item \textbf{Validar capacidad de descubrimiento científico:} Demostrar que DRAFTS++ no solo reproduce detecciones conocidas, sino que posee sensibilidad para descubrir eventos nuevos genuinos. Criterio de éxito: recuperar 100\% de eventos conocidos (ground truth) y descubrir $\geq$2 eventos nuevos confirmados independientemente por expertos en al menos uno de los regímenes frecuenciales (baja o alta frecuencia).
 
-\item Código abierto, documentación de protocolos reproducibles, y conjuntos de candidatos para estudios de seguimiento.
-\end{itemize}
+\item \textbf{Caracterizar limitaciones y proponer trabajo futuro:} Realizar análisis quirúrgico por componentes/fases para identificar con precisión qué funciona correctamente y qué presenta limitaciones, proponiendo soluciones concretas. Criterio de éxito: localizar limitaciones específicas (si existen) con evidencia cuantitativa y proponer al menos una estrategia de mejora verificable para trabajo futuro.
+
+\item \textbf{Entregar artefacto reproducible:} Desarrollar un pipeline de código abierto con documentación técnica completa, interfaces bien definidas, y configuración versionada que permita reproducibilidad. Criterio de éxito: código público accesible, documentación que permita replicación independiente, y casos de validación ejecutables.
+\end{enumerate}
+
+\subsection{Aportes y contribuciones esperadas}
+
+Las contribuciones originales anticipadas de esta tesis son metodológicas, técnicas y científicas:
+
+\begin{enumerate}
+\item \textbf{Pipeline híbrido HF-PoL para régimen milimétrico:} Metodología que combina matched filtering clásico (sensibilidad) con clasificación CNN dual en Intensidad y Polarización Lineal (especificidad) para detección efectiva en alta frecuencia.
+
+\item \textbf{Caracterización de transfer learning en radioastronomía:} Análisis empírico de cómo modelos CNN pre-entrenados en baja frecuencia generalizan (o no) a alta frecuencia en diferentes productos Stokes.
+
+\item \textbf{Infraestructura de software de grado productivo:} Sistema robusto con gestión inteligente de memoria, procesamiento en streaming, y mecanismos de resiliencia extrema validados empíricamente.
+
+\item \textbf{Descubrimientos científicos:} Identificación de eventos transitorios nuevos que demuestran capacidad práctica del sistema en condiciones reales.
+
+\item \textbf{Código abierto reproducible:} Pipeline disponible públicamente (\url{https://github.com/Kodamonkey/DRAFTS-UC}) que permite replicación y adaptación por la comunidad científica.
+\end{enumerate}
+
+\subsection{Colaboración}
+
+Esta investigación se desarrolló en colaboración con investigadores que proporcionaron datos observacionales y validación científica independiente. Los datos de FRB 121102 utilizados en la validación del Componente 1 fueron analizados en colaboración con \citet{cruces2020frb121102} y \citet{2025A&A...693A..40B}.

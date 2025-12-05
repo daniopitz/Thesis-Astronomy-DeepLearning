@@ -1,4 +1,4 @@
-\secnumbersection{MARCO CONCEPTUAL}
+\secnumbersection{Estado del Arte y Marco Conceptual}
 \setcounter{secnumdepth}{4}
 \setcounter{tocdepth}{4}
 \makeatletter
@@ -8,16 +8,18 @@
   {\normalfont\normalsize\bfseries}}  % estilo
 \makeatother
 
+Habiendo establecido en el capítulo anterior el problema específico de detección en alta frecuencia y las limitaciones de los pipelines existentes, este capítulo proporciona el marco conceptual necesario para comprender los fundamentos físicos de los FRBs, su fenomenología observacional, y el estado del arte en métodos de detección. Este contexto es esencial para comprender tanto las estrategias tradicionales como las adaptaciones metodológicas requeridas para el régimen milimétrico.
+
 \subsection{Introducción a los Fast Radio Bursts}
 
 \subsubsection{Descubrimiento y Naturaleza de los FRBs}
 
-Los Fast Radio Bursts (FRBs) son pulsos de radio transitorios de duración milisegundo y extremadamente luminosos, detectados por primera vez en 2007 por Lorimer et al. en datos del radiotelescopio de Parkes \citep{Lorimer2007}. Su medida de dispersión (DM) anómalamente alta reveló un origen extragaláctico a distancias cosmológicas \citep{Thornton2013a}. La firma característica de los FRBs es la dispersión en plasma interestelar: los pulsos de baja frecuencia arriban más tarde que los de alta frecuencia siguiendo $t(\nu)\propto \nu^{-2}$, generando una curvatura distintiva en los espectrogramas frecuencia-tiempo (Figura~\ref{fig:lorimer_burst}).
+Los Fast Radio Bursts (FRBs) son pulsos de radio transitorios de duración milisegundo y extremadamente luminosos, detectados por primera vez en 2007 por Lorimer et al. en datos del radiotelescopio de Parkes \citep{Lorimer2007}. Su medida de dispersión (DM) anómalamente alta reveló un origen extragaláctico a distancias cosmológicas \citep{Thornton2013a}. La firma característica de los FRBs es la dispersión en plasma interestelar: los pulsos de baja frecuencia arriban más tarde que los de alta frecuencia siguiendo $t(\nu)\propto \nu^{-2}$ (ver Ec.~\ref{eq:dispersion_law}), generando una curvatura distintiva en los espectrogramas frecuencia-tiempo (Figura~\ref{fig:lorimer_burst}).
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.8\textwidth]{Marco_conceptual/20140512_Lorimer-Burst.png}
-\caption{Espectrograma del ``Lorimer Burst'' (FRB 010724), primer FRB reportado. Se observa el barrido dispersivo característico con dependencia $\sim\nu^{-2}$: frecuencias altas ($\sim$1.5 GHz) arriban antes que bajas ($\sim$1.2 GHz). Panel insertado: pulso dedispersado de $\sim$5 ms. Adaptado de \citet{Lorimer2007}.}
+\caption{Figura~\ref{fig:lorimer_burst}. Espectrograma del primer FRB reportado (FRB 010724, Parkes). Muestra barrido dispersivo característico ($\sim\nu^{-2}$): frecuencias altas ($\sim$1.5 GHz) arriban antes que bajas ($\sim$1.2 GHz). Panel insertado: pulso dedispersado de $\sim$5 ms. Adaptado de \citet{Lorimer2007}.}
 \label{fig:lorimer_burst}
 \end{figure}
 
@@ -27,7 +29,7 @@ Establecida la firma dispersiva característica de los FRBs, su naturaleza físi
 
 \subsubsection{Motivación para Observaciones en Alta Frecuencia}
 
-Comprendiendo ya la naturaleza energética de los FRBs y la dicotomía repetidores/únicos, surge naturalmente la pregunta sobre estrategias observacionales óptimas. Históricamente, los FRBs se han observado en bandas centimétricas (0.1--10 GHz) donde exhiben mayor luminosidad pero sufren fuertemente dispersión y scattering ($\propto \nu^{-4}$). Las observaciones milimétricas (30--300 GHz) mitigan estos efectos, permitiendo detectar pulsos intrínsecamente breves, aunque presentan desafíos de sensibilidad y campos de visión reducidos. Las secciones siguientes abordan: fundamentos físicos de los FRBs, casos emblemáticos de repetidores, conexión con magnetars (incluyendo SGR 1935+2154), detección en alta frecuencia, métodos tradicionales de búsqueda, y soluciones modernas de aprendizaje automático.
+Comprendiendo ya la naturaleza energética de los FRBs y la dicotomía repetidores/únicos, surge naturalmente la pregunta sobre estrategias observacionales óptimas. Históricamente, los FRBs se han observado en bandas centimétricas (0.1--10 GHz) donde exhiben mayor luminosidad pero sufren fuertemente dispersión y scattering ($\propto \nu^{-4}$, ver Ec.~\ref{eq:scattering_law}). Las observaciones milimétricas (30--300 GHz) mitigan estos efectos, permitiendo detectar pulsos intrínsecamente breves, aunque presentan desafíos de sensibilidad y campos de visión reducidos. Las secciones siguientes abordan: fundamentos físicos de los FRBs, casos emblemáticos de repetidores, conexión con magnetars (incluyendo SGR 1935+2154), detección en alta frecuencia, métodos tradicionales de búsqueda, y soluciones modernas de aprendizaje automático.
 
 \subsection{Fundamentos Físicos y Fenomenología Observacional de los FRBs}
 
@@ -35,14 +37,42 @@ Para comprender los desafíos de detección que motivan esta tesis, es esencial 
 
 \subsubsection{Dispersión en Plasma y Medida de DM}
 
-Un FRB típico se manifiesta como un pulso único de radio de duración brevísima ($\sim$1--10 ms) que sobresale muy significativamente por encima del ruido de fondo. En el dominio tiempo-frecuencia, la señal presenta la firma de la dispersión en plasma: las componentes de menor frecuencia arriban con mayor retraso temporal respecto a las de mayor frecuencia, según la ley $\Delta t \propto \text{DM} \cdot \nu^{-2}$. Esta ley implica que, cuando se observa en un ancho de banda amplio, el pulso aparece como un trazo inclinado o curvo en el diagrama de frecuencia vs. tiempo, donde las bajas frecuencias se retrasan más \citep{CordesMcLaughlin2003}. Al corregir este retraso mediante un proceso de dedispersión para un cierto valor de DM, las componentes de frecuencia se alinean en el tiempo revelando el pulso comprimido.
+Un FRB típico se manifiesta como un pulso único de radio de duración brevísima ($\sim$1--10 ms) que sobresale muy significativamente por encima del ruido de fondo. En el dominio tiempo-frecuencia, la señal presenta la firma de la dispersión en plasma: las componentes de menor frecuencia arriban con mayor retraso temporal respecto a las de mayor frecuencia, según la ley de dispersión:
+
+\begin{equation}
+\Delta t \propto \mathrm{DM} \cdot \nu^{-2}
+\label{eq:dispersion_law}
+\end{equation}
+
+Esta ley implica que, cuando se observa en un ancho de banda amplio, el pulso aparece como un trazo inclinado o curvo en el diagrama de frecuencia vs. tiempo, donde las bajas frecuencias se retrasan más \citep{CordesMcLaughlin2003}. Al corregir este retraso mediante un proceso de dedispersión para un cierto valor de DM, las componentes de frecuencia se alinean en el tiempo revelando el pulso comprimido.
 
 
-Más allá de la fenomenología cualitativa, la DM proporciona información cuantitativa crucial. La medida de dispersión (DM) es una magnitud central en el estudio de FRBs. Se define como la integral de la densidad de electrones libres $n_e$ a lo largo de la línea de visión hasta la fuente: ${\rm DM} = \int_0^D n_e\, dl$, típicamente expresada en unidades de pc cm$^{-3}$. Dado que las señales de radio sufren un retraso relativo $\Delta t \approx 4.15\,{\rm ms} \times ({\rm DM}/{\rm pc\,cm^{-3}}) \times[(\nu_{\rm baja}/{\rm GHz})^{-2} - (\nu_{\rm alta}/{\rm GHz})^{-2}]$ \citep{LorimerKramer2004}, una DM anómalamente alta es evidencia de un origen extragaláctico o cosmológico. Los FRBs descubiertos hasta ahora exhiben DM de cientos hasta miles de pc cm$^{-3}$, excediendo por mucho el contenido electrónico de la Vía Láctea en sus direcciones \citep{Petroff2019}. Por ejemplo, el FRB inicial de Lorimer tenía DM $\sim375$ pc cm$^{-3}$, varias veces mayor que la contribución galáctica esperada en su coordenada, implicando una distancia de orden gigapársec si el exceso de DM proviene del medio intergaláctico \citep{Lorimer2007}. La DM se utiliza entonces como un indicador de distancia cosmológica: aunque existe dispersión en la relación DM--$z$ por la distribución inhomogénea del medio intergaláctico, a primera aproximación DMs del orden $10^3$ pc cm$^{-3}$ sugieren orígenes a redshifts $z\sim0.5$--1 \citep{Inoue2004,Tendulkar2017}.
+Más allá de la fenomenología cualitativa, la DM proporciona información cuantitativa crucial. La medida de dispersión (DM) es una magnitud central en el estudio de FRBs. Se define como la integral de la densidad de electrones libres $n_e$ a lo largo de la línea de visión hasta la fuente:
+
+\begin{equation}
+\mathrm{DM} = \int_0^D n_e\, dl
+\label{eq:dm_definition}
+\end{equation}
+
+\noindent típicamente expresada en unidades de pc cm$^{-3}$. Dado que las señales de radio sufren un retraso relativo dado por \citep{LorimerKramer2004}:
+
+\begin{equation}
+\Delta t \approx 4.15\,\mathrm{ms} \times \frac{\mathrm{DM}}{\mathrm{pc\,cm}^{-3}} \times\left[\left(\frac{\nu_{\mathrm{baja}}}{\mathrm{GHz}}\right)^{-2} - \left(\frac{\nu_{\mathrm{alta}}}{\mathrm{GHz}}\right)^{-2}\right]
+\label{eq:dispersion_delay}
+\end{equation}
+
+\noindent una DM anómalamente alta es evidencia de un origen extragaláctico o cosmológico. Los FRBs descubiertos hasta ahora exhiben DM de cientos hasta miles de pc cm$^{-3}$, excediendo por mucho el contenido electrónico de la Vía Láctea en sus direcciones \citep{Petroff2019}. Por ejemplo, el FRB inicial de Lorimer tenía DM $\sim375$ pc cm$^{-3}$, varias veces mayor que la contribución galáctica esperada en su coordenada, implicando una distancia de orden gigapársec si el exceso de DM proviene del medio intergaláctico \citep{Lorimer2007}. La DM se utiliza entonces como un indicador de distancia cosmológica: aunque existe dispersión en la relación DM--$z$ por la distribución inhomogénea del medio intergaláctico, a primera aproximación DMs del orden $10^3$ pc cm$^{-3}$ sugieren orígenes a redshifts $z\sim0.5$--1 \citep{Inoue2004,Tendulkar2017}.
 
 \subsubsection{Scattering y Ensanchamiento Temporal}
 
-Además de la dispersión, los FRBs exhiben ensanchamiento temporal por scattering multipath en plasma turbulento, más pronunciado a bajas frecuencias ($\tau_{\rm sc} \propto \nu^{-4}$) \citep{Cordes2016}. A frecuencias altas, los pulsos son significativamente más breves: FRB 121102 mostró anchos de $\sim30$--100 $\mu$s a 4--8 GHz versus varios milisegundos a 1.4 GHz \citep{Gajjar2018a,Hessels2019,Nimmo2021}, motivando observaciones en bandas milimétricas para captar morfologías intrínsecas.
+Además de la dispersión, los FRBs exhiben ensanchamiento temporal por scattering multipath en plasma turbulento, más pronunciado a bajas frecuencias \citep{Cordes2016}:
+
+\begin{equation}
+\tau_{\mathrm{sc}} \propto \nu^{-4}
+\label{eq:scattering_law}
+\end{equation}
+
+A frecuencias altas, los pulsos son significativamente más breves: FRB 121102 mostró anchos de $\sim30$--100 $\mu$s a 4--8 GHz versus varios milisegundos a 1.4 GHz \citep{Gajjar2018a,Hessels2019,Nimmo2021}, motivando observaciones en bandas milimétricas para captar morfologías intrínsecas.
 
 \subsubsection{Polarización y Rotación Faraday}
 
@@ -55,7 +85,7 @@ Los FRBs exhiben morfología espectro-temporal diversa: desde pulsos simples de 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.92\textwidth]{Marco_conceptual/morfologias.jpg}
-\caption{Cuatro arquetipos morfológicos de FRBs (CHIME/FRB, 400--800 MHz): (1) banda ancha simple, (2) banda estrecha simple, (3) temporalmente compleja, y (4) deriva descendente (``efecto trombón triste''). Cada panel muestra espectro dinámico (abajo) y perfil temporal (arriba). Crédito: \citet{Pleunis2021}.}
+\caption{Figura~\ref{fig:morfologias_frb}. Cuatro arquetipos morfológicos de FRBs (CHIME/FRB, 400--800 MHz): (1) banda ancha simple, (2) banda estrecha simple, (3) temporalmente compleja, y (4) deriva descendente (``efecto trombón triste''). Cada panel muestra espectro dinámico (abajo) y perfil temporal (arriba). Crédito: \citet{Pleunis2021}.}
 \label{fig:morfologias_frb}
 \end{figure}
 
@@ -64,7 +94,7 @@ Para ilustrar concretamente esta diversidad morfológica, un ejemplo detallado s
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.95\textwidth]{Marco_conceptual/waterfall-FRB121102.jpg}
-\caption{Espectros dinámicos de 18 ráfagas de FRB 121102 (DM = 560.5 pc cm$^{-3}$) en tres campañas: Arecibo (1.2--1.7 GHz), Green Bank (1.7--2.3 GHz), y GB-BL (4--8 GHz). Se observa deriva descendente característica (``efecto trombón triste'') y variabilidad morfológica entre ráfagas. A frecuencias más altas (4--8 GHz), los pulsos son más breves ($\sim$30--100 $\mu$s), demostrando reducción del scattering. Adaptado de \citet{Hessels2019}.}
+\caption{Figura~\ref{fig:frb121102_waterfall}. Espectros dinámicos de 18 ráfagas de FRB 121102 (DM = 560.5 pc cm$^{-3}$) en tres campañas: Arecibo (1.2--1.7 GHz), Green Bank (1.7--2.3 GHz), y GB-BL (4--8 GHz). Muestra deriva descendente característica (``efecto trombón triste'') y variabilidad morfológica. A frecuencias más altas (4--8 GHz), los pulsos son más breves ($\sim$30--100 $\mu$s), demostrando reducción del scattering. Adaptado de \citet{Hessels2019}.}
 \label{fig:frb121102_waterfall}
 \end{figure}
 
@@ -82,7 +112,7 @@ El descubrimiento de FRB 121102 como primer repetidor \citep{Spitler2016} demost
 
 \subsubsection{FRB 180916 y Periodicidad}
 
-Más allá de las ráfagas múltiples, algunos repetidores exhiben periodicidad en su actividad. FRB 180916 (CHIME/FRB) reveló periodicidad de $\sim16.35$ días, la primera evidencia de ciclos de actividad en FRBs \citep{CHIME_FRB_Collaboration_2020}. Indicios tentativos de periodicidad $\sim161$ días también se reportaron para FRB 121102 \citep{Rajwade2020,cruces2020frb121102}. Estas modulaciones temporales sugieren sistemas binarios o precesión de magnetars, y son relevantes para estrategias de observación dirigida.
+Más allá de las ráfagas múltiples, algunos repetidores exhiben periodicidad en su actividad. FRB 180916 (CHIME/FRB) reveló periodicidad de $\sim16.35$ días, la primera evidencia de ciclos de actividad en FRBs \citep{CHIME_FRB_Collaboration_2020}. Indicios tentativos de periodicidad $\sim161$ días también se reportaron para FRB 121102 \citep{Rajwade2020,cruces2020frb121102}, confirmada posteriormente con un período de $159.3 \pm 0.8$ días mediante monitoreo extendido en banda L \citep{2025A&A...693A..40B}. Estas modulaciones temporales sugieren sistemas binarios o precesión de magnetars, y son relevantes para estrategias de observación dirigida.
 
 \subsubsection{Propiedades Distintivas de Repetidores}
 
@@ -99,7 +129,7 @@ La prueba definitiva llegó el 28 de abril de 2020: el magnetar galáctico SGR 1
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.85\textwidth]{Marco_conceptual/FRB-magnetar.png}
-\caption{Coincidencia radio--rayos X del evento FRB 200428 de SGR 1935+2154 (28 abril 2020). Perfil temporal de rayos X (curva azul, INTEGRAL) con dos picos principales. Líneas rojas verticales: tiempos de arribo de pulsos de radio (CHIME/FRB, 400--800 MHz). Esta correlación temporal multi-longitud de onda estableció definitivamente el vínculo magnetar-FRB. Adaptado de \citet{Mereghetti2020,CHIME_SGR2020,Bochenek2020}.}
+\caption{Figura~\ref{fig:sgr1935_radio_xray}. Coincidencia radio--rayos X del evento FRB 200428 de SGR 1935+2154 (28 abril 2020). Perfil temporal de rayos X (curva azul, INTEGRAL) con dos picos principales. Líneas rojas verticales: tiempos de arribo de pulsos de radio (CHIME/FRB, 400--800 MHz). Esta correlación temporal multi-longitud de onda estableció definitivamente el vínculo magnetar-FRB. Adaptado de \citet{Mereghetti2020,CHIME_SGR2020,Bochenek2020}.}
 \label{fig:sgr1935_radio_xray}
 \end{figure}
 
@@ -117,13 +147,20 @@ La evidencia de emisión de magnetars en banda milimétrica motiva examinar las 
 
 \subsubsection{Ventajas Físicas: Mitigación de Efectos de Propagación}
 
-Los retardos por dispersión ($\Delta t \propto \nu^{-2}$) y scattering ($\tau_{\rm sc} \propto \nu^{-4}$) decrecen drásticamente con la frecuencia. A frecuencias mm, un pulso sufre ensanchamiento miles de veces menor que a 1 GHz, permitiendo captar morfologías intrínsecas. En ALMA banda 3 (86 GHz, ancho 2 GHz), la demora por DM $\sim1770$ pc cm$^{-3}$ es apenas $\sim46$ $\mu$s, posibilitando integración directa en frecuencia sin dedispersión \citep{veracasanova2025}.
+Los retardos por dispersión (Ec.~\ref{eq:dispersion_delay}) y scattering (Ec.~\ref{eq:scattering_law}) decrecen drásticamente con la frecuencia. A frecuencias mm, un pulso sufre ensanchamiento miles de veces menor que a 1 GHz, permitiendo captar morfologías intrínsecas. En ALMA banda 3 (86 GHz, ancho 2 GHz), la demora por DM $\sim1770$ pc cm$^{-3}$ es apenas $\sim46$ $\mu$s, posibilitando integración directa en frecuencia sin dedispersión \citep{veracasanova2025}.
 
 Adicionalmente, altas frecuencias penetran entornos densos (restos de supernova, vientos nebulares) opacos a bajas frecuencias, abriendo la posibilidad de detectar FRBs ``oscuros'' invisibles para CHIME o Parkes \citep{Yang2020,Omand2022,Hilmarsson2022}.
 
 \subsubsection{Desafíos: Sensibilidad, Firma Dispersiva y Morfología}
 
-Sin embargo, las ventajas vienen acompañadas de desafíos significativos. Primero, los espectros típicamente decrecientes (índice $\alpha \approx -1$ a $-3$, flux $\propto \nu^\alpha$) implican que pulsos a 100 GHz podrían ser 1--2 órdenes de magnitud más débiles que a 1 GHz \citep{Jankowski2017}. Un FRB de 1 Jy$\cdot$ms a 1.4 GHz tendría solo $\sim0.1$ Jy$\cdot$ms a 90 GHz.
+Sin embargo, las ventajas vienen acompañadas de desafíos significativos. Primero, los espectros típicamente decrecientes con índice espectral $\alpha \approx -1$ a $-3$ \citep{Jankowski2017}:
+
+\begin{equation}
+S_\nu \propto \nu^\alpha
+\label{eq:spectral_index}
+\end{equation}
+
+\noindent implican que pulsos a 100 GHz podrían ser 1--2 órdenes de magnitud más débiles que a 1 GHz. Un FRB de 1 Jy$\cdot$ms a 1.4 GHz tendría solo $\sim0.1$ Jy$\cdot$ms a 90 GHz.
 
 Segundo, y crítico para algoritmos de detección, la firma dispersiva se comprime drásticamente: la curva $\nu^{-2}$ se vuelve casi imperceptible, eliminando el indicador clave para distinguir FRBs de RFI. Para FRBs extragalácticos sin DM conocido, detectar en mm sin firma dispersiva clara requiere estrategias alternativas: (i) validación por polarización (FRBs muestran $>50\%$ polarización vs. RFI no polarizada \citep{veracasanova2025}), (ii) coherencia multi-antena en arrays interferométricos, o (iii) detecciones simultáneas multi-frecuencia.
 
@@ -203,7 +240,7 @@ Estos cinco pasos fundamentales constituyen el núcleo de prácticamente todos l
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.95\textwidth]{Marco_conceptual/PipelineClassic.png}
-\caption{Pipeline tradicional de detección de FRBs. Flujo secuencial: (1) preprocesamiento/RFI, (2) dedispersión sobre parrilla DM (0--5000 pc cm$^{-3}$), (3) búsqueda de pulsos (filtros boxcar), (4) umbralización (S/N$>$6--8$\sigma$), y (5) clasificación/validación. Implementaciones modernas incorporan ML (ej. FETCH) en la etapa final. Adaptado de \citet{Wang2025CRACO}.}
+\caption{Figura~\ref{fig:traditional_pipeline}. Pipeline tradicional de detección de FRBs. Flujo secuencial: (1) preprocesamiento/RFI, (2) dedispersión sobre parrilla DM (0--5000 pc cm$^{-3}$), (3) búsqueda de pulsos (filtros boxcar), (4) umbralización (S/N$>$6--8$\sigma$), y (5) clasificación/validación. Implementaciones modernas incorporan ML (ej. FETCH) en la etapa final. Adaptado de \citet{Wang2025CRACO}.}
 \label{fig:traditional_pipeline}
 \end{figure}
 
@@ -327,14 +364,26 @@ próxima generación en radioastronomía \citep{zhang2024drafts}. La Figura~\ref
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.95\textwidth]{WorkFlow-original.png}
-\caption{Arquitectura del pipeline DRAFTS. Sistema de dos etapas: \textbf{Etapa 1:} Detector CenterNet analiza espacio DM--tiempo identificando coordenadas (DM, tiempo) de candidatos. \textbf{Etapa 2:} Clasificador ResNet18 evalúa autenticidad de candidatos extraídos en formato frecuencia--tiempo. Salida: probabilidad FRB real vs. RFI/ruido. Esta arquitectura híbrida recupera $\sim$3× más ráfagas que métodos tradicionales con mínimos falsos positivos. Adaptado de \citet{zhang2024drafts}.}
+\includegraphics[width=0.95\textwidth]{figures/Marco_conceptual/WorkFlow-original.png}
+\caption{Figura~\ref{fig:drafts_architecture}. Arquitectura del pipeline DRAFTS. Sistema de dos etapas: \textbf{Etapa 1:} Detector CenterNet analiza espacio DM--tiempo identificando coordenadas (DM, tiempo) de candidatos. \textbf{Etapa 2:} Clasificador ResNet18 evalúa autenticidad de candidatos extraídos en formato frecuencia--tiempo. Salida: probabilidad FRB real vs. RFI/ruido. Esta arquitectura híbrida recupera $\sim$3× más ráfagas que métodos tradicionales con mínimos falsos positivos. Adaptado de \citet{zhang2024drafts}.}
 \label{fig:drafts_architecture}
 \end{figure}
 
 \medskip
 
 Este marco conceptual ha trazado el camino desde los fundamentos físicos de los FRBs hasta el estado del arte en detección mediante aprendizaje profundo, integrando casos históricos, conexión con magnetars, y desafíos específicos de alta frecuencia. La fenomenología observacional diversa, las limitaciones de métodos tradicionales, el éxito de DRAFTS en frecuencias centimétricas, y los desafíos únicos del régimen milimétrico (compresión de firma dispersiva, validación por polarización, limitaciones instrumentales) establecen el contexto completo que motiva el desarrollo de DRAFTS++: un pipeline operativo, robusto y extensible capaz de operar efectivamente tanto en regímenes de dispersión prominente como comprimida.
+
+\subsubsection{Gap Metodológico: Polarización como Firma de Validación en Alta Frecuencia}
+
+Como se estableció en la Sección 2.5, el régimen milimétrico presenta desafíos algorítmicos fundamentales para la detección de FRBs. El desafío más crítico es la compresión drástica de la firma dispersiva: la curva $\nu^{-2}$ característica que permite distinguir FRBs de RFI en frecuencias centimétricas se vuelve casi imperceptible a frecuencias milimétricas, eliminando el indicador clave sobre el cual se basan tanto los pipelines tradicionales (Sección 2.6) como los modernos basados en deep learning como DRAFTS (Sección 2.7). Para FRBs extragalácticos sin DM conocido, detectar en mm sin firma dispersiva clara requiere estrategias alternativas de validación.
+
+La evidencia observacional reciente proporciona una solución a este desafío. Como se discutió en la Sección 2.2.3, la polarización proporciona pistas cruciales sobre los entornos de los progenitores de FRBs, con muchos FRBs exhibiendo alta polarización lineal ($\sim100\%$) y medidas de rotación Faraday extremas. Más relevante aún para el régimen milimétrico, las observaciones pioneras del magnetar galáctico PSR J1745--2900 con ALMA a $\sim86$ GHz (Sección 2.5.4) revelaron que todos los pulsos detectados mostraron $>50\%$ de polarización lineal, claramente diferenciados de RFI no polarizada \citep{veracasanova2025}. Esta observación establece que los pulsos astrofísicos en alta frecuencia son altamente polarizados, proporcionando una firma de validación robusta que puede compensar la ausencia de firma dispersiva clara.
+
+Por lo tanto, la polarización se convierte en una firma de validación crucial en alta frecuencia. Mientras que en bajas frecuencias la polarización puede ser una fuente de confusión (debido a variaciones en RM y depolarización), en el régimen milimétrico la alta polarización lineal de los pulsos astrofísicos genuinos contrasta marcadamente con la RFI típicamente no polarizada o débilmente polarizada. Esta propiedad física proporciona un criterio de validación ortogonal a la morfología dispersiva, permitiendo distinguir señales astrofísicas de artefactos instrumentales incluso cuando la firma dispersiva es imperceptible.
+
+Sin embargo, los pipelines de estado del arte --tanto tradicionales (Sección 2.6) como basados en deep learning (Sección 2.7)-- no están diseñados para explotar la polarización como un clasificador morfológico primario. Los métodos tradicionales (PRESTO, HEIMDALL, CHIME) utilizan polarización principalmente para rechazo de RFI mediante umbrales de SNR en polarización lineal, pero no implementan clasificación morfológica en el dominio de polarización. DRAFTS, aunque representa el estado del arte en detección mediante deep learning, opera exclusivamente en el dominio de intensidad (Stokes I), utilizando el clasificador ResNet18 únicamente sobre espectros dinámicos de intensidad dedispersados. Ningún pipeline actual implementa clasificación morfológica mediante deep learning en polarización lineal (Stokes L) como un componente primario del proceso de validación.
+
+Este gap metodológico establece la necesidad de extender DRAFTS hacia DRAFTS++, incorporando clasificación dual en intensidad y polarización lineal. La Línea 2b del Componente 2 (Capítulo 4) aborda precisamente este gap mediante la implementación de un clasificador morfológico de deep learning en polarización lineal, explotando la coherencia polarimétrica como criterio de validación primario en alta frecuencia. Esta extensión transforma la polarización de un criterio de rechazo secundario (como en pipelines tradicionales) a un clasificador morfológico primario que puede reducir dramáticamente los falsos positivos mediante validación en un dominio físico ortogonal, estableciendo así la justificación metodológica fundamental para la solución propuesta en esta tesis.
 
 
 

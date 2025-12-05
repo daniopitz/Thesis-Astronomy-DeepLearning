@@ -27,16 +27,28 @@ Considerando lo importancia de este trabajo para los alumnos, este apartado es p
 Considerando la importancia de este trabajo para los alumnos, este apartado se podrá incluir en el caso de que el autor desee agradecer a las personas que facilitaron alguna ayuda relevante en su trabajo para la realización de este documento. La extensión puede ser de máximo una hoja y se deben mantener este formato, tipo y tamaño de letra.
 }
 \newcommand{\resumen}{
-El resumen y las palabras clave no deben superar la mitad de la página, donde debe precisarse brevemente: 1) lo que el autor ha hecho, 2) cómo lo hizo (sólo si es importante detallarlo), 3) los resultados principales, 4) la relevancia de los resultados. El resumen es una representación abreviada, pero comprensiva de la memoria y debe informar sobre el objetivo, la metodología y los resultados del trabajo realizado.
+La detección de Fast Radio Bursts (FRBs) enfrenta dos desafíos metodológicos críticos. En frecuencias bajas (LF, 0.3--8 GHz), pipelines tradicionales generan miles de candidatos con $>99\%$ falsos positivos, haciendo inviable la curaduría manual ante volúmenes masivos de datos. Aunque DRAFTS demuestra viabilidad conceptual mediante deep learning (CenterNet + ResNet18), permanece como prototipo sin infraestructura operacional: carece de gestión robusta de memoria, manejo multi-formato, y continuidad temporal verificada. En frecuencias milimétricas (HF, 30--100 GHz), la firma dispersiva característica (patrón ``bow-tie'') se comprime hasta volverse imperceptible, eliminando la base de algoritmos convencionales desarrollados para frecuencias centimétricas.
+
+Esta tesis propone \textbf{DRAFTS++}, un pipeline astronómico operativo estructurado en dos componentes complementarios. El \textbf{Componente 1} desarrolla infraestructura de software robusta mediante ingeniería rigurosa: pipeline end-to-end modular con procesamiento en streaming, gestión inteligente de memoria, ingesta multi-formato automática, y orquestación automatizada de modelos pre-entrenados. El \textbf{Componente 2} extiende el sistema al régimen milimétrico mediante el modo HF-PoL (High-Frequency Polarization-Linear), que combina matched filtering temporal con clasificación dual CNN en intensidad y polarización lineal mediante ResNet18 pre-entrenado, sin reentrenamiento.
+
+Los resultados validan empíricamente ambos componentes. En LF, el sistema alcanza 97.3\% de recall (732/752 pulsos) en observaciones del púlsar B0355+54, validando robustez temporal y continuidad sin pérdidas en bordes de chunks. En FRB 121102, logra recall 100\% recuperando los 24 eventos conocidos y descubriendo 2 nuevos bursts confirmados. En HF (86 GHz ALMA), la Línea 2b alcanza precision $\sim$100\% reduciendo falsos positivos en 94.1\% (102 $\rightarrow$ 6 candidatos) y descubre 44 pulsos nuevos del magnetar PSR J1745-2900.
+
+La contribución metodológica principal es la demostración empírica de que el \textbf{transfer learning falla en intensidad pero triunfa en polarización}: la Línea 2a (clasificación solo en I) logra recall 100\% pero precision 37.3\%, mientras que la Línea 2b (clasificación dual I+L) transforma el sistema en productivo (precision $\sim$100\%) validando que pulsos astrofísicos genuinos exhiben coherencia morfológica entre polarizaciones mientras RFI muestra discrepancia. Este hallazgo, combinado con la transformación de un prototipo en pipeline operativo reproducible, constituye la contribución de mayor impacto científico y técnico de esta tesis.
 }
 \newcommand{\resumeningles}{
-Corresponde a la traducción al idioma inglés del Resumen anterior. Sujeto a la misma regla de extensión del Resumen.
+The detection of Fast Radio Bursts (FRBs) faces two critical methodological challenges. At low frequencies (LF, 0.3--8 GHz), traditional pipelines generate thousands of candidates with $>99\%$ false positives, making manual curation unfeasible given massive data volumes. Although DRAFTS demonstrates conceptual viability through deep learning (CenterNet + ResNet18), it remains a research prototype without operational infrastructure: it lacks robust memory management, multi-format handling, and verified temporal continuity. At millimeter frequencies (HF, 30--100 GHz), the characteristic dispersive signature (``bow-tie'' pattern) compresses until it becomes imperceptible, eliminating the foundation of conventional algorithms developed for centimeter frequencies.
+
+This thesis proposes \textbf{DRAFTS++}, an operational astronomical pipeline structured in two complementary components. \textbf{Component 1} develops robust software infrastructure through rigorous engineering: modular end-to-end pipeline with streaming processing, intelligent memory management, automatic multi-format ingestion, and automated orchestration of pre-trained models. \textbf{Component 2} extends the system to the millimeter regime through the HF-PoL (High-Frequency Polarization-Linear) mode, which combines temporal matched filtering with dual CNN classification in intensity and linear polarization using pre-trained ResNet18, without retraining.
+
+Results empirically validate both components. In LF, the system achieves 97.3\% recall (732/752 pulses) in observations of pulsar B0355+54, validating temporal robustness and continuity without losses at chunk boundaries. In FRB 121102, it achieves 100\% recall recovering the 24 known events and discovering 2 new confirmed bursts. In HF (86 GHz ALMA), Line 2b achieves $\sim$100\% precision reducing false positives by 94.1\% (102 $\rightarrow$ 6 candidates) and discovers 44 new pulses from magnetar PSR J1745-2900.
+
+The main methodological contribution is the empirical demonstration that \textbf{transfer learning fails in intensity but succeeds in polarization}: Line 2a (classification only in I) achieves 100\% recall but 37.3\% precision, while Line 2b (dual I+L classification) transforms the system into a productive one ($\sim$100\% precision) validating that genuine astrophysical pulses exhibit morphological coherence between polarizations while RFI shows discrepancy. This finding, combined with the transformation of a prototype into a reproducible operational pipeline, constitutes the contribution of greatest scientific and technical impact of this thesis.
 }
 \newcommand{\palabrasclave}{
-Cinco es el máximo de palabras clave para describir los temas tratados en la memoria, ponerlas separadas por punto y comas.
+Fast Radio Bursts; Transfer Learning; Radioastronomía; Pipeline de Detección; Polarización Lineal
 }
 \newcommand{\palabrasclaveingles}{
-Corresponde a la traducción al idioma inglés de Palabras Clave anteriores.
+Fast Radio Bursts; Transfer Learning; Radio Astronomy; Detection Pipeline; Linear Polarization
 }
 % @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@>
 
@@ -294,9 +306,9 @@ Corresponde a la traducción al idioma inglés de Palabras Clave anteriores.
 \input{introduccion}
 
 \newpage
-\input{marco_conceptual}
-\newpage
 \input{definicion_del_problema}
+\newpage
+\input{marco_conceptual}
 \newpage
 \input{propuesta_de_solucion}
 \newpage

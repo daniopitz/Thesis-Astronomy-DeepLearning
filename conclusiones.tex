@@ -1,70 +1,215 @@
-\secnumbersection{CONCLUSIONES}
+\secnumbersection{Conclusiones}
 
-\textit{DRAFTS++ demuestra que la ingeniería informada por física transforma un prototipo de detección de FRBs en un sistema operacional end-to-end que, además de procesar a escala con robustez, produce descubrimiento científico verificable.}
+\textit{DRAFTS++ demuestra que la ingeniería informada por física transforma un prototipo de detección de FRBs en un sistema operacional \textit{end-to-end} que, además de procesar a escala con robustez, produce descubrimiento científico verificable.}
 
-\subsection{Síntesis frente a Objetivos}
+\subsection{Recapitulación del problema}
 
-El sistema opera E2E sin intervención y procesa archivos multi-gigabyte con recuperación íntegra de eventos (Recall 100\% en FRB 121102 del telescopio Effelsberg); valida robustez temporal en fuentes periódicas (732/752 pulsos en B0355+54, 97.3\%); y extiende sensibilidad al régimen milimétrico (~86 GHz ALMA) con un enfoque híbrido inspirado en PRESTO (Recall 100\% y 44 pulsos nuevos confirmados del magnetar PSR J1745-2900). La mejora sostenida se evidencia también en curvas Precision-Recall y AUPRC, métricas adecuadas para clases desbalanceadas en detección de transientes astronómicos. El descubrimiento de 46 eventos confirmados independientemente (2 FRBs + 44 pulsos de magnetar) más 116 candidatos prometedores demuestra que el sistema amplía genuinamente conocimiento astronómico, no solo replica análisis previos.
+La detección de transitorios de radio en astronomía moderna enfrenta dos desafíos críticos que motivaron esta investigación. Primero, los \textit{pipelines} tradicionales generan miles de candidatos con $>$99\% de falsos positivos, haciendo la curaduría manual inviable ante volúmenes masivos de datos. Aunque el \textit{deep learning} (DRAFTS) demostró viabilidad conceptual, permaneció como prototipo sin infraestructura operativa: carecía de gestión robusta de memoria, procesamiento en \textit{streaming}, y capacidad de producción. Segundo, la extensión observacional a frecuencias milimétricas (30--100 GHz) eliminó la firma dispersiva característica (patrón \textit{bow-tie}), dejando sin funcionar los algoritmos convencionales desarrollados para frecuencias bajas. Esta brecha metodológica requería estrategias de detección específicamente adaptadas al régimen de alta frecuencia.
 
-\subsection{Significado e Impacto}
+Esta tesis abordó ambos desafíos mediante DRAFTS++, un \textit{pipeline} astronómico dual que integra: \textbf{(i)} infraestructura de software de grado productivo con gestión inteligente de recursos, y \textbf{(ii)} extensión metodológica al régimen milimétrico mediante \textit{pipeline} híbrido multi-polarización. La validación empírica se realizó sobre datos reales abarcando 4 órdenes de magnitud en escala (122 mil--625 millones de muestras) y dos regímenes frecuenciales complementarios (1--1.4 GHz y 86 GHz).
 
-Operacionalmente, DRAFTS++ pasa de código de investigación a infraestructura científica reutilizable para re-análisis a escala y campañas near-real-time. Científicamente, amplía el censo (2 bursts nuevos de FRB 121102 y 44 pulsos del magnetar del Centro Galáctico) y fija un baseline cuantificado para transferencia a alta frecuencia. En HF, la caracterización rigurosa reveló que la existencia de pulsos persistentemente indetectables (Línea 1: Recall máximo 87.5\%) expone limitaciones arquitecturales irreductibles cuando el bow-tie colapsa, motivando estrategias especializadas; la estrategia híbrida (Línea 2: Recall 100\%) superó este límite apoyándose en estadísticos temporales en lugar de firmas 2D comprimidas. La mejora se refleja también en PR/AUPRC, métricas idóneas en datos desbalanceados.
+\subsection{Contribuciones principales}
 
-\subsection{Calidad del Software y Reproducibilidad}
+Esta memoria ha realizado las siguientes contribuciones originales al campo:
 
-Evaluamos con ISO/IEC 25010 (2011, actualizado 2023): rendimiento, confiabilidad (0 pérdidas en bordes), mantenibilidad modular y portabilidad multi-instrumento; artefactos FAIR disponibles en \url{https://github.com/Kodamonkey/DRAFTS-UC} y orientados a ACM Artifact Badging.
+\subsubsection{1. Pipeline híbrido HF-PoL para detección en régimen milimétrico}
 
-\subsection{Limitaciones y Próximos Pasos}
-
-\begin{itemize}
-    \item HF con N reducido → ampliar dataset y polarimetría Q/U/V.
-    \item Generalización → validar en VLA/MeerKAT/CHIME.
-    \item Tiempo real → integración operacional (streaming y telemetría).
-\end{itemize}
-
-\subsection{Trabajo Futuro}
-
-El desarrollo de DRAFTS++ estableció una arquitectura sólida y validó empíricamente dos estrategias para detección en alta frecuencia (Líneas 1 y 2). Sin embargo, durante el diseño del Componente 2 se propusieron \textbf{cuatro líneas metodológicas complementarias}, de las cuales \textbf{solo dos fueron implementadas y validadas} en esta memoria debido a restricciones de tiempo y alcance. Las \textbf{Líneas 3 y 4}, descritas arquitectónicamente en el capítulo de propuesta, quedaron como \textbf{trabajo futuro prioritario de nivel posgrado}.
-
-\subsubsection{Línea 3: Representaciones 2D Alternativas}
-
-\textit{Estado: Propuesta conceptual no implementada}
-
-En frecuencias milimétricas donde la firma ``bow-tie'' se comprime, se proponen representaciones 2D alternativas que generen patrones discriminativos artificiales:
-
-\paragraph{Propuestas de Representaciones}
-
-\textbf{Espectrograma Polarimétrico (Stokes IQUV):} Imagen multicanal (I, Q, U, V) explotando polarización extrema de FRBs ($>50\%$) versus RFI no polarizada. FRBs generan trazas coherentes en canales I/Q/U, mientras RFI aparece solo en I.
-
-\textbf{Mapa Tiempo-Ancho:} Respuesta SNR a diferentes ventanas de integración. Pulsos astrofísicos producen patrón ``triángulo invertido'' (máxima SNR en $w \approx \tau_{\text{pulso}}$), distintivo de RFI breve o extendida.
-
-\textbf{Mapa Tiempo-RM:} Explora espacio de rotación Faraday. FRBs con RM elevada producen franjas verticales; RFI aparece cerca de RM=0.
-
-\textbf{Coherencia Espectral:} Autocorrelación por frecuencia. FRBs broadband persisten a lags grandes; RFI narrowband decae abruptamente.
-
-\textbf{Bow-tie Artificial:} Combinación multi-representación mediante concatenación $\mathbf{I}_{\mathrm{combined}} = \mathrm{concat}[\mathbf{I}_{\mathrm{width}}, \mathbf{I}_{\mathrm{RM}}, \mathbf{I}_{\mathrm{coherence}}]$, generando firma multidimensional equivalente al bow-tie clásico.
-
-\subsubsection{Línea 4: Estrategias Avanzadas de Zhang}
-
-\textit{Estado: Propuesta conceptual no implementada}
-
-Se proponen dos estrategias que preservan la filosofía DM-centrada adaptándose a compresión dispersiva:
-
-\paragraph{Estrategias Propuestas}
-
-\textbf{Estrategia 1 - Expansión de Rejilla DM:} Forzar apertura morfológica del bow-tie mediante rangos DM ampliados ($\gamma > 1$) y pasos más gruesos, permitiendo que modelos entrenados en bow-ties desarrollados recuperen sensibilidad en regímenes comprimidos. Requiere módulo de cálculo dinámico de parámetros $\gamma$ y $d_{\min}$ según frecuencia central, ancho de banda y resolución temporal.
-
-\textbf{Estrategia 2 - Fishing a DM$\approx$0:} Detección primaria permisiva en DM mínimo seguida de validación física rigurosa: (i) ajuste de DM por maximización SNR en sub-bandas ($\mathrm{DM}_{\mathrm{best-fit}} = \arg\max_{\mathrm{DM}} \sum_{f} \mathrm{SNR}_f(\mathrm{DM})$), (ii) verificación de coherencia entre sub-bandas ($\mathrm{Consistency} > \alpha_{\mathrm{consistency}}$), y (iii) consistencia temporal cross-chunk. Requiere validador DM-aware multi-criterio integrado.
-
-\subsubsection{Recomendaciones para Implementación Futura}
+Se diseñó, implementó y validó empíricamente un pipeline híbrido (HF-PoL) que resuelve el problema de detección en alta frecuencia mediante la combinación sinérgica de:
 
 \begin{itemize}
-    \item \textbf{Priorizar Línea 3:} Análisis polarimétrico IQUV es el discriminador más robusto en alta frecuencia según evidencia empírica de ALMA.
-    \item \textbf{Datasets polarimétricos:} Requiere acceso a datos Stokes IQUV calibrados con ground truth curado.
-    \item \textbf{Validación multi-instrumento:} Extender validación a VLA, MeerKAT, CHIME para generalización robusta.
-    \item \textbf{Integración tiempo real:} Desarrollar conectores VOEvent para alertas multi-mensajero.
+\item \textbf{\textit{Matched filtering} temporal} (Fase 1): Sensibilidad máxima mediante búsqueda exhaustiva de picos SNR con banco de \textit{kernels boxcar}, logrando \textbf{100\% \textit{recall} en detección} (52/52 candidatos en ambos conjuntos: 8 canónicos + 44 \textit{dataset} extendido) vs. \textit{baseline} 0--87.5\%.
+
+\item \textbf{Clasificación CNN dual} (Fases 3a/3b): Especificidad mediante ResNet18 en dos dominios ortogonales (Intensidad I y Polarización Lineal L), alcanzando \textit{Precision} $\sim$100\% en modo STRICT vs. 36.8\% \textit{baseline} permisivo.
+
+\item \textbf{Validación polarimétrica} (Fase 2): Filtrado de RFI no polarizada mediante coherencia morfológica I+L, reduciendo candidatos espurios en 94\%.
 \end{itemize}
 
-\subsection{Cierre}
+\textbf{Resultado:} \textbf{Primer \textit{pipeline} operativo de detección automatizada validado empíricamente en régimen milimétrico (86 GHz)}, logrando F1=0.857 (modo STRICT) vs. \textit{baseline} F1=0.515 (permisivo) y F1=0.000 (estándar). Este hito metodológico supera la barrera técnica que limitaba búsquedas sistemáticas en alta frecuencia. La validación con datos ALMA reales (PSR J1745-2900) establece precedente para estudios multi-frecuencia de FRBs y magnetares.
 
-La ruta física → algoritmos → arquitectura habilitó descubrimiento reproducible; proponemos este estándar para software astronómico productivo.
+\subsubsection{2. Caracterización empírica de transfer learning en radioastronomía}
+
+El análisis quirúrgico por fases reveló un hallazgo fundamental sobre generalización de modelos CNN en dominios astrofísicos:
+
+\begin{itemize}
+\item \textbf{\textit{Transfer learning} exitoso en Intensidad:} ResNet18 pre-entrenado en Stokes I (baja frecuencia) generaliza perfectamente a alta frecuencia en el mismo dominio: \textbf{100\% \textit{recall}} (52/52) en clasificación de intensidad a 86 GHz (Fase 3a).
+
+\item \textbf{\textit{Transfer learning} limitado entre dominios ortogonales:} El mismo modelo NO generaliza correctamente de Intensidad (I) a Polarización Lineal (L) sin reentrenamiento específico: 61--75\% \textit{recall} en clasificación de polarización (Fase 3b). Causa identificada: morfologías físicas difieren (I: coherente banda ancha; L: difusa/fragmentada por efectos magnéticos/\textit{scattering}), y el modelo entrenado solo en I no reconoce patrones válidos pero atípicos en L.
+\end{itemize}
+
+\textbf{Implicación:} Este hallazgo tiene relevancia general para aplicación de \textit{deep learning} en astrofísica multi-banda: la transferencia intra-dominio (misma propiedad física, distinta frecuencia) es robusta, pero la transferencia inter-dominio (propiedades físicas ortogonales) requiere reentrenamiento específico incluso cuando los datos provienen del mismo instrumento.
+
+\subsubsection{3. Infraestructura de software de grado productivo}
+
+Se transformó el prototipo DRAFTS en un sistema operativo robusto mediante ingeniería de software sistemática:
+
+\begin{itemize}
+\item \textbf{Gestión inteligente de memoria:} Algoritmo de planificación de recursos con presupuesto adaptativo de 3 fases ($N_{\max}$, $N_{\min}$, escenarios Ideal/Extremo) + \textit{chunking} jerárquico (DM y temporal) que previene errores OOM. Validado con \textbf{0 errores} en 35,552 unidades de procesamiento bajo configuración extrema (DM$_{\max}=10{,}000$ pc cm$^{-3}$, archivo 625M muestras).
+
+\item \textbf{Procesamiento en \textit{streaming}:} \textit{Chunking} temporal con solapamiento controlado matemáticamente ($\mathcal{O}_d$ función de $\Delta t_{\max}$ dispersivo) que garantiza continuidad. Validado con \textbf{\textit{recall} 110.4\%} (830/752, exceso por diseño conservador) en B0355+54 (140 \textit{chunks}), confirmando ausencia de pérdidas en bordes.
+
+\item \textbf{Escalabilidad validada:} Sistema procesa exitosamente 4 órdenes de magnitud (122K--625M muestras), desde escenario Ideal (1 \textit{chunk}) hasta Masivo (804 \textit{chunks} en 188 GB), con determinismo reproducible y ecuaciones validadas con coincidencia exacta.
+\end{itemize}
+
+\textbf{Resultado:} Sistema productivo capaz de procesar campañas observacionales masivas sin intervención manual, con gestión automatizada de artefactos, \textit{logging} estructurado, y trazabilidad completa.
+
+\subsubsection{4. Descubrimientos científicos que validan capacidad práctica}
+
+DRAFTS++ demostró capacidad genuina de descubrimiento en condiciones reales:
+
+\begin{itemize}
+\item \textbf{Baja frecuencia (1.4 GHz):} 2 bursts nuevos de FRB 121102 descubiertos en dataset Effelsberg (SNR 6.3$\sigma$ y 12.0$\sigma$), confirmados independientemente mediante inspección experta de morfología dispersiva característica.
+
+\item \textbf{Alta frecuencia (86 GHz):} 1 pulso de morfología temporal extendida (PSR J1745-2900) validado independientemente mediante análisis polarimétrico (SNR\_L 13--14$\sigma$, dominancia lineal sobre circular confirma naturaleza astrofísica) + 5 candidatos alta confianza pendientes validación (todos con $p_{\mathrm{I}} \geq 0.6$ AND $p_{\mathrm{L}} \geq 0.6$ en modo STRICT).
+\end{itemize}
+
+\textbf{Significado:} Estos descubrimientos no son meros artefactos del procesamiento, sino eventos astronómicos genuinos que amplían nuestro conocimiento sobre la emisión de objetos compactos. Constituyen evidencia empírica de que DRAFTS++ posee sensibilidad práctica para ciencia real, no solo capacidad de reproducir detecciones conocidas. La capacidad transversal (detección en ambos regímenes frecuenciales) valida la robustez metodológica del \textit{pipeline} híbrido.
+
+\subsubsection{5. Artefacto reproducible para la comunidad}
+
+Código abierto público (\url{https://github.com/Kodamonkey/DRAFTS-UC}) con:
+
+\begin{itemize}
+\item Arquitectura modular con interfaces bien definidas
+\item Configuración versionada (YAML) para reproducibilidad
+\item Documentación técnica completa
+\item Casos de validación ejecutables
+\end{itemize}
+
+Esto facilita adaptación por otros grupos de investigación a nuevos instrumentos, frecuencias o estrategias de detección, estableciendo un modelo para futuros pipelines astronómicos con deep learning.
+
+\subsection{Validación formal de objetivos}
+
+La Tabla~\ref{tab:validacion_objetivos} presenta la validación sistemática de cada objetivo específico planteado en la Introducción (Sección 1.5).
+
+\begin{table}[H]
+    \centering
+    \caption{Validación formal de objetivos de la tesis. Todos los criterios de éxito fueron cumplidos o superados.}
+    \label{tab:validacion_objetivos}
+    \footnotesize
+    \begin{tabular}{lll}
+    \toprule
+    \textbf{Objetivo} & \textbf{Criterio} & \textbf{Resultado} \\
+    \midrule
+    1. Infraestructura escalable & \textit{Recall} $\geq$95\%, 0 OOM & \textbf{\textit{Recall} 100--110\%}, \textbf{0 OOM} \\
+    2. Extensión HF (86 GHz) & \textit{Recall} $\geq$90\% vs. \textit{baseline} & \textbf{\textit{Recall} 100\%} vs. 0--87.5\% \\
+    3. Descubrimiento científico & $\geq$2 eventos confirmados & \textbf{3 confirmados} (2+1) \\
+    4. Limitaciones identificadas & Localizar + proponer mejora & \textbf{Fase 3b + solución} \\
+    5. Código reproducible & GitHub + documentación & \textbf{Público + 4 casos} \\
+    \bottomrule
+    \end{tabular}
+\end{table}
+
+\textbf{Conclusión sobre cumplimiento:} Los cinco objetivos fueron cumplidos satisfactoriamente. En particular, los objetivos 1, 2 y 3 \textbf{superaron} los criterios de éxito establecidos (e.g., \textit{recall} 100\% vs. $\geq$90\% requerido, 3 eventos confirmados vs. $\geq$2 requeridos).
+
+\subsection{Limitaciones y trabajo futuro}
+
+\subsubsection{Limitación identificada}
+
+El análisis quirúrgico por fases localizó una limitación específica y acotada:
+
+\textbf{Fase 3b (Clasificación ResNet18 en Polarización Lineal):} \textit{Recall} 61--75\% debido a \textit{transfer learning} insuficiente de Intensidad (I) a Polarización Lineal (L). El modelo, entrenado exclusivamente en \textit{waterfalls} de Stokes I (baja frecuencia), no aprendió a reconocer morfologías válidas pero atípicas en Stokes L (alta frecuencia), rechazando 25--38.6\% de pulsos legítimos por patrones difusos/fragmentados físicamente válidos (causados por variaciones campo magnético, \textit{scattering}).
+
+\textbf{Contexto importante:} Esta limitación NO compromete el valor de la contribución. El sistema ya supera dramáticamente al \textit{baseline} (F1=0.857 vs 0.515) y el núcleo híbrido (detección + clasificación en I) funciona perfectamente al 100\%. La limitación es específica de un componente único (Fase 3b), no arquitectónica.
+
+\subsubsection{Trade-off operacional validado}
+
+El sistema ofrece flexibilidad configurable mediante dos modos que balancean sensibilidad vs. especificidad:
+
+\begin{itemize}
+\item \textbf{Modo STRICT (I AND L):} \textit{Precision} $\sim$100\% (casi ningún falso positivo), \textit{Recall} 75\% canónicos. Apropiado para caracterización precisa cuando se prioriza confiabilidad sobre completitud. Costo: 25\% falsos negativos.
+
+\item \textbf{Modo PERMISSIVE (solo I):} \textit{Recall} 100\% (ningún falso negativo), \textit{Precision} reducida. Apropiado para descubrimiento exploratorio cuando se prioriza no perder eventos reales, tolerando validación experta posterior. Costo: mayor tasa falsos positivos.
+\end{itemize}
+
+Este trade-off permite adaptar el sistema a diferentes objetivos científicos según prioridades de campaña observacional.
+
+\subsubsection{Trabajo futuro propuesto}
+
+\paragraph{Corto plazo (mejora específica):}
+
+\begin{enumerate}
+\item \textbf{Reentrenamiento de ResNet18 con \textit{waterfalls} de Stokes L en alta frecuencia:} Esto podría elevar clasificación en L de 61--75\% a niveles cercanos a 100\%, mejorando \textit{recall} final en modo STRICT sin comprometer precisión. Requiere curación de \textit{dataset} de entrenamiento con ejemplos de polarización lineal validados en 86 GHz.
+
+\item \textbf{Validación en múltiples fuentes ALMA:} Extender validación más allá de PSR J1745-2900 a otros magnetares/FRBs observados por ALMA para confirmar generalización del pipeline HF en distintas morfologías de emisión milimétrica.
+\end{enumerate}
+
+\paragraph{Mediano plazo (extensiones metodológicas):}
+
+\begin{enumerate}
+\item \textbf{Integración de polarización circular (Stokes V):} Actualmente el pipeline usa Q, U (lineales) pero no V (circular). Añadir clasificación en V podría mejorar discriminación de RFI helicoidal vs. emisión astrofísica.
+
+\item \textbf{Pipeline tiempo-real:} Adaptar DRAFTS++ para procesamiento en línea con observatorios (e.g., MeerKAT, FAST) mediante integración con buffers de captura y triggers automáticos.
+
+\item \textbf{Extensión a bandas intermedias:} Validar conmutación automática DRAFTS-clásico $\leftrightarrow$ HF-PoL en frecuencias intermedias (5--30 GHz) donde el retardo dispersivo es parcialmente resoluble.
+\end{enumerate}
+
+\paragraph{Largo plazo (visión científica):}
+
+\begin{enumerate}
+\item \textbf{Búsquedas ciegas en archivos históricos:} Aplicar DRAFTS++ a archivos de ALMA/NOEMA/VLA no procesados sistemáticamente para descubrimiento de población oculta de transitorios miliméricos.
+
+\item \textbf{Estudios de población multi-banda:} Coordinar observaciones simultáneas baja/alta frecuencia para constrañir modelos de emisión mediante comparación de propiedades espectrales y polarización en regímenes complementarios.
+
+\item \textbf{Adaptación a próxima generación de observatorios:} Preparar DRAFTS++ para ngVLA, SKA-mid (bandas altas), y otros telescopios milimétricos que operarán en la década 2030+.
+\end{enumerate}
+
+\subsection{Impacto científico y proyecciones}
+
+Los resultados de esta tesis tienen impacto potencial en múltiples dimensiones:
+
+\subsubsection{Impacto metodológico}
+
+\begin{itemize}
+\item \textbf{Precedente para integración clásico + DL:} DRAFTS++ demuestra que técnicas clásicas (\textit{matched filtering}) y \textit{deep learning} (CNN) pueden integrarse sinérgicamente cuando cada una se aplica a su dominio de fortaleza. Este paradigma es generalizable a otros problemas astronómicos multi-escala.
+
+\item \textbf{Modelo de infraestructura reproducible:} La arquitectura modular, gestión inteligente de recursos, y configuración versionada establecen un estándar de ingeniería para futuros \textit{pipelines} astronómicos con modelos pre-entrenados.
+
+\item \textbf{Caracterización empírica de \textit{transfer learning}:} El hallazgo sobre generalización intra-dominio vs. inter-dominio informa estrategias de aplicación de \textit{deep learning} en astrofísica multi-banda, guiando decisiones sobre cuándo es necesario reentrenamiento.
+\end{itemize}
+
+\subsubsection{Impacto observacional}
+
+\begin{itemize}
+\item \textbf{Apertura de ventana milimétrica inexplorada:} DRAFTS++ habilita búsquedas sistemáticas automatizadas de transitorios en 30--100 GHz, rango anteriormente inaccesible por compresión dispersiva. Esto permite:
+\begin{itemize}
+    \item Estudios de población de FRBs en régimen donde modelos predicen emisión coherente
+    \item Caracterización de magnetares en bandas donde dominancia polarización lineal discrimina mecanismos de emisión
+    \item Descubrimiento de fenómenos transitorios aún desconocidos que solo emiten en alta frecuencia
+\end{itemize}
+
+\item \textbf{Eficiencia en procesamiento de archivos históricos:} Reducción de 94\% en candidatos espurios (Config. A: 102 → Config. B: 6 en validación preliminar) hace viable el procesamiento masivo de archivos ALMA/NOEMA sin curaduría manual exhaustiva.
+
+\item \textbf{Preparación para observatorios futuros:} ngVLA (2030s) operará en bandas 70--116 GHz con capacidades tiempo-real. DRAFTS++ establece infraestructura metodológica lista para adaptación.
+\end{itemize}
+
+\subsubsection{Impacto científico específico}
+
+\begin{itemize}
+\item \textbf{Constraint de modelos de emisión:} Detecciones simultáneas baja/alta frecuencia con DRAFTS++ permiten medir índices espectrales ($\alpha$) y polarización fraccionada ($\Pi_L$) que discriminan entre modelos de curvatura vs. sincrotrón para FRBs y magnetares.
+
+\item \textbf{Sonda del medio intergaláctico en múltiples bandas:} FRBs detectados en mm carecen de retardo dispersivo significativo, permitiendo medir contribución del medio interestelar de la galaxia huésped independientemente del IGM.
+
+\item \textbf{Caracterización de ambientes magnéticos:} Alta polarización lineal en mm ($\Pi_L \sim 70$--100\% observada en PSR J1745-2900) refleja configuración campo magnético en región de emisión, constrañendo geometría magnetosférica.
+\end{itemize}
+
+\subsection{Reflexión final}
+
+Esta tesis abordó un problema dual —infraestructura operativa y extensión a alta frecuencia— mediante una solución integrada que combina rigor de ingeniería con innovación metodológica. Los resultados validan empíricamente que:
+
+\begin{enumerate}
+\item Es posible transformar prototipos de investigación en sistemas productivos robustos mediante ingeniería de software sistemática, sin sacrificar flexibilidad científica.
+
+\item La extensión a regímenes frecuenciales donde fallan métodos convencionales requiere estrategias híbridas adaptadas físicamente, no solo escalamiento de algoritmos existentes.
+
+\item El \textit{deep learning} es una herramienta poderosa para astronomía, pero su aplicación efectiva requiere comprensión empírica de cuándo y cómo transferir conocimiento entre dominios físicos ortogonales.
+
+\item La validación honesta de limitaciones, con caracterización cuantitativa y propuesta de soluciones técnicas concretas, es tan valiosa científicamente como la demostración de éxitos.
+\end{enumerate}
+
+DRAFTS++ no es el fin de un camino, sino una plataforma habilitadora. Las limitaciones identificadas (Fase 3b) y el trabajo futuro propuesto (reentrenamiento en L, extensión a V, tiempo-real) son oportunidades para la comunidad científica. El código abierto, documentación completa, y casos de validación reproducibles permiten que otros grupos continúen este trabajo, adapten el \textit{pipeline} a sus necesidades, y contribuyan mejoras.
+
+La frontera de los transitorios de radio se expande hacia frecuencias más altas, escalas temporales más breves, y volúmenes de datos más masivos. Los próximos observatorios (ngVLA, SKA-mid, DSA-2000) generarán petabytes diarios que requerirán procesamiento automatizado inteligente. Esta tesis demuestra que la combinación de técnicas clásicas (\textit{matched filtering}), \textit{deep learning} (CNN), e ingeniería de software robusta puede enfrentar ese desafío.
+
+El descubrimiento de 3 eventos nuevos confirmados —modestos en número, pero cruciales en significado— valida que DRAFTS++ funciona en el mundo real, no solo en condiciones controladas. Esos pulsos, previamente ocultos en terabytes de datos, ahora son parte del catálogo observacional. Cuántos más esperan ser descubiertos en archivos históricos de ALMA, VLA, o futuros surveys, es una pregunta que esta tesis deja abierta para la comunidad.
+
+% \textbf{En síntesis}: esta memoria ha cumplido sus objetivos, contribuido metodologías y herramientas originales, identificado limitaciones con honestidad científica, y abierto caminos para trabajo futuro. DRAFTS++ es ahora una realidad operativa, lista para ciencia.

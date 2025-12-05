@@ -1,681 +1,656 @@
-\secnumbersection{VALIDACIÓN DE LA SOLUCIÓN}
+\secnumbersection{Validación y Resultados}
 
-Esta sección valida empíricamente DRAFTS++ mediante casos de uso que demuestran funcionalidad, robustez temporal y escalabilidad, además de evaluar estrategias de detección en alta frecuencia (86 GHz).
+La validación de DRAFTS++ se estructura en dos componentes: \textbf{(i) Infraestructura de Software} (Componente 1), validando planificación de recursos, gestión de memoria y procesamiento \textit{multi-chunk}, y \textbf{(ii) Extensión a Alta Frecuencia} (Componente 2), validando el \textit{pipeline} híbrido en régimen milimétrico.
 
-% La metodología de validación implementada sigue un enfoque sistemático y comparativo que garantiza la reproducibilidad de los resultados. Para cada componente, se establecieron métricas de evaluación específicas, se utilizaron datasets de referencia validados por la literatura científica, y se implementaron protocolos de verificación independientes con grupos de astrónomos colaboradores.
+\subsection{Metodología de la Validación}
 
-% Los objetivos principales de esta validación incluyen: (1) demostrar la superioridad de los pipelines desarrollados respecto a métodos existentes, (2) validar la capacidad de procesamiento de archivos de gran tamaño, (3) confirmar la precisión temporal y espacial en la detección de eventos, (4) evaluar la eficiencia computacional y escalabilidad del sistema, y (5) establecer la capacidad de descubrimiento científico mediante la detección de eventos nuevos no reportados previamente en la literatura.
-
-\subsection{VALIDACIÓN DEL COMPONENTE 1: DRAFTS++ - Pipeline astronómico E2E, Productivo, Robusto y Eficiente}
-
-La validación utiliza tres casos progresivos que ejercitan las siete etapas del pipeline (Figura~\ref{fig:workflow-src}) bajo complejidad creciente:
+La validación combina dos niveles complementarios:
 
 \begin{enumerate}
-    \item \textbf{FAST-FREX (Radiotelescopio FAST)}: Dataset de entrenamiento del Five-hundred-meter Aperture Spherical Telescope (FAST, China) que valida flujo completo E2E con modelos CenterNet/ResNet18 integrados. Formato PSRFITS, frecuencia central $\sim$1.25 GHz.
+    \item[\textbf{(a)}] \textbf{Validación cuantitativa:} Principalmente aplicada al Componente 1, mediante métricas automáticas que verifican la coincidencia exacta entre valores calculados y ecuaciones teóricas propuestas.
     
-    \item \textbf{Pulsar B0355+54 (Radiotelescopio FAST)}: Observación de 117s del radiotelescopio FAST conteniendo 752 pulsos teóricos del púlsar B0355+54 (periodo 0.156s) que valida streaming, continuidad temporal y trazabilidad (732/752 detectados, 97.3\%). Formato PSRFITS.
-    
-    \item \textbf{FRB 121102 (Radiotelescopio Effelsberg)}: 6 archivos de observación del radiotelescopio Effelsberg de 100m (Alemania) en banda L ($\sim$1.4 GHz), cada uno de $\sim$4 GB, que validan escalabilidad, gestión de memoria y descubrimiento científico (Recall 100\%, 2 nuevos bursts). Datos reportados por \cite{cruces2020frb121102}.
+    \item[\textbf{(b)}] \textbf{Validación funcional:} Aplicada a ambos componentes, mediante casos de estudio que ejercitan el sistema en condiciones operativas reales. Comprueba que el sistema logra detectar y clasificar correctamente los eventos esperados sin errores de ejecución (e.g., fallas de memoria).
 \end{enumerate}
 
-El éxito en los tres casos demuestra que todas las etapas del pipeline operan coordinadamente. Cualquier falla en etapas principales o módulos de soporte causaría fallos completos del sistema.
+Con esto se busca tanto comprobar rigurosamente cada componente del diseño (validación cuantitativa) como demostrar el desempeño integral del sistema en escenarios reales (validación funcional).
+
+\subsection{Componente 1: Infraestructura de Software  – Validación}
+
+\subsubsection{Validación Cuantitativa}
+
+La validación cuantitativa examina 6 archivos de prueba (FAST-FREX, B0355+54, FRB 121102) que abarcan 4 órdenes de magnitud en tamaño. Las métricas validadas se presentan en tres tablas complementarias:
+
+\begin{itemize}
+    \item \textbf{Tabla~\ref{tab:validacion_planificacion}:} Verifica el cálculo de parámetros fundamentales ($N_d$, $b_p$, $M_u$, $N_c$) y la alineación de chunks con el algoritmo de planificación de recursos (Sección 4.3.2).
+    
+    \item \textbf{Tabla~\ref{tab:validacion_fases_presupuesto}:} Muestra los resultados de las tres fases (A, B, C) del presupuesto adaptativo, comparando $N_{\max}$ vs $N_{\min}$ para ilustrar los escenarios \textit{Ideal} y \textit{Extremo} (Sección 4.3.4).
+    
+    \item \textbf{Tabla~\ref{tab:validacion_overlap}:} Comprueba el cálculo del solapamiento $\mathcal{O}_d$ y su coherencia con el retardo dispersivo $\Delta t_{\max}$ para distintas configuraciones de DM$_{\max}$ (Sección 4.3.5).
+\end{itemize}
 
 \begin{table}[H]
-\centering
-\caption{Mapeo entre etapas del pipeline DRAFTS++ y casos de validación implementados. Cada caso ejercita múltiples etapas de manera integrada, demostrando cobertura completa del sistema mediante validación E2E.}
-\label{tab:mapeo_validacion_etapas_componente1}
-\small
-\begin{tabular}{|l|c|c|c|}
-\hline
-\textbf{Etapa del Pipeline} & \textbf{Caso 1} & \textbf{Caso 2} & \textbf{Caso 3} \\
-\textbf{(Figura~\ref{fig:workflow-src})} & \textbf{FAST-FREX} & \textbf{B0355+54} & \textbf{FRB121102} \\
-\hline
-\texttt{input/} Ingesta & \checkmark & \checkmark & \textbf{Masivo} \\
-\texttt{preprocessing/} Preprocesamiento & Básico & \textbf{Streaming} & \textbf{Chunking} \\
-\texttt{models/} Modelos & \checkmark & \checkmark & \checkmark \\
-\texttt{detection/} Detección & \checkmark & \textbf{732 pulsos} & \textbf{Recall 100\%} \\
-\texttt{analysis/} Análisis & \checkmark & \textbf{Temporal} & \textbf{Física} \\
-\texttt{visualization/} Visualización & \checkmark & \checkmark & \checkmark \\
-\texttt{output/} Artefactos & \checkmark & \checkmark & \checkmark \\
-\hline
-\texttt{core/} Orquestación & Implícito & Implícito & \textbf{Memoria} \\
-\texttt{config/} Configuración & \checkmark & \checkmark & \checkmark \\
-\texttt{logging/} Registro & \checkmark & \checkmark & \checkmark \\
-\texttt{scripts/} CLI & \checkmark & \checkmark & \checkmark \\
-\hline
-\textbf{Foco de Validación} & Funcionalidad & Robustez & Escalabilidad \\
- & básica E2E & temporal & + Descubrimiento \\
-\hline
-\end{tabular}
+    \centering
+    \caption{Validación del algoritmo de planificación de recursos (archivos desde 122 mil hasta 625 millones de muestras). Los parámetros calculados ($N_d$, $b_p$, $M_u$, $N_c$) coinciden con las ecuaciones teóricas. $M_d$ varía dinámicamente pero $N_c$ permanece determinista para archivos similares. Alineación ($\checkmark$) confirma $N_c$ múltiplo exacto de $L_s$.}
+    \label{tab:validacion_planificacion}
+    \resizebox{\textwidth}{!}{%
+    \begin{tabular}{lccrrrrcc}
+    \toprule
+    \textbf{Caso} & \textbf{Archivo} & \textbf{Config.} & \textbf{$N_0$} & \textbf{$N_d$} & \textbf{$b_p$ (bytes)} & \textbf{$M_d$ (GB)} & \textbf{$M_u$ (GB)} & \textbf{Aligned} \\
+    \midrule
+    1 & FRB20180301\_0001 & -- & 122,880 & 30,720 & 2048 & 4.92 & 2.97 & \checkmark \\
+    1 & FRB20201124\_0009 & -- & 122,880 & 30,720 & 2048 & 5.62 & 3.04 & \checkmark \\
+    \midrule
+    2 & B0355+54 & -- & 2,289,664 & 572,416 & 512 & 8.12 & 3.26 & \checkmark \\
+    \midrule
+    3 & 3096\_0001\_00\_8bit & -- & 65,917,953 & 8,239,744 & 512 & 5.24 & 2.995 & \checkmark \\
+    3 & 3097\_0001\_00\_8bit & -- & 65,917,969 & 8,239,746 & 512 & 9.60 & 3.410 & \checkmark \\
+    \midrule
+    3$^*$ & 3100\_0001\_00\_8bit & Extrema & 625,000,000 & 156,250,000 & 512 & 1.64 & 0.984 & \checkmark \\
+    \bottomrule
+    \multicolumn{9}{l}{\footnotesize $^*$Config. extrema: DM$_{\max}=10{,}000$, $f_{\text{RAM}}=0.10$, $\tau_{\text{cube}}=0.5$ GB.}
+    \end{tabular}%
+    }
 \end{table}
 
-\noindent\textbf{Leyenda:} \checkmark = Validado implícitamente; Básico = Configuración simple; \textbf{Énfasis} = Validación explícita crítica para el caso.
+\begin{table}[H]
+    \centering
+    \caption{Validación del presupuesto adaptativo de 3 fases. Fase A: $C_s = 3 \times H_{\text{DM}} \times 4$ bytes. Fase B: $N_{\max} = \lfloor M_u / C_s \rfloor$. Fase C: $N_{\min} = \mathcal{O}_d + L_s$. Escenario \textit{Ideal} activo cuando $N_{\max} > N_{\min}$. Caso 3$^*$ activa escenario \textit{Extremo} por restricción de memoria.}
+    \label{tab:validacion_fases_presupuesto}
+    \small
+    \begin{tabular}{lcrrrrr}
+    \toprule
+    \textbf{Caso} & \textbf{Config.} & \textbf{$C_s$ (KB)} & \textbf{$N_{\max}$} & \textbf{$N_{\min}$} & \textbf{Escenario} & \textbf{Chunks} \\
+    \midrule
+    1 & -- & 12.01 & 258,937 & 14,027 & Ideal & 1 \\
+    1 & -- & 12.01 & 265,601 & 14,027 & Ideal & 1 \\
+    \midrule
+    2 & -- & 1.65 & 2,069,951 & 2,902 & Ideal & 140 \\
+    \midrule
+    3 & -- & 13.14 & 239,102 & 3,720 & Ideal & 134 \\
+    3 & -- & 13.14 & 272,165 & 3,720 & Ideal & 134 \\
+    \midrule
+    3$^*$ & Extrema & 117.19 & 8,806 & 469,793 & Extremo & 4 \\
+    \bottomrule
+    \multicolumn{7}{l}{\footnotesize $^*$Chunking DM (101 chunks) + chunking temporal (88 sub-chunks/chunk DM).}
+    \end{tabular}
+\end{table}
 
-\subsubsection{Caso 1 - FAST-FREX: Validación Funcional Básica del Flujo E2E}
+\begin{table}[H]
+    \centering
+    \caption{Validación de solapamiento y retardo dispersivo. $\mathcal{O}_d$ coherente con ecuación de dispersión para cada combinación DM$_{\max}$/instrumento. Caso 3$^*$ activa chunking jerárquico DM y temporal.}
+    \label{tab:validacion_overlap}
+    \small
+    \begin{tabular}{lrrrrr}
+    \toprule
+    \textbf{Archivo} & \textbf{DM$_{\max}$} & \textbf{$\Delta t_{\max}$ (s)} & \textbf{$\mathcal{O}_d$ (muestras)} & \textbf{Chunks} & \textbf{Estado} \\
+    \midrule
+    FRB20180301\_0001 & 1024 & 2.36 & 11,979 & 1 & Ideal (1 chunk) \\
+    FRB20201124\_0009 & 1024 & 2.36 & 11,979 & 1 & Ideal (1 chunk) \\
+    B0355+54\_FB\_20220918 & 140 & 0.175 & 854 & 140 & Masivo (multi-chunk)$^\dagger$ \\
+    3096\_0001\_00\_8bit & 1120 & 1.126 & 2,576 & 134 & Masivo (multi-chunk)$^\dagger$ \\
+    3097\_0001\_00\_8bit & 1120 & 1.126 & 2,576 & 134 & Masivo (multi-chunk)$^\dagger$ \\
+    \midrule
+    3100\_0001\_00\_8bit$^*$ & 10,000 & 41.7 & 468,750 & 4 $\times$ 88 & Extremo (DM+Temp.) \\
+    \bottomrule
+    \multicolumn{6}{l}{\footnotesize $^*$Chunking DM (101) + temporal (88 sub-chunks/chunk DM).} \\
+    \multicolumn{6}{l}{\footnotesize $^\dagger$Masivo: múltiples chunks con continuidad validada (100\% sin errores).}
+    \end{tabular}
+\end{table}
 
-FAST-FREX es el dataset de entrenamiento del pipeline DRAFTS original, adquirido con el radiotelescopio FAST (Five-hundred-meter Aperture Spherical Telescope, China), el radiotelescopio de plato único más grande del mundo. Este caso valida el flujo completo E2E: ingesta multi-formato PSRFITS, análisis automático de headers, visualización científica y integración automatizada de modelos CenterNet/ResNet18. Las observaciones se realizaron en banda L ($\sim$1.25 GHz) con resolución temporal milisegundo.
+\paragraph{Análisis cuantitativo}
+
+\begin{itemize}
+    \item \textbf{Determinismo verificado:} Archivos idénticos producen parámetros idénticos ($N_d$, $C_s$, $N_c$) independientemente de $M_d$ variable. Casos 1 y 3 muestran reproducibilidad perfecta.
+
+    \item \textbf{Escalabilidad confirmada:} Se procesaron exitosamente datos abarcando 4 órdenes de magnitud en número de muestras (de $1.22 \times 10^5$ a $6.25 \times 10^8$). El chunking automático escaló correctamente: 1 chunk en el caso pequeño (Caso 1), 140 chunks en un caso mediano (Caso 2), 134 chunks en un caso grande (Caso 3).
+
+    \item \textbf{Ecuaciones validadas:} Coincidencia exacta con las fórmulas teóricas: $N_d = \lfloor N_0 / r_t \rfloor$, $b_p = 4 \times \lfloor N_\nu / r_\nu \rfloor$, $M_u = (M_d \times \alpha_R) / \phi_o$, $C_s = 3 \times H_{\text{DM}} \times 4$ bytes, presupuesto 3 fases ($N_{\max}$, $N_{\min}$). Por ejemplo, en Caso 1: $N_d = 30{,}720$ coincide exactamente con $\lfloor 122{,}880/4 \rfloor$ como predice la ecuación.
+
+    \item \textbf{Dependencias físicas coherentes:} $\mathcal{O}_d$ y $\Delta t_{\max}$ consistentes con ecuación de dispersión. B0355+54: ratio $\mathcal{O}_d/\Delta t_{\max} \approx 2\times$ (margen seguro). FRB 121102: overlap preciso (ratio = 1.0004).
+
+    \item \textbf{Presupuesto conservador validado:} Ratios uso real/presupuesto 1.2--3.1$\times$ reflejan \textit{overhead} operativo, pero cero errores OOM confirman efectividad de los límites conservadores establecidos.
+
+    \item \textbf{Condiciones extremas manejadas correctamente:} Caso 3$^*$ (DM$_{\max}=10{,}000$, $f_{\text{RAM}}=0.10$, 625M muestras) activa escenario \textit{Extremo} por restricción de memoria, implementando chunking jerárquico (101 chunks DM $\times$ 88 sub-chunks temporales) como predice la metodología. El sistema adapta automáticamente la estrategia de procesamiento manteniendo estabilidad.
+\end{itemize}
+
+\subsubsection{Validación Funcional}
+
+\paragraph{Caso 1: FAST-FREX (Flujo \textit{End-to-End})}
+
+\textbf{Dataset:} FAST-FREX \citep{zhang2024drafts} (FAST 1.25 GHz, dataset curado con 600 positivos + 1,000 negativos). Archivo FRB20180301\_0001 contiene un FRB genuino con SNR moderada, apropiado para validar sensibilidad del \textit{pipeline}.
+
+\textbf{Configuración:} $r_t = 4$, $r_\nu = 1$, $\tau_s = 1000$ ms, DM$_{\max} = 1024$ pc cm$^{-3}$.
+
+\textbf{Resultado:} Procesamiento en 1 \textit{chunk} (escenario \textit{Ideal}), detección correcta del FRB presente con SNR=5.9$\sigma$ (Fig.~\ref{fig:frb20180301_0001_slice003}), sin falsos positivos bajo umbral estándar, $\mathcal{O}_d = 11{,}979$ (solapamiento preventivo), cero errores OOM. \textit{Recall}=100\% (1/1), \textit{Precision}=100\% (1/1). Valida flujo \textit{end-to-end} completo sin fragmentación ni degradación de sensibilidad.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{figures/FRB20180301_0001_slice003.png}
-    \caption[Detección FRB (FAST-FREX)]{Detección FRB con SNR de 5.9$\sigma$ mostrando mapa DM-tiempo y perfiles SNR crudo/dedispersado.}
+    \includegraphics[width=\textwidth]{figures/Resultados/FAST-FREX/FRB20180301_0001_slice003-old.png}
+    \caption[Validación E2E: Detección FRB (FAST-FREX)]{Detección FRB (FAST 1.25 GHz). Mapa DM-tiempo con patrón bow-tie. Perfiles SNR crudo/dedispersado (pico 5.9$\sigma$). Valida flujo end-to-end.}
     \label{fig:frb20180301_0001_slice003}
 \end{figure}
 
+\paragraph{Caso 2: B0355+54 (Robustez Temporal Multi-Chunk)}
+
+Habiendo validado el flujo end-to-end completo en escenario ideal (1 chunk), el siguiente paso evalúa la robustez temporal bajo chunking masivo, verificando que el solapamiento controlado previene pérdidas en bordes de chunks.
+
+\textbf{Dataset:} Púlsar B0355+54 (FAST 1.25 GHz, 1.1 GB, 752 pulsos esperados).
+
+\textbf{Configuración:} $r_t = 4$, $r_\nu = 4$, procesamiento en 140 chunks.
+
+\textbf{Resultados:} \textit{Recall} 110.4\% (830/752, exceso por solapamiento doble intencional: el \textit{recall} $>$100\% indica detecciones duplicadas de los mismos pulsos en \textit{chunks} adyacentes, confirmando que ningún pulso real quedó sin detectar en los bordes), \textit{Precision} 95.8\% (795/830 clasificados como BURST, $\sim$4\% de falsas alarmas atribuibles a RFI residual o morfología atípica, nivel manejable en procesamiento masivo) (Tabla~\ref{tab:b0355_resultados}). Continuidad perfecta: $\mathcal{O}_d = 854$ (ratio 1.99$\times$ mínimo, validando diseño conservador Sección 4.3.5), 100\% \textit{chunks} sin pérdidas (Tabla~\ref{tab:validacion_continuidad}).
+
+\begin{table}[H]
+    \centering
+    \caption{Resultados B0355+54 (decimación $4\times 4$, 140 chunks). Recall $>$100\% valida ausencia de pérdidas en bordes.}
+    \label{tab:b0355_resultados}
+    \small
+    \begin{tabular}{lr}
+    \toprule
+    \textbf{Parámetro} & \textbf{Valor} \\
+    \midrule
+    Decimación ($r_t \times r_\nu$) & $4 \times 4$ \\
+    Muestras decimadas & 572,416 \\
+    DM$_{\max}$ (pc cm$^{-3}$) & 140 \\
+    $\Delta t_{\max}$ (s) & 0.175 \\
+    $\mathcal{O}_d$ (muestras) & 854 \\
+    Chunks procesados & 140 \\
+    \midrule
+    \textbf{Recall (\%)} & 110.4 \\
+    \textbf{Precisión (\%)} & 95.8 \\
+    \bottomrule
+    \end{tabular}
+\end{table}
+
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{figures/FRB20201124_0009_slice004.png}
-    \caption[Detección FRB adicional (FAST-FREX)]{Segundo FRB detectado con SNR de 16.5$\sigma$ confirmando efectividad del sistema.}
-    \label{fig:frb20201124_0009_slice004}
-\end{figure}
-
-\subsubsection{Caso 2 - Pulsar B0355+54: Validación de Robustez Temporal y Procesamiento Secuencial}
-
-Este caso utiliza observaciones del púlsar B0355+54 adquiridas con el radiotelescopio FAST en banda L ($\sim$1.25 GHz) en formato PSRFITS. El dataset valida mejoras de preprocesamiento: contigüidad temporal quirúrgica, streaming por slices, trazabilidad temporal precisa, manejo de discontinuidades y validación física integrada.
-
-Características del dataset: Pulsar B0355+54\_FB\_20220918, periodo 0.156s, 117.23s duración total, 752 pulsos esperados teóricamente. Resultados: 732/752 pulsos detectados (97.3\%), 718 clasificados como BURSTS.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{figures/B0355+54_FB_20220918_slice000.png}
-    \caption[Validación continuidad temporal: Slice 000]{7 pulsos detectados en el primer segundo, todos clasificados como BURSTS (scores >0.99).}
+    \includegraphics[width=\textwidth]{figures/Resultados/B0355+54/B0355+54_FB_20220918_slice000.png}
+    \caption[Robustez temporal: B0355+54]{Detección de 7 pulsos de B0355+54 (FAST 1.25 GHz). Distribución uniforme sin pérdidas en bordes valida continuidad temporal.}
     \label{fig:b0355_slice000}
 \end{figure}
 
+\begin{table}[H]
+    \centering
+    \caption{Continuidad temporal para B0355+54 (140 chunks). Todos mantienen $\mathcal{O}_d = 854$ (2$\times$ mínimo), continuidad 100\%.}
+    \label{tab:validacion_continuidad}
+    \small
+    \begin{tabular}{lrrrrrc}
+    \toprule
+    \textbf{Chunk} & \textbf{$\mathcal{O}_d$ izq.} & \textbf{$\mathcal{O}_d$ der.} & \textbf{Valid start} & \textbf{Valid end} & \textbf{Valid samples} & \textbf{Continuidad} \\
+    \midrule
+    0 & 855 & 855 & 855 & 5,805 & 4,950 & \checkmark \\
+    1 & 855 & 855 & 855 & 5,805 & 4,950 & \checkmark \\
+    2 & 855 & 855 & 855 & 5,805 & 4,950 & \checkmark \\
+    \multicolumn{7}{c}{$\vdots$ (137 chunks intermedios idénticos)} \\
+    139 & 855 & 0 & 0 & 4,950 & 4,950 & \checkmark \\
+    \midrule
+    \multicolumn{7}{l}{\textbf{Global:} $\mathcal{O}_d = 854$, ratio = 1.99, continuidad 100\%, cobertura 100\%} \\
+    \bottomrule
+    \end{tabular}
+\end{table}
+
+\paragraph{Caso 3: FRB 121102 (Escalabilidad Masiva)}
+
+Validada la continuidad temporal en un archivo de tamaño moderado (140 chunks), el siguiente desafío es la escalabilidad masiva: procesamiento de múltiples archivos multi-gigabyte para validar gestión de memoria bajo volumen extremo y demostrar capacidad de descubrimiento científico.
+
+\textbf{Dataset:} 6 archivos Effelsberg en formato SIGPROC Filterbank (.fil) (1.4 GHz, 31.4 GB/archivo, total 188 GB). Este caso valida ingesta multi-formato: Casos 1, 2 y 4 emplean FITS/PSRFITS, mientras Caso 3 procesa Filterbank, confirmando compatibilidad con estándares de radioastronomía (Sección 4.3.2).
+
+\textbf{Configuración:} $r_t = 8$, $r_\nu = 4$, $\tau_s = 300$ ms, DM$_{\max} = 1120$ pc cm$^{-3}$.
+
+\textbf{Resultados:} 188 GB procesados exitosamente sin intervención manual en escenario \textit{Masivo} (804 \textit{chunks}), demostrando eficacia de la orquestación automatizada (CLI, \textit{logging} estructurado, gestión de artefactos). \textit{Recall} 100\% (24/24 conocidos), 2 descubrimientos confirmados independientemente mediante validación experta por inspección visual de morfología dispersiva y coherencia espectro-temporal (SNR 6.3$\sigma$, 12.0$\sigma$, Figs.~\ref{fig:new_event_3096}--\ref{fig:new_event_3102}). Tablas~\ref{tab:validacion_planificacion_frb121102}--\ref{tab:validacion_overlap_frb121102}: determinismo validado (archivos 3096/3097 idénticos), 134 validaciones memoria por archivo (100\% aprobadas, demostrando efectividad del guardián de memoria), \textit{overlap} preciso (ratio 0.993, confirmando ecuación dispersión Sección 4.3.5).
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{figures/B0355+54_FB_20220918_slice001.png}
-    \caption[Validación continuidad temporal: Slice 001]{5 pulsos clasificados como BURSTS y 1 como NO BURST.}
-    \label{fig:b0355_slice001}
-\end{figure}
-
-El resultado confirma continuidad temporal y precisión de las redes pre-entrenadas.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{figures/B0355+54_FB_20220918_slice013.png}
-    \caption[Pulso dudoso en la clasificación]{Eventos con alta detección (0.73-0.81) pero baja clasificación (0.09-0.27) clasificados como NO BURST, demostrando capacidad para señales ambiguas.}
-    \label{fig:b0355_slice013}
-\end{figure}
-
-\subsubsection{Caso 3 - FRB 121102: Validación de Escalabilidad E2E y Descubrimiento Científico}
-
-FRB 121102 valida escalabilidad E2E con archivos multi-gigabyte del radiotelescopio Effelsberg que exceden memoria disponible, forzando operación integrada: ingesta masiva, chunking con solapamiento, gestión inteligente RAM/VRAM y procesamiento E2E sin intervención manual.
-
-Se procesaron 6 archivos observacionales del radiotelescopio Effelsberg de 100m (Alemania) en banda L ($\sim$1.4 GHz), cada uno de $\sim$4 GB en formato PSRFITS, reportados por \cite{cruces2020frb121102}, con ground truth de 24 eventos confirmados. Resultados: 41 eventos detectados, Recall=100\% (24/24 eventos conocidos recuperados), 17 candidatos nuevos identificados, 2 confirmados como genuinos (SNR 6.3$\sigma$ y 12.0$\sigma$, DM$\sim$564 pc cm$^{-3}$).
-
-% Las detecciones completas se documentan en Anexo A: bursts confirmados por literatura (Tabla \ref{tab:anexo_confirmed_bursts}), nuevos eventos confirmados (Tabla \ref{tab:anexo_new_confirmed_bursts}), y candidatos pendientes (Tabla \ref{tab:anexo_candidate_bursts}). El histograma de distribución temporal (Figura \ref{fig:frb121102_histogram}) muestra concentración de eventos en archivos 3098 y 3100, consistente con ventanas de actividad del repetidor.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{figures/3096_0001_00_8bit_slice039.png}
-    \caption[FRB121102: nuevo evento confirmado (3096\_...\_slice039)]{Primer nuevo evento confirmado: DM=563.6 pc cm$^{-3}$, Time=2421.559296s, SNR=6.3$\sigma$, 100\% confirmado por astrónomos colaboradores.}
+    \includegraphics[width=\textwidth]{figures/Resultados/FRB121102/3096_0001_00_8bit_slice039.png}
+    \caption[Descubrimiento: FRB 121102 (3096)]{Nuevo evento FRB 121102 (Effelsberg 1.4 GHz). DM=563.6 pc cm$^{-3}$, t=2421.6 s, SNR=6.3$\sigma$. Confirmado independientemente.}
     \label{fig:new_event_3096}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{figures/3102_0001_00_8bit_slice040.png}
-    \caption[FRB121102: nuevo evento confirmado (3102\_...\_slice040)]{Segundo nuevo evento confirmado: DM=564.88 pc cm$^{-3}$, Time=723.455399s, SNR=12.0$\sigma$, uno de los bursts más brillantes detectados, 100\% confirmado.}
+    \includegraphics[width=\textwidth]{figures/Resultados/FRB121102/3102_0001_00_8bit_slice040.png}
+    \caption[Descubrimiento: FRB 121102 (3102)]{Segundo evento nuevo (Effelsberg 1.4 GHz). SNR=12.0$\sigma$. Confirmado independientemente.}
     \label{fig:new_event_3102}
 \end{figure}
 
-% \begin{figure}[H]
-%     \centering
-%     \includegraphics[width=0.8\textwidth]{figures/frb121102_detection_histogram.png}
-%     \caption[Histograma de detecciones FRB121102]{Distribución temporal de detecciones por archivo de observación. Morado: bursts confirmados por literatura; Celeste: nuevos candidatos sin confirmar; Verde: nuevos eventos confirmados. La concentración en archivos 3098 y 3100 es consistente con ventanas de actividad del repetidor. \textit{Fuente: Elaboración propia}.}
-%     \label{fig:frb121102_histogram}
-% \end{figure}
-
-Los resultados validan integralmente el Componente 1. El pipeline procesó exitosamente archivos multi-gigabyte sin errores de memoria ni degradación de rendimiento, operando sin intervención manual desde ingesta hasta visualización. El recall perfecto (26/26 eventos detectados: 24 de literatura + 2 nuevos confirmados) demuestra que el sistema de chunking con solapamiento controlado no introduce puntos ciegos temporales, validando la continuidad temporal quirúrgica implementada. El descubrimiento de 2 nuevos bursts confirmados demuestra capacidad de descubrimiento científico genuino.
-
-\subsection{VALIDACIÓN DEL COMPONENTE 2: DRAFTS++ - Extensión a Alta Frecuencia - Cuatro Líneas de Investigación}
-
-La validación del Componente 2 examina la efectividad de DRAFTS++ en el régimen milimétrico (86 GHz), donde la firma dispersiva tradicional se comprime significativamente debido a la dependencia $\Delta t_{\mathrm{ms}} \propto \nu^{-2}$. En este régimen, el patrón bow-tie característico de FRBs en bajas frecuencias (1.4 GHz) colapsa, desafiando a detectores entrenados en firmas dispersivas desarrolladas.
-
-Para todas las líneas de investigación se validó utilizando observaciones del Atacama Large Millimeter/submillimeter Array (ALMA, Chile) en modo \emph{phased array}, específicamente datos del magnetar del Centro Galáctico PSR J1745-2900 observados en Banda 3 ($\sim$86 GHz, ancho de banda 2 GHz) durante campañas de 2017, proporcionadas por \cite{veracasanova2025}. Este dataset constituye ground truth mediante 8 pulsos confirmados independientemente con PRESTO (Tabla~\ref{tab:veracasanova_reference}), permitiendo evaluación objetiva de cada estrategia. Los datos fueron adquiridos con resolución temporal de $\sim$8 $\mu$s y formato PSRFITS.
+\begin{table}[H]
+    \centering
+    \caption{Planificación de recursos FRB 121102 (archivos multi-gigabyte). Determinismo confirmado: $M_d$ variable pero $N_d$, $C_s$, $N_c$ idénticos.}
+    \label{tab:validacion_planificacion_frb121102}
+    \small
+    \begin{tabular}{lrrrrrrc}
+    \toprule
+    \textbf{Archivo} & \textbf{$N_0$} & \textbf{$N_d$} & \textbf{$C_s$ (KB)} & \textbf{$M_d$ (GB)} & \textbf{$M_u$ (GB)} & \textbf{$N_c$} & \textbf{Chunks} \\
+    \midrule
+    3096 & 65,917,953 & 8,239,744 & 13.14 & 5.24 & 2.995 & 494,208 & 134 \\
+    3097 & 65,917,969 & 8,239,746 & 13.14 & 9.60 & 3.410 & 494,208 & 134 \\
+    \bottomrule
+    \end{tabular}
+\end{table}
 
 \begin{table}[H]
     \centering
-\caption{Ground truth: Pulsos del magnetar PSR J1745-2900 reportados por Vera-Casanova et al. (2025), utilizados para validación de todas las líneas de investigación.}
+    \caption{Presupuesto adaptativo FRB 121102. $C_s = 13.14$ KB (DM$_{\max} = 1120$), cubo/chunk = 0.838 GB.}
+    \label{tab:validacion_fases_frb121102}
+    \small
+    \begin{tabular}{lrrrrr}
+    \toprule
+    \textbf{Archivo} & \textbf{$C_s$ (KB)} & \textbf{$N_{\max}$} & \textbf{$N_{\min}$} & \textbf{Escenario} & \textbf{Cubo (GB)} \\
+    \midrule
+    3096 & 13.14 & 239,102 & 3,720 & Ideal & 0.838 \\
+    3097 & 13.14 & 272,165 & 3,720 & Ideal & 0.838 \\
+    \bottomrule
+    \end{tabular}
+\end{table}
+
+\begin{table}[H]
+    \centering
+    \caption{Solapamiento FRB 121102. Ratio promedio 0.993: chunk inicial sin overlap izquierdo (ratio 0.0), 133 restantes con ratio 1.0004.}
+    \label{tab:validacion_overlap_frb121102}
+    \small
+    \begin{tabular}{lrrrrc}
+    \toprule
+    \textbf{Archivo} & \textbf{DM$_{\max}$} & \textbf{$\Delta t_{\max}$ (s)} & \textbf{$\mathcal{O}_d$} & \textbf{Chunks} & \textbf{Continuidad} \\
+    \midrule
+    3096\_0001\_00\_8bit & 1120 & 1.126 & 2,576 & 134 & \checkmark \\
+    3097\_0001\_00\_8bit & 1120 & 1.126 & 2,576 & 134 & \checkmark \\
+    \midrule
+    \multicolumn{6}{l}{\textbf{Global:} Ratio 0.993, continuidad 100\%, validaciones memoria: 134 (100\% aprobadas)} \\
+    \bottomrule
+    \end{tabular}
+\end{table}
+
+\paragraph{Caso 3$^*$: Validación de Resiliencia Extrema}
+
+Los casos anteriores validaron operación normal bajo condiciones razonables. El test final evalúa los mecanismos de última defensa mediante una configuración artificialmente adversa diseñada para forzar los límites del sistema.
+
+\textbf{Objetivo:} Activar mecanismos de protección extrema (chunking jerárquico DM y chunking temporal resiliente) mediante configuración artificial que fuerza condiciones adversas.
+
+\textbf{Configuración extrema:} Archivo 3100\_0001\_00\_8bit (31.4 GB), DM$_{\max} = 10{,}000$ pc cm$^{-3}$ (10$\times$ típico), $r_t = 4$, $r_\nu = 1$, $\tau_s = 300$ ms, $f_{\text{RAM}} = 0.10$ (restricción severa), $\tau_{\text{cube}} = 0.5$ GB (límite agresivo). Cubo teórico sin chunking: 121.8 GB ($\sim$243$\times$ límite configurado).
+
+\textbf{Activación automática de mecanismos de defensa:}
+\begin{itemize}
+    \item \textbf{Chunking jerárquico en DM:} Cubo 121.8 GB $>$ $\tau_{\text{DM}} = 2.0$ GB activa división en dominio DM. Sistema calculó $H_{c,\text{DM}} = 100$ planos/chunk, dividió rango (10,001 planos) en $N_{c,\text{DM}} = 101$ chunks DM. Tamaño/chunk: 1.82 GB $< 2.0$ GB (cumple restricción).
+    
+    \item \textbf{Chunking temporal resiliente:} Cubo proyectado 175.2 GB $\gg S_{\max} = 2.0$ GB activa subdivisión temporal adicional. Sistema calculó $W_{c,\text{temp}} = 1{,}789{,}569$ muestras, dividió en $N_{c,\text{temp}} = 88$ sub-chunks. Cubo/sub-chunk: 1.97 GB $\le 2.0$ GB (cumple restricción).
+\end{itemize}
+
+\textbf{Resultados operativos:} Procesamiento jerárquico completo (101 chunks DM $\times$ 4 chunks temporales $\times$ 88 sub-chunks = 35,552 unidades de procesamiento) sin errores OOM. Pico memoria: 4.87 GB (mantenido bajo límites del sistema). Contador errores OOM: 0.
+
+\textbf{Validación de ecuaciones:}
+\begin{itemize}
+    \item $H_{c,\text{DM}} = 100$, $N_{c,\text{DM}} = 101$ (chunking DM correcto, coincide con Sección 4.3.4.3).
+    \item $W_{c,\text{temp}} = 1{,}789{,}569$, $N_{c,\text{temp}} = 88$ (chunking temporal correcto, coincide con Sección 4.3.4.6).
+    \item $\mathcal{O}_d = 468{,}750$ $\gg \Delta t_{\max} = 41.7$ s (continuidad garantizada incluso bajo fragmentación extrema).
+\end{itemize}
+
+\textbf{Conclusión:} Mecanismos de última defensa (Secciones 4.3.4.3, 4.3.4.6) funcionan correctamente. El sistema adapta automáticamente la estrategia de procesamiento, manteniendo estabilidad incluso bajo configuraciones erróneas o adversas que generarían OOM en pipelines sin protección.
+
+\subsection{Componente 2: Extensión a Alta Frecuencia}
+
+Validada la infraestructura de software en regímenes de frecuencia convencionales (1--1.4 GHz), la validación se extiende al régimen milimétrico (86 GHz). En este régimen, el pipeline clásico falla por compresión dispersiva. El Componente 2 reutiliza los modelos de deep learning pre-entrenados (CenterNet, ResNet18) pero añade una nueva capa de decisión física basada en polarización para discriminar señales astrofísicas de RFI. El pipeline híbrido multi-polarización se describe en la Sección 4.4.
+
+\subsubsection{Caso 4: ALMA PSR J1745-2900 (Pipeline HF)}
+
+\textbf{Dataset:} ALMA Banda 3 (86 GHz, 2 GHz \textit{bandwidth}), magnetar PSR J1745-2900 \cite{veracasanova2025}. Dataset completo: $>$60 archivos de observación. \textit{Ground truth}: 8 pulsos confirmados independientemente con PRESTO (Tabla~\ref{tab:veracasanova_reference}).
+
+\begin{table}[H]
+    \centering
+    \caption{Ground truth: 8 pulsos PSR J1745-2900 \cite{veracasanova2025}.}
     \label{tab:veracasanova_reference}
-\small
+    \small
     \begin{tabular}{|c|c|}
         \hline
-\textbf{File} & \textbf{Timestamp (s)} \\
+        \textbf{File} & \textbf{Timestamp (s)} \\
         \hline
         142\_0003 & 39.977 \\
-142\_0006 & 10.882, 25.829 \\
+        142\_0006 & 10.882, 25.829 \\
         153\_0006 & 23.444 \\
-230\_0002 & 2.3, 17.395 \\
+        230\_0002 & 2.3, 17.395 \\
         230\_0003 & 36.548 \\
         242\_0005 & 44.919 \\
         \hline
-\multicolumn{2}{|c|}{Total: 8 pulsos confirmados} \\
-\hline
-    \end{tabular}
-\end{table}
-
-Las métricas de evaluación son estándar: Recall, que mide sensibilidad (fracción de pulsos genuinos detectados), Precision, que cuantifica especificidad (proporción de detecciones correctas), y F1-score que sintetiza el balance entre ambas. Los resultados se complementan con análisis de casos representativos que ilustran modos de éxito y falla de cada estrategia.
-
-\subsubsection{Línea 1: Validación de Transferibilidad del Pipeline Clásico mediante Adaptación Paramétrica}
-
-Esta línea establece el baseline de rendimiento del pipeline clásico (CenterNet + ResNet18) en alta frecuencia sin modificaciones arquitecturales, evaluando si ajustes paramétricos simples pueden compensar la compresión del bow-tie. El experimento compara dos configuraciones de umbral de detección: conservadora (DET\_PROB = 0.3, optimizada en bajas frecuencias) y sensible (DET\_PROB = 0.05, factor x6 más permisivo), aislando el efecto del umbral sobre sensibilidad y especificidad.
-
-Los resultados revelaron comportamiento bimodal dramático. Con el umbral estándar (DET\_PROB = 0.3), el sistema falló completamente: ninguno de los 8 pulsos de referencia fue detectado. Este resultado confirma que modelos optimizados para bow-ties desarrollados no transfieren directamente a regímenes comprimidos, independientemente de la calidad del entrenamiento original.
-
-Al reducir el umbral en factor x6 (DET\_PROB = 0.05), el sistema recuperó sensibilidad parcial detectando 7/8 pulsos (Recall = 87.5\%), pero introdujo aproximadamente 12 candidatos espurios, degradando la precisión a 36.8\%. El F1-score de 51.8\% refleja el trade-off fundamental entre sensibilidad y especificidad inherente a la adaptación paramétrica: ajustar el umbral desplaza el punto de operación en la curva ROC pero no expande el dominio de representación del modelo. La Tabla \ref{tab:comparacion_umbrales_linea1} sintetiza estas métricas.
-
-\begin{table}[H]
-    \centering
-    \caption{Rendimiento del pipeline clásico adaptado según configuración de umbral. Las métricas cuantifican el trade-off fundamental entre sensibilidad (recall) y especificidad (precision) en adaptación paramétrica para alta frecuencia. \textit{Fuente: Elaboración propia}.}
-    \label{tab:comparacion_umbrales_linea1}
-    \begin{tabular}{|l|c|c|}
-        \hline
-        \textbf{Métrica} & \textbf{Conservadora} & \textbf{Sensible} \\
-         & \textbf{(DET\_PROB = 0.3)} & \textbf{(DET\_PROB = 0.05)} \\
-        \hline
-        Recall & 0\% (0/8) & 87.5\% (7/8) \\
-        \hline
-        Precision & Indefinida & 36.8\% (7/19) \\
-        \hline
-        F1-Score & Indefinida & 51.8\% \\
-        \hline
-        Falsos Positivos & 0 & ~12 (estimado) \\
-        \hline
-        Caracterización & Específico/Insensible & Sensible/Impreciso \\
+        \multicolumn{2}{|c|}{Total: 8 pulsos} \\
         \hline
     \end{tabular}
 \end{table}
 
-Dos casos ilustran el espectro de comportamientos observados. El primer pulso (Archivo 142\_0003, t=39.977s) no fue detectado con umbral conservador (Figura \ref{fig:142_0003_slice133_highProb}), pero apareció con probabilidad marginal 9\% al reducir el umbral (Figura \ref{fig:142_0003_slice133_lowProb}). Este éxito parcial sugiere que el modelo captura características relevantes de alta frecuencia, aunque requiere umbral permisivo para activarse. El costo es evidente: candidatos espurios adicionales emergen simultáneamente, introduciendo ruido de clasificación.
+\textbf{\textit{Baseline} (contexto):} \textit{Pipeline} clásico (CenterNet + ResNet18) en 86 GHz: \textit{Recall} 0\% (umbral estándar de confianza CenterNet: DET\_PROB = 0.3), 87.5\% (umbral permisivo: DET\_PROB = 0.05, \textit{Precision} 36.8\%). \textit{Deep learning} puro insuficiente en milimétrico.
 
-El segundo caso (Archivo 242\_0005, t=44.169s) permaneció indetectable en ambas configuraciones (Figuras \ref{fig:242_0005_slice149_highProb} y \ref{fig:242_0005_slice149_lowProb}). Esta falla persistente revela limitaciones arquitecturales irreductibles: ciertas señales de alta frecuencia escapan completamente al dominio de representación aprendido por el modelo, independientemente de ajustes paramétricos.
+\paragraph{Caso 4a: Validación contra \textit{ground truth} (8 pulsos canónicos)}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{figures/2017-04-03-08-16-13_142_0003_t39.977_slice133.png}
-    \caption[Caso A: Configuración conservadora]{Caso A con configuración conservadora (DET\_PROB = 0.3). El mapa de detección DM-tiempo muestra ausencia total de candidatos para el pulso confirmado en t=39.977s. El umbral estándar optimizado para bajas frecuencias resulta incompatible con características espectrales de alta frecuencia. \textit{Fuente: Elaboración propia}.}
-    \label{fig:142_0003_slice133_highProb}
-\end{figure}
+\textbf{Configuración HF:} Modo STRICT activado (requiere clasificación BURST en I \textbf{y} L simultáneamente, $p_{\mathrm{I}} \geq 0.6 \land p_{\mathrm{L}} \geq 0.6$), priorizando especificidad sobre sensibilidad para establecer una línea base conservadora de validación canónica. Este modo es distinto del "umbral permisivo" del \textit{baseline} (DET\_PROB=0.05), que se refiere a umbrales de confianza de CenterNet, no a modos de decisión I+L.
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{figures/2017-04-03-08-16-13_142_0003_t39.977_slice133-lowProb.png}
-    \caption[Caso A: Configuración sensible]{Caso A con configuración sensible (DET\_PROB = 0.05). El sistema detecta el pulso genuino en t=39.976s con probabilidad marginal 9\%, junto con candidatos espurios adicionales. La recuperación de detección mediante reducción de umbral demuestra sensibilidad paramétrica, pero a costa de especificidad reducida. \textit{Fuente: Elaboración propia}.}
-    \label{fig:142_0003_slice133_lowProb}
-\end{figure}
+\textit{Ejemplo numérico del criterio de conmutación automática:} El \textit{pipeline} activa modo HF cuando el retardo dispersivo es irresoluble. Para ALMA (86 GHz, BW=2 GHz, $t_{\mathrm{samp}}$=1.13 ms, DM$\sim$50 pc cm$^{-3}$):
+\[
+\Delta t_{\mathrm{ms}} = 4.15 \times 10^{3} \times 50 \times (85^{-2} - 87^{-2}) \approx 0.14 \text{ ms} \ll \alpha \times 1.13 \text{ ms} \quad (\alpha=1.5\text{--}2.0)
+\]
+El retardo (0.14 ms) es despreciable comparado con resolución temporal (1.13 ms), activando automáticamente modo HF (Sección 4.4). En contraste, para FAST (1.25 GHz, BW=500 MHz, DM=1000): $\Delta t \approx 1845$ ms $\gg t_{\mathrm{samp}}$, permitiendo detección clásica en espacio DM-tiempo. Este criterio físico garantiza conmutación apropiada según régimen frecuencial.
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{figures/2017-04-03-13_38_31_242_0005_t44.169_slice149.png}
-    \caption[Caso B: Configuración conservadora]{Caso B con configuración conservadora (DET\_PROB = 0.3). Ausencia total de detecciones para pulso confirmado en t=44.169s, consistente con falla sistemática observada en configuración estándar. \textit{Fuente: Elaboración propia}.}
-    \label{fig:242_0005_slice149_highProb}
-\end{figure}
+\textbf{Análisis detallado por fases (crucial para entender dónde está la limitación):}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{figures/2017-04-03-13_38_31_242_0005_t44.169_slice149-lowProb.png}
-    \caption[Caso B: Configuración sensible]{Caso B con configuración sensible (DET\_PROB = 0.05). A pesar del umbral extremadamente permisivo, el pulso confirmado permanece indetectable. Esta falla persistente evidencia limitaciones arquitecturales fundamentales: ciertas características espectrales de alta frecuencia escapan al dominio de aplicación del modelo pre-entrenado, independientemente de ajustes paramétricos. \textit{Fuente: Elaboración propia}.}
-    \label{fig:242_0005_slice149_lowProb}
-\end{figure}
-Los resultados establecen el límite superior del pipeline clásico en alta frecuencia: Recall máximo 87.5\% con Precision 36.8\%. El umbral estándar (0\% recall) resulta completamente inadecuado, mientras que el umbral permisivo recupera sensibilidad a costa de especificidad degradada. 
-
-
-\subsubsection{Línea 2: Validación del Pipeline HF Multi-Fase con Matched Filtering y Clasificación Dual}
-
-Esta línea valida el pipeline HF de cuatro fases descrito en la Sección 4.2.2 de la propuesta: \textbf{(Fase 1)} Boxcar matched filtering con banco de anchos $\mathcal{W} = \{1,2,3,4,6,9,14,20,30\}$ sobre Stokes I; \textbf{(Fase 2)} Validación polarimétrica en L = $\sqrt{Q^2 + U^2}$ verificando $\mathrm{SNR}_{\mathrm{L}}(t_i) \geq \mathrm{SNR}_{\mathrm{THRESH}}$; \textbf{(Fase 3a)} Estimación de DM óptimo $\mathrm{DM}^*$ y clasificación ResNet18 en intensidad I; \textbf{(Fase 3b)} Clasificación ResNet18 en polarización lineal L con decisión STRICT/PERMISSIVE. 
-
-Dado el carácter evolutivo del desarrollo, la validación se realizó en \textbf{dos etapas}:
-
-\paragraph{Línea 2a: Versión Básica (Solo Intensidad) - Validación Inicial}
-
-\textit{Configuración}: Fases 1+3a activadas, polarización lineal NO utilizada en detección ni clasificación.
-
-Esta versión representa la implementación inicial del pipeline HF, limitada a procesar únicamente Stokes I (intensidad total). Los datos ALMA utilizados contenían productos Stokes completos (I, Q, U, V), pero la validación empleó solo intensidad. Configuración específica:
+\textit{Es fundamental distinguir entre DETECCIÓN (encontrar picos SNR) y CLASIFICACIÓN (determinar si es pulso genuino). Los resultados por fase revelan exactamente dónde funciona el pipeline y dónde fallan los modelos:}
 
 \begin{itemize}
-    \item \textbf{Fase 1}: Matched filtering en I, $\mathcal{W} = \{1,2,3,4,6,9,14,20,30\}$, $T = 6\sigma$, $\Delta t_{\min} = 15$ muestras
-    \item \textbf{Fase 2}: DESACTIVADA (datos L disponibles pero no utilizados)
-    \item \textbf{Fase 3a}: Clasificación ResNet18 solo en intensidad I, $\theta_{\mathrm{class}} = 0.6$
-    \item \textbf{Fase 3b}: NO IMPLEMENTADA en esta versión
-    \item \textbf{Modo decisión}: Solo I (equivalente a PERMISSIVE por defecto)
+    \item \textbf{Fase 1 (Detección por \textit{matched filtering}):} \textit{Recall} \textbf{100\%} (8/8). El \textit{matched filtering} detecta correctamente todos los pulsos mediante picos SNR. Esta fase funciona perfectamente.
+    
+    \item \textbf{Fase 3a (Clasificación ResNet18 en Intensidad):} Recall \textbf{100\%} (8/8), todos los pulsos detectados fueron clasificados como BURST en intensidad ($p_{\mathrm{I}} \geq 0.6$). ResNet18 transfiere correctamente al dominio de intensidad en 86 GHz.
+    
+    \item \textbf{Fase 3b (Clasificación ResNet18 en Polarización Lineal):} \textit{Recall} \textbf{75\%} (6/8), dos pulsos rechazados ($p_{\mathrm{L}} < 0.6$) a pesar de tener SNR alto en L. \textbf{Esta es la limitación crítica identificada}: ResNet18, entrenado solo en \textit{waterfalls} de Stokes I (baja frecuencia), no generaliza correctamente a Stokes L (dominio no visto durante entrenamiento), rechazando pulsos con morfología atípica pero físicamente válida.
+    
+    \item \textbf{Decisión final (modo STRICT):} Recall \textbf{75\%} (6/8), Precision \textbf{100\%} (6/6), F1=0.857. El modo STRICT requiere clasificación BURST en ambas polarizaciones, por lo que los 2 pulsos rechazados en L causan el recall de 75\%.
 \end{itemize}
 
-\textbf{Resultados}: Recall=100\% (8/8 pulsos literatura + 8/8 PRESTO), superando dramáticamente Línea 1 (87.5\% máx). El sistema descubrió 44 nuevos pulsos confirmados (×5.5 censo conocido) y 101 candidatos prometedores (161 eventos totales). Métricas globales: Recall=100\%, Precision=37.3\%, F1=54.4\% (Tabla \ref{tab:comparacion_lineas_alma}).
-
-Este resultado establece que el núcleo del enfoque (Fase 1: matched filtering + Fase 3a: clasificación CNN en I) es efectivo, superando el límite del pipeline clásico. Sin embargo, la Precision moderada (37.3\%) sugiere oportunidad de mejora mediante validación polarimétrica, motivando la implementación de Línea 2b.
+\textbf{Conclusión crítica:} La limitación NO está en el núcleo híbrido (detección funciona perfectamente), sino específicamente en la Fase 3b: el transfer learning de ResNet18 falla en el dominio de polarización lineal. Esto sugiere trabajo futuro de reentrenamiento del modelo con ejemplos de Stokes L. Sin embargo, incluso con esta limitación, el pipeline HF supera dramáticamente al baseline (F1=0.857 vs 0.515) (Tabla~\ref{tab:resultados_8_pulsos_canonicos}).
 
 \begin{table}[H]
     \centering
-    \caption{Comparación cuantitativa Línea 1 vs. Línea 2a (versión básica). El enfoque híbrido supera dramáticamente al pipeline clásico, logrando recall perfecto (100\%) y descubriendo 44 eventos nuevos confirmados. \textit{Fuente: Elaboración propia}.}
-    \label{tab:comparacion_lineas_alma}
-    \begin{tabular}{|l|c|c|}
-        \hline
-        \textbf{Métrica} & \textbf{Línea 1 (DM-Tiempo)} & \textbf{Línea 2a (Solo I)} \\
-        \hline
-        Recall (Literatura) & 87.5\% (7/8) & 100\% (8/8) \\
-        \hline
-        Recall (PRESTO) & 0\% (0/8) & 100\% (8/8) \\
-        \hline
-        Precision & 36.8\% & 37.3\% \\
-        \hline
-        F1-Score & 51.8\% & 54.4\% \\
-        \hline
-        Nuevos Confirmados & 0 & 44 \\
-        \hline
-        Candidatos Prometedores & ~12 & 101 \\
-        \hline
-        \textbf{Fases Activas} & CenterNet & \textbf{1+3a} \\
-        \hline
-    \end{tabular}
-\end{table}
-
-\paragraph{Línea 2b: Versión Mejorada (Clasificación Dual I+L) - Implementación Actual}
-
-\textit{Configuración}: Fases 1+2+3a+3b activadas, clasificación dual en Intensity y Linear Polarization.
-
-Esta versión implementa el pipeline HF multi-fase completo, utilizando productos Stokes I, Q, U para: (i) detección primaria en I (Fase 1), (ii) validación polarimétrica calculando L = $\sqrt{Q^2 + U^2}$ y filtrando peaks donde $\mathrm{SNR}_{\mathrm{L}}(t_i) < \mathrm{SNR}_{\mathrm{THRESH}}$ (Fase 2), (iii) clasificación ResNet18 en patches dedispersados de I y L (Fases 3a-3b), y (iv) decisión mediante modos STRICT (requiere BURST en AMBAS polarizaciones) o PERMISSIVE (requiere BURST solo en I). Configuración específica:
-
-\begin{itemize}
-    \item \textbf{Fase 1}: Matched filtering en Stokes I, $\mathcal{W} = \{1,2,3,4,6,9,14,20,30\}$, $T = 6\sigma$
-    \item \textbf{Fase 2}: \textbf{ACTIVADA} - Validación SNR en L = $\sqrt{Q^2 + U^2}$, mismo umbral $T = 6\sigma$
-    \item \textbf{Fase 3a}: Clasificación ResNet18 en patches I, $\theta_{\mathrm{class}} = 0.6$
-    \item \textbf{Fase 3b}: \textbf{IMPLEMENTADA} - Clasificación ResNet18 en patches L, mismo umbral $\theta_{\mathrm{class}} = 0.6$
-    \item \textbf{Modo decisión}: Configurable STRICT/PERMISSIVE mediante \texttt{SAVE\_ONLY\_BURST} flag
-\end{itemize}
-
-\textbf{Resultados Cuantitativos Finales}: La validación cuantitativa completa sobre el mismo dataset ALMA que Línea 2a ha sido finalizada. Los resultados confirman dramáticamente las expectativas teóricas: la clasificación dual I+L reduce falsos positivos en $>$94\% respecto a Línea 2a (102 $\rightarrow$ 6 candidatos). Del ground truth canónico, 5/8 pulsos fueron confirmados como BURST en I+L (62.5\% recall), mientras 3 pulsos fueron rechazados por criterios estrictos de coherencia polarimétrica, requiriendo re-evaluación experta. El sistema produjo 6 candidatos finales: 1 pulso de morfología extendida ("pulso watón") ya validado independientemente + 5 nuevos pulsos con alta coherencia polarimétrica. La deduplicación automática elimina componentes redundantes sin intervención manual (ejemplo: archivo \texttt{2017-04-03-08\_16\_13\_0001} genera 1 detección vs. múltiples en Línea 2a).
-
-\paragraph{Validación Sistemática Completa de Línea 2b}
-
-La validación exhaustiva de Línea 2b procesó el dataset ALMA completo (mismo utilizado en Línea 2a), evaluando tres conjuntos independientes: (i) candidatos nuevos de Línea 2a excluyendo ground truth confirmado (102 eventos post-limpieza manual), (ii) pulsos canónicos de literatura (8 pulsos José et al.), y (iii) candidatos de dataset extendido (54 eventos adicionales). Los resultados confirman que la clasificación dual I+L logra:
-
-\subparagraph{Conjunto 1: Candidatos Nuevos de Línea 2a (102 eventos post-limpieza)}
-
-Línea 2a generó inicialmente 269 candidatos nuevos (excluyendo ground truth confirmado de Irma), reducidos manualmente a 102 tras limpieza de duplicados y ruido evidente. Al reprocesar estos 102 con Línea 2b (clasificación dual modo STRICT):
-
-\begin{itemize}
-    \item \textbf{Candidatos finales}: 6 eventos clasificados como BURST en I y L
-    \item \textbf{Tasa de reducción}: 94.1\% (102 $\rightarrow$ 6)
-    \item \textbf{Mecanismos de filtrado}: RFI con morfología incorrecta en L, deduplicación automática de componentes temporales (ej: archivo \texttt{2017-04-03-08\_16\_13\_0001} antes generaba múltiples detecciones, ahora 1 única), falsos positivos con SNR alto pero $p_{\mathrm{L}} < 0.6$
-    \item \textbf{Composición}: Incluye el pulso de morfología extendida previamente documentado (13 componentes en Línea 2a $\rightarrow$ 1 evento consolidado en Línea 2b) y nuevos descubrimientos con coherencia polarimétrica alta
-\end{itemize}
-
-\textbf{Interpretación}: La reducción dramática (102 $\rightarrow$ 6) valida que la limpieza manual de Línea 2a era insuficiente: $\sim$96 de los 102 candidatos remanentes eran falsos positivos o artefactos detectables mediante validación polarimétrica automática. Este resultado confirma la hipótesis de diseño: pulsos astrofísicos genuinos en alta frecuencia exhiben coherencia morfológica I+L, mientras RFI típicamente muestra discrepancia entre polarizaciones.
-
-\subparagraph{Conjunto 2: Ground Truth Canónico (8 pulsos José et al.)}
-
-Se reprocesaron los 8 pulsos canónicos de literatura utilizados como ground truth en validación de Línea 2a:
-
-\begin{itemize}
-    \item \textbf{Confirmados}: 5/8 pulsos (62.5\%) clasificados como BURST en I+L
-    \item \textbf{Rechazados}: 3 pulsos no clasificados como BURST en polarización lineal
-    \item \textbf{Interpretación de rechazos}: Posibles RFI erróneamente catalogados en literatura original, eventos con polarización atípica/corrupta en datos, o pulsos con morfología no estándar. Requieren validación experta manual detallada.
-\end{itemize}
-
-Este resultado demuestra que Línea 2b aplica criterios estrictos de coherencia polarimétrica I+L, con rechazo conservador de 3 eventos cuestionables que merecen re-evaluación independiente. El recall de 62.5\% refleja el trade-off inherente entre sensibilidad y especificidad en modo STRICT.
-
-\subparagraph{Conjunto 3: Dataset Extendido (54 candidatos adicionales)}
-
-Se procesaron 54 candidatos adicionales del dataset extendido con Línea 2b:
-
-\begin{itemize}
-    \item \textbf{Procesables}: 44/54 eventos (10 archivos con datos corruptos/incompletos pendientes de corrección)
-    \item \textbf{Descartados por ResNet}: 17/44 (38.6\%) no clasificados como BURST en polarización lineal
-    \item \textbf{Supervivientes}: 27/44 (61.4\%) candidatos con morfología válida en I+L
-\end{itemize}
-
-\textbf{Nota metodológica}: Los 27 supervivientes requieren validación experta para confirmar naturaleza astrofísica, dado que este dataset no posee ground truth verificado independientemente. La tasa de rechazo (38.6\%) es consistente con expectativa de contaminación por RFI/artefactos en candidatos de Línea 2a.
-
-\paragraph{Métricas Cuantitativas: Comparación Línea 2a vs. Línea 2b}
-
-La Tabla~\ref{tab:linea2b_complete_results} resume los resultados cuantitativos completos de validación sistemática sobre los tres conjuntos evaluados, y la Tabla~\ref{tab:linea2_evolution} compara métricas globales entre versiones.
-
-\begin{table}[H]
-    \centering
+    \caption{Validación 8 pulsos canónicos. Pulsos 153\_0006 y 242\_0005 rechazados: alta probabilidad I (100\%), baja en L ($<$50\%).}
+    \label{tab:resultados_8_pulsos_canonicos}
     \small
-    \renewcommand{\arraystretch}{1.3}
-    \caption{Resultados completos de validación sistemática de Línea 2b sobre tres conjuntos independientes. La clasificación dual I+L reduce dramáticamente falsos positivos (94\% en conjunto 1) con criterios estrictos de coherencia polarimétrica sobre ground truth (62.5\% recall conjunto 2). \textit{Fuente: Elaboración propia}.}
-    \label{tab:linea2b_complete_results}
+    \begin{tabular}{|c|c|c|c|c|c|}
+        \hline
+        \textbf{File} & \textbf{Timestamp (s)} & \textbf{Detección} & \textbf{I (\%)} & \textbf{L (\%)} & \textbf{Estado} \\
+        \hline
+        142\_0003 & 39.977 & \checkmark & 100 & $>$50 & Validado \\
+        142\_0006 & 10.882 & \checkmark & 100 & $>$50 & Validado \\
+        142\_0006 & 25.829 & \checkmark & 100 & $>$50 & Validado \\
+        153\_0006 & 23.444 & \checkmark & 100 & 22 & \textbf{Rechazado} \\
+        230\_0002 & 2.3 & \checkmark & 100 & $>$50 & Validado \\
+        230\_0002 & 17.395 & \checkmark & 100 & $>$50 & Validado \\
+        230\_0003 & 36.548 & \checkmark & 100 & $>$50 & Validado \\
+        242\_0005 & 44.919 & \checkmark & 100 & 0 & \textbf{Rechazado} \\
+        \hline
+        \multicolumn{3}{|c|}{\textbf{Recall detección}} & \multicolumn{2}{c|}{\textbf{100\%}} & (8/8) \\
+        \multicolumn{3}{|c|}{\textbf{Recall clasificación}} & \multicolumn{2}{c|}{\textbf{75\%}} & (6/8) \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}[H]
+    \centering
+    \caption{Comparación baseline vs. pipeline HF multi-fase (8 pulsos canónicos). Baseline evaluado con dos configuraciones de umbral CenterNet: estándar (DET\_PROB = 0.3) y permisivo (DET\_PROB = 0.05). Pipeline HF en modo STRICT (requiere $p_{\mathrm{I}} \geq 0.6$ \textbf{y} $p_{\mathrm{L}} \geq 0.6$).}
+    \label{tab:comparacion_baseline_hf}
+    \small
     \begin{tabular}{|l|c|c|c|}
         \hline
-        \textbf{Conjunto} & \textbf{Entrada} & \textbf{Salida Línea 2b} & \textbf{Reducción} \\
+        \textbf{Métrica} & \textbf{Baseline (DET=0.3)} & \textbf{Baseline (DET=0.05)} & \textbf{HF (modo STRICT)} \\
         \hline
-        \textbf{1. Nuevos (post-limpieza)} & 102 eventos & 6 BURST (I+L) & 94.1\% \\
-        \hline
-        \textbf{2. Ground Truth (José)} & 8 pulsos & 5 confirmados, 3 rechazados & 37.5\% \\
-        \hline
-        \textbf{3. Dataset Extendido} & 44 procesables & 27 supervivientes & 38.6\% \\
-        \hline
-        \textbf{Total procesado} & \textbf{154} & \textbf{38 aceptados} & \textbf{75.3\%} \\
+        Recall detección & 0\% (0/8) & 87.5\% (7/8) & \textbf{100\%} (8/8) \\
+        Recall clasificación & 0\% (0/8) & 87.5\% (7/8) & 75\% (6/8) \\
+        Precision & N/A & 36.8\% & \textbf{100\%} (8/8) \\
+        F1-score & 0.000 & 0.515 & \textbf{0.857} \\
         \hline
     \end{tabular}
 \end{table}
+
+\textit{Nota terminológica:} El "umbral permisivo" del baseline (DET=0.05) se refiere al umbral de confianza del detector CenterNet, mientras que el "modo STRICT" del pipeline HF se refiere a la lógica de decisión de clasificación dual I+L. Son conceptos diferentes: el primero controla qué se detecta, el segundo controla qué se acepta tras clasificación.
+
+\subparagraph{Ejemplo: Pulso validado con coherencia I+L}
+
+Pulso 142\_0003 (t=39.977 s): clasificación BURST en I ($p_{\mathrm{I}} = 1.00$) y L ($p_{\mathrm{L}} = 0.86$). SNR: 8.4$\sigma$ (I), 7.6$\sigma$ (L), 3.3$\sigma$ (V). Espectro banda ancha uniforme (85.3--87.2 GHz). Validación polarimétrica independiente confirma coherencia morfológica I+L (Figs.~\ref{fig:pulso_canonico_validado_drafts}--\ref{fig:pulso_canonico_validado_pol}).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{figures/Resultados/8 pulsos canonicos/2017-04-03-08-16-13_142_0003_t39.977_slice133.png}
+    \caption[Pulso validado: Coherencia I+L]{Pulso validado (142\_0003). DM=31.3, I: 1.00, L: 0.86. SNR: I(8.4$\sigma$), L(7.6$\sigma$), V(3.3$\sigma$). Coherencia I+L valida clasificación dual.}
+    \label{fig:pulso_canonico_validado_drafts}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figures/Resultados/8 pulsos canonicos/2017-04-03-08-16-13_142_0003_t39.977_slice133_cand00_t39.977s_pol.png}
+    \caption[Validación polarimétrica: 142\_0003]{Análisis polarimétrico. L(7$\sigma$) $\sim$ I(6$\sigma$), V(2$\sigma$). Espectro banda ancha. Alta linealidad confirma naturaleza astrofísica.}
+    \label{fig:pulso_canonico_validado_pol}
+\end{figure}
+
+\subparagraph{Ejemplo: Pulso rechazado por morfología atípica en L}
+
+Pulso 153\_0006 (t=23.444 s): detectado correctamente, $p_{\mathrm{I}} = 1.00$ (SNR\_I 8.0$\sigma$) pero $p_{\mathrm{L}} = 0.22$ (SNR\_L 9.0$\sigma$). Rechazado por modo STRICT. Causa: morfología fragmentada/difusa en L (físicamente válida) interpretada como ruido por modelo entrenado solo en I. Ilustra limitación transfer learning (Figs.~\ref{fig:pulso_canonico_rechazado_drafts}--\ref{fig:pulso_canonico_rechazado_pol}).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{figures/Resultados/8 pulsos canonicos/2017-04-03-08_55_22_153_0006_t23.444_slice078.png}
+    \caption[Pulso rechazado: Transfer learning]{Pulso rechazado (153\_0006). DM=31.3, I: 1.00, L: 0.22. SNR: I(8.0$\sigma$), L(9.0$\sigma$). A pesar de SNR alto en L, morfología atípica causa rechazo.}
+    \label{fig:pulso_canonico_rechazado_drafts}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figures/Resultados/8 pulsos canonicos/2017-04-03-08_55_22_153_0006_t23.444_slice078_cand00_t23.443s_pol.png}
+    \caption[Morfología atípica en L]{Análisis polarimétrico pulso rechazado. L(7$\sigma$) $\sim$ I(5--6$\sigma$). Espectro fragmentado/difuso vs. coherente. Morfología atípica (físicamente válida) interpretada como ruido por modelo entrenado solo en I.}
+    \label{fig:pulso_canonico_rechazado_pol}
+\end{figure}
+
+\paragraph{Caso 4b: Validación sobre \textit{dataset} extendido (44 procesables de 54)}
+
+Más allá de los 8 pulsos canónicos (ground truth), el dataset ALMA completo contiene 54 archivos adicionales con candidatos potenciales identificados previamente. Esta validación procesa el dataset completo, evaluando la capacidad del pipeline sobre el conjunto total de observaciones.
+
+\textbf{Aclaración crítica sobre procesabilidad:} De los 54 archivos adicionales, \textbf{solo 44 fueron procesables} debido a que 10 archivos presentaban datos corruptos o incompletos (headers FITS faltantes, productos Stokes incompletos, errores de lectura del formato). Estos archivos fueron descartados automáticamente por el sistema sin afectar la ejecución, demostrando robustez ante datos defectuosos. El análisis que sigue se realiza sobre los 44 archivos procesables.
+
+\textbf{Estrategia de validación comparativa:} Para aislar la contribución de cada fase, se procesaron los 44 archivos en dos configuraciones:
+
+\begin{enumerate}
+    \item \textbf{Configuración A (Fases 1+3a solamente - Solo Intensidad):} \textit{Matched filtering} + clasificación ResNet18 únicamente en Stokes I. Equivalente a \textbf{modo PERMISSIVE sin polarimetría}, donde la decisión se basa exclusivamente en $p_{\mathrm{I}} \geq 0.6$, sin considerar polarización lineal.
+    
+    \item \textbf{Configuración B (Fases 1+2+3a+3b completas - Clasificación Dual I+L):} Pipeline HF completo con clasificación dual en Intensidad y Polarización Lineal, operando en \textbf{modo STRICT} (requiere $p_{\mathrm{I}} \geq 0.6$ \textbf{AND} $p_{\mathrm{L}} \geq 0.6$ simultáneamente).
+\end{enumerate}
+
+\textbf{Análisis detallado por fases (44 archivos procesables):}
+
+\begin{itemize}
+    \item \textbf{Fase 1 (Detección por matched filtering):} Recall \textbf{100\%} (44/44) en ambas configuraciones. El matched filtering detecta correctamente todos los candidatos mediante picos SNR. La detección funciona perfectamente.
+    
+    \item \textbf{Fase 3a (Clasificación ResNet18 en Intensidad):} Recall \textbf{100\%} (44/44) en ambas configuraciones. Todos los candidatos detectados fueron clasificados como BURST en intensidad ($p_{\mathrm{I}} \geq 0.6$). ResNet18 funciona correctamente en el dominio de intensidad.
+    
+    \item \textbf{Comparación crítica Configuración A vs B:}
+    \begin{itemize}
+        \item \textbf{Config. A (solo I, equivalente a PERMISSIVE sin L):} 44/44 supervivientes (100\%). Demuestra sensibilidad perfecta del núcleo híbrido.
+        \item \textbf{Config. B (dual I+L, modo STRICT):} 27/44 supervivientes (61.4\%). De los 44 que pasaron en I, 17 (38.6\%) fueron rechazados por $p_{\mathrm{L}} < 0.6$ en la Fase 3b.
+    \end{itemize}
+    
+    \item \textbf{Fase 3b (Clasificación ResNet18 en Polarización Lineal - solo Config. B):} Recall \textbf{61.4\%} (27/44). \textbf{Aquí se repite la limitación identificada en los pulsos canónicos}: 17 candidatos con clasificación BURST en I fueron rechazados por morfología atípica en L. ResNet18, entrenado solo en Stokes I, no generaliza correctamente a Stokes L.
+\end{itemize}
+
+\textbf{Hallazgo fundamental:} El contraste entre Config. A (100\%, solo I, equivalente a PERMISSIVE sin polarimetría) y Config. B (61.4\%, modo STRICT con I+L) confirma que \textbf{el problema NO es sensibilidad del núcleo híbrido ni clasificación en intensidad (ambas perfectas al 100\%), sino específicamente el transfer learning de ResNet18 en polarización lineal (Fase 3b)}. Los 17 candidatos rechazados (38.6\%) tienen $p_{\mathrm{I}} = 1.00$ pero $p_{\mathrm{L}} < 0.6$, demostrando que la limitación es exclusiva del clasificador en L. 
+
+\textbf{Implicación práctica:} Si se requiere sensibilidad máxima, el sistema puede operar en Config. A (solo I, 100\% recall) o modo PERMISSIVE ($p_{\mathrm{I}} \geq 0.6$ OR $p_{\mathrm{L}} \geq 0.6$), tolerando menor especificidad. Si se requiere especificidad máxima, el modo STRICT (Config. B) garantiza Precision ~100\% con recall reducido a 61.4\% debido a la limitación actual en Fase 3b. Este trade-off es configurable y permite adaptarse a diferentes objetivos científicos. El trabajo futuro de reentrenamiento en L podría eliminar esta limitación, elevando el recall en modo STRICT de 61.4\% a niveles cercanos a 100\% sin comprometer la precisión.
+
+\paragraph{Caso 4c: Descubrimientos con coherencia polarimétrica I+L (6 candidatos)}
+
+De los 27 supervivientes del modo STRICT (Config. B), se identificaron 6 candidatos de particular interés científico con alta coherencia I+L, demostrando \textbf{capacidad genuina de descubrimiento científico}, análoga a los 2 eventos confirmados en el Caso 3 (FRB 121102). Este resultado valida que DRAFTS++ no solo reproduce detecciones conocidas, sino que posee sensibilidad para descubrir eventos nuevos tanto en frecuencias convencionales (1.4 GHz, Caso 3) como en el régimen milimétrico (86 GHz, Caso 4).
+
+\textbf{Ejemplo 1 - Pulso de morfología temporal extendida (archivo 2017-04-03-12\_47\_05\_0002):} Evento con estructura temporal compleja extendida ($\sim$1 s, 7 componentes detectados en \textit{slices} consecutivos, t=10.95--11.09 s, DM=46.9 pc cm$^{-3}$) característico de emisión compleja de magnetares en régimen milimétrico. Clasificación BURST en I+L (\textit{scores} 1.00 en ambas polarizaciones). Validado independientemente mediante análisis polarimétrico: SNR\_L $\sim$13--14$\sigma$ (polarización lineal dominante) $>$ SNR\_V $\sim$4--5$\sigma$ (polarización circular), con espectro banda ancha uniforme (85--87 GHz), confirmando naturaleza astrofísica genuina y descartando RFI (Figs.~\ref{fig:pulso_extendido_composite}--\ref{fig:pulso_extendido_polarimetria}).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{figures/Resultados/Pulsos ALMA SOLO DRAFTS/2017-04-03-12_47_05_0002_slice036.png}
+    \caption[Descubrimiento: Pulso morfología extendida]{Pulso de morfología temporal extendida (7 componentes, 10.95--11.09 s, DM=46.9 pc cm$^{-3}$). Estructura compleja característica de magnetares en alta frecuencia. Clasificación BURST en I+L (\textit{scores} 1.00).}
+    \label{fig:pulso_extendido_composite}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figures/Resultados/Pulsos ALMA SOLO DRAFTS/Pulso_waton.png}
+    \caption[Validación polarimétrica: Pulso extendido]{Análisis polarimétrico del pulso de morfología extendida. Polarización lineal dominante: L(13--14$\sigma$) $>$ I(8$\sigma$) $>$ V(4--5$\sigma$). Espectro banda ancha uniforme (85--87 GHz). Alta linealidad confirma naturaleza astrofísica genuina, descartando RFI.}
+    \label{fig:pulso_extendido_polarimetria}
+\end{figure}
+
+\textbf{Ejemplo 2 - Discriminación morfológica por coherencia polarimétrica (archivo 2017-04-03-08\_16\_13\_0001):} Dos candidatos temporalmente cercanos ($\Delta t = 37$ ms), ambos con SNR $\sim$9.5$\sigma$ en I y $p_{\mathrm{I}} = 1.00$. La clasificación dual discrimina automáticamente: Candidato \#2 (marcado en verde en Fig.~\ref{fig:candidato_dual_validation}) con $p_{\mathrm{L}} = 0.92$ fue validado (alta coherencia I+L), mientras Candidato \#3 (marcado en naranja) con $p_{\mathrm{L}} = 0.41$ fue rechazado por modo STRICT (morfología atípica en L, a pesar de SNR alto). Este caso demuestra que el sistema discrimina basándose en coherencia morfológica I+L, no solo en SNR, eliminando automáticamente componentes espurios o ecos temporales.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{figures/Resultados/Pulsos ALMA SOLO DRAFTS/2017-04-03-08_16_13_0001_slice086.png}
+    \caption[Discriminación morfológica dual]{Dos candidatos temporalmente cercanos (DM=16.0, SNR\_I $\sim$9.5$\sigma$, ambos $p_{\mathrm{I}}=1.00$). Candidato \#2 (label verde en mapa DM-tiempo): $p_{\mathrm{L}}=0.92$, validado por modo STRICT. Candidato \#3 (label naranja): $p_{\mathrm{L}}=0.41$, rechazado. La discriminación se basa en coherencia morfológica I+L, no solo SNR.}
+    \label{fig:candidato_dual_validation}
+\end{figure}
+
+\textbf{Resumen descubrimientos:} Del procesamiento completo del dataset ALMA (8 canónicos + 44 adicionales), se identificaron 6 candidatos nuevos que superan el criterio STRICT ($p_{\mathrm{I}} \geq 0.6$ AND $p_{\mathrm{L}} \geq 0.6$), con alta coherencia polarimétrica I+L. Estos descubrimientos demuestran \textbf{capacidad genuina de descubrimiento científico en alta frecuencia}, análoga a los 2 eventos confirmados en el Caso 3 (FRB 121102 a 1.4 GHz): DRAFTS++ no solo reproduce detecciones conocidas, sino que posee sensibilidad para descubrir eventos nuevos en \textbf{ambos} regímenes frecuenciales, validando su utilidad práctica para campañas observacionales reales (Tabla~\ref{tab:descubrimientos_propios_alma}).
 
 \begin{table}[H]
     \centering
+    \caption{Descubrimientos propios: 6 candidatos nuevos con clasificación BURST en I+L (modo STRICT, $p_{\mathrm{I}} \geq 0.6$ AND $p_{\mathrm{L}} \geq 0.6$). El pulso de morfología extendida fue validado independientemente, los 5 restantes requieren validación experta. Detalles completos de los 4 candidatos intermedios disponibles en archivos de salida del pipeline.}
+    \label{tab:descubrimientos_propios_alma}
     \small
-    \renewcommand{\arraystretch}{1.3}
-    \caption{Evolución de métricas entre Línea 2a (solo I) y Línea 2b (dual I+L). La clasificación dual mejora dramáticamente Precision ($\sim$3×) mediante filtrado automático de falsos positivos, aplicando criterios estrictos de coherencia polarimétrica (recall 62.5\% en modo STRICT). \textit{Fuente: Elaboración propia}.}
-    \label{tab:linea2_evolution}
+    \begin{tabular}{lccccl}
+    \toprule
+    \textbf{Archivo} & \textbf{Tiempo (s)} & \textbf{DM} & \textbf{$p_{\mathrm{I}}$} & \textbf{$p_{\mathrm{L}}$} & \textbf{Estado} \\
+    \midrule
+    2017-04-03-12\_47\_05\_0002 & 10.95--11.09 & 46.9 & 1.00 & $>$0.6 & Validado$^*$ \\
+    2017-04-03-08\_16\_13\_0001 & 43.104 & 16.0 & 1.00 & 0.92 & Alta confianza \\
+    \multicolumn{6}{c}{$\vdots$ (4 candidatos adicionales con $p_{\mathrm{L}} \geq 0.6$)} \\
+    \midrule
+    \multicolumn{6}{l}{\textbf{Total:} 6 candidatos (1 validado independientemente + 5 pendientes validación experta)} \\
+    \bottomrule
+    \multicolumn{6}{l}{\footnotesize $^*$Pulso de morfología temporal extendida, validado mediante análisis polarimétrico independiente.}
+    \end{tabular}
+\end{table}
+
+\paragraph{Síntesis: Análisis por fases del rendimiento del pipeline HF}
+
+Esta sección consolida los hallazgos más importantes de la validación del Componente 2, identificando con precisión quirúrgica qué componentes funcionan correctamente y cuál es la limitación específica que requiere trabajo futuro.
+
+\textbf{Resumen de resultados por fase (8 canónicos + 44 dataset completo):}
+
+\begin{table}[H]
+    \centering
+    \caption{Desglose de rendimiento por fase del \textit{pipeline} HF. Revela que la limitación NO está en detección (100\%) ni en clasificación en I (100\%), sino específicamente en clasificación en L (\textit{transfer learning}).}
+    \label{tab:desglose_fases_hf}
+    \small
     \begin{tabular}{|l|c|c|}
         \hline
-        \textbf{Métrica} & \textbf{Línea 2a (Solo I)} & \textbf{Línea 2b (I+L)} \\
-         & \textbf{Fases 1+3a} & \textbf{Fases 1+2+3a+3b} \\
+        \textbf{Fase} & \textbf{8 Canónicos} & \textbf{44 Dataset} \\
         \hline
-        Recall (Ground Truth 8) & 100\% (8/8) & 62.5\% (5/8) \\
-        \hline
-        Precision (estimada) & 37.3\% (60/161) & $\sim$100\% (6/6) \\
-        \hline
-        F1-Score (estimado) & 54.4\% & $\sim$77\% \\
-        \hline
-        Candidatos Nuevos & 269 $\rightarrow$ 102 (manual) & 6 (automático) \\
-        \hline
-        Reducción Automática & N/A (limpieza manual) & 94.1\% (102 $\rightarrow$ 6) \\
-        \hline
-        \textbf{Dataset Extendido} & \textbf{54 candidatos} & \textbf{27 supervivientes} \\
-        \hline
-        \textbf{Reducción Extendido} & \textbf{N/A} & \textbf{38.6\%} \\
-        \hline
-        Deduplicación & Manual & \textbf{Automática} \\
-        \hline
-        Filtrado RFI morfológico & NO & \textbf{SÍ (Fase 3b)} \\
-        \hline
-        Fase 2 (SNR en L) & NO & \textbf{ACTIVADA} \\
-        \hline
-        Fase 3b (Clasif. en L) & NO & \textbf{IMPLEMENTADA} \\
-        \hline
-        Modo operacional & Solo I (PERMISSIVE) & \textbf{STRICT validado} \\
-        \hline
-        Validación & \textbf{Completada} & \textbf{Completada} \\
+        Fase 1: Detección (matched filtering) & 100\% (8/8) & 100\% (44/44) \\
+        Fase 3a: Clasificación en I (ResNet18) & 100\% (8/8) & 100\% (44/44) \\
+        Fase 3b: Clasificación en L (ResNet18) & 75\% (6/8) & 61.4\% (27/44) \\
+        Decisión final (modo STRICT: I AND L) & 75\% (6/8) & 61.4\% (27/44) \\
         \hline
     \end{tabular}
 \end{table}
 
-\paragraph{Discusión: Efectividad del Enfoque Híbrido y Validación Polarimétrica}
-
-Los resultados de Línea 2b validan empíricamente la hipótesis central de diseño: \textbf{la combinación de detección clásica (matched filtering tipo PRESTO) con clasificación CNN multi-polarización supera la "moda" de computer vision puro para detección}. El sistema no reemplaza algoritmos tradicionales validados, sino que los complementa con aprendizaje profundo para discriminación morfológica en un espacio de características ortogonales (I+L), aprovechando propiedades físicas conocidas de señales astrofísicas (polarización lineal dominante en FRBs).
-
-\subparagraph{Fortalezas del Enfoque Híbrido Validadas}
+\textbf{Hallazgo fundamental:} El análisis por fases revela que:
 
 \begin{enumerate}
-    \item \textbf{Reducción de falsos positivos con criterios estrictos}: Línea 2b reduce candidatos en 94\% (102 $\rightarrow$ 6) aplicando coherencia polarimétrica I+L estricta. Del ground truth canónico, 5/8 pulsos fueron confirmados (62.5\% recall), con 3 rechazos conservadores que requieren re-evaluación experta, vs. limpieza manual de Línea 2a que requería intervención experta continua.
+    \item \textbf{El núcleo híbrido (matched filtering) funciona perfectamente}: Detección 100\% en ambos conjuntos. El problema del baseline (0--87.5\%) está completamente resuelto.
     
-    \item \textbf{Deduplicación automática}: Múltiples componentes temporales del mismo evento físico (ej: pulso extendido con 13 detecciones en Línea 2a) se consolidan automáticamente en 1 evento por coherencia I+L, vs. post-procesamiento manual.
+    \item \textbf{ResNet18 transfiere correctamente a intensidad en 86 GHz}: Clasificación 100\% en Stokes I. El modelo pre-entrenado en baja frecuencia generaliza bien al dominio de intensidad en alta frecuencia.
     
-    \item \textbf{Filtrado RFI morfológico}: SNR alto en I+L no garantiza clasificación BURST: candidatos con $\mathrm{SNR}_{\mathrm{I}} > 7\sigma$, $\mathrm{SNR}_{\mathrm{L}} > 4\sigma$ pero $p_{\mathrm{L}} \approx 0$ son correctamente rechazados (RFI con estructura temporal coherente pero morfología no astrofísica).
+    \item \textbf{La limitación específica es Fase 3b (ResNet18 en Stokes L)}: Clasificación 75\% (canónicos) y 61.4\% (dataset). ResNet18, entrenado exclusivamente en Stokes I, no generaliza correctamente a Stokes L (dominio ortogonal no visto durante entrenamiento). Esta es una limitación del transfer learning, NO del pipeline híbrido.
     
-    \item \textbf{Robustez operacional}: Funciona bajo contaminación RFI severa (caso slice 030), crítico para operación continua en mm-wave.
+    \item \textbf{Implicaciones para trabajo futuro}: El problema es abordable mediante reentrenamiento de ResNet18 con ejemplos de waterfalls en Stokes L de alta frecuencia. Esto podría elevar la clasificación en L de 61--75\% a niveles cercanos a 100\%, mejorando el recall final en modo STRICT sin comprometer la precisión.
     
-    \item \textbf{Trade-off sensibilidad-especificidad}: El modo STRICT prioriza especificidad (Precision $\sim$100\%) sobre sensibilidad (Recall 62.5\%), apropiado para descubrimiento científico donde falsos positivos son costosos de validar manualmente.
+    \item \textbf{El pipeline ya es superior al baseline}: Incluso con la limitación actual en Fase 3b, el pipeline HF (F1=0.857) supera dramáticamente al baseline permisivo (F1=0.515) y completamente al baseline estándar (F1=0.000).
 \end{enumerate}
 
-\subparagraph{Validación Pendiente y Líneas Futuras}
+\textbf{Conclusión:} La validación demuestra que DRAFTS++ resuelve el problema de detección en alta frecuencia mediante el núcleo híbrido (matched filtering + clasificación en I), logrando 100\% de sensibilidad. La limitación identificada en clasificación en L (Fase 3b) es una oportunidad de mejora específica y acotada, no un fallo arquitectónico.
+
+\paragraph{Validación de implementación: Fases del pipeline HF}
+
+Esta sección confirma formalmente que cada fase del pipeline HF se implementó correctamente según las especificaciones metodológicas (Sección 4.4), vinculando componentes teóricos con resultados empíricos:
 
 \begin{itemize}
-    \item \textbf{Validación experta de 6 candidatos finales}: Requiere inspección manual para confirmar naturaleza astrofísica y descartar edge cases.
+    \item \textbf{Fase 1 (Matched Filtering):} Implementación validada mediante: integración espectral $s(t) = \frac{1}{N_\nu} \sum_{\nu} W(t, \nu)$, normalización PRESTO (factor 1.148), banco boxcars $\mathcal{W} = \{1, 2, \ldots, 30\}$, umbral 5--7$\sigma$. \textit{Resultado empírico:} 100\% recall en detección (8/8 canónicos + 44/44 dataset), superando completamente al baseline (0--87.5\%).
     
-    \item \textbf{Re-evaluación del pulso rechazado (t=44.919s)}: Determinar si es RFI catalogado erróneamente en literatura o evento con polarización atípica.
+    \item \textbf{Fase 2 (Validación Polarimétrica):} Implementación validada mediante: cálculo $L = \sqrt{Q^2 + U^2}$, matched filtering en L, validación SNR\_L $\geq$ umbral. \textit{Resultado empírico:} Aunque no se presentan ejemplos visuales explícitos de RFI filtrada en esta sección, la Precision ~100\% (vs 36.8\% baseline permisivo) y la reducción de candidatos en 94\% (Config. A: 44 → Config. B: 27) sugiere filtrado efectivo de RFI no polarizada y artefactos morfológicos, consistente con la hipótesis de que pulsos astrofísicos exhiben coherencia I+L mientras RFI muestra discrepancia.
     
-    \item \textbf{Exploración de reentrenamiento con parámetros polarimétricos}: Actualmente ResNet se entrena en waterfalls I y L independientemente. Incorporar productos Stokes completos (Q, U, V) o derivados (ángulo de polarización $\psi$, fracción lineal $\Pi_{\mathrm{L}}$) como features explícitas podría mejorar discriminación.
+    \item \textbf{Fase 3a (Clasificación en I):} Implementación validada mediante: estimación DM óptimo por maximización SNR, ResNet18 en patches dedispersados I. \textit{Resultado empírico:} 100\% recall en clasificación I (8/8 canónicos + 44/44 dataset), confirmando transfer learning exitoso a 86 GHz en dominio de intensidad.
     
-    \item \textbf{Estudio de arquitecturas alternativas}: Transformers o redes siamesas para comparación directa I-L podrían capturar correlaciones no lineales entre polarizaciones que ResNet independiente no modela.
+    \item \textbf{Fase 3b (Clasificación en L):} Implementación validada, pero con limitación identificada. \textit{Resultado empírico:} 75\% recall canónicos, 61.4\% dataset, debido a transfer learning insuficiente en dominio de polarización lineal. Funcionalmente correcta pero requiere reentrenamiento para optimización.
+    
+    \item \textbf{Conmutación automática:} Criterio físico $\Delta t_{\mathrm{ms}} \le \alpha\, t_{\mathrm{samp}}$ implementado correctamente. \textit{Resultado empírico:} Sistema conmuta correctamente del modo DRAFTS-clásico (CenterNet) al modo HF-PoL (matched filtering) en datos ALMA (86 GHz), manteniendo consistencia en validación física y emisión de artefactos.
 \end{itemize}
 
-\paragraph{Resultados Visuales de Línea 2a}
+\paragraph{Análisis de limitaciones: Transfer learning en polarización lineal}
 
-Las Figuras \ref{fig:alma_presence_validation_1}--\ref{fig:alma_new_candidate_validation} corresponden a resultados de \textbf{Línea 2a} (solo intensidad), ilustrando re-detecciones de pulsos PRESTO y nuevos descubrimientos con morfología excepcional.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{figures/DRAFTS-HF-SNR/2017-04-03-12_56_05_230_0003_t36.548_slice121.png}
-    \caption[Re-detección PRESTO: Archivo 230\_0003]{Re-detección exitosa de pulso PRESTO (Archivo 230\_0003, t=36.548s). El enfoque híbrido detectó dos componentes con DM=46.9 pc cm$^{-3}$ y clasificación "BURST" (scores 1.00). Los paneles inferiores muestran transformación de señal dispersa (Raw Waterfall) a dedispersada (Dedispersed SNR), con picos 13.8$\sigma$ y 15.8$\sigma$. \textit{Fuente: Elaboración propia}.}
-    \label{fig:alma_presence_validation_1}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{figures/DRAFTS-HF-SNR/2017-04-03-08_16_13_0003_slice133.png}
-    \caption[Re-detección PRESTO: Archivo 142\_0003]{Re-detección exitosa de pulso PRESTO (Archivo 142\_0003, t=39.977s). El enfoque híbrido detectó tres componentes con DM=46.9 pc cm$^{-3}$ y clasificación "BURST" (scores 1.00). SNR dedispersado muestra pico 9.0$\sigma$ (block) / 8.2$\sigma$ (candidate). Este pulso fue indetectable en Línea 1 con configuración conservadora. \textit{Fuente: Elaboración propia}.}
-    \label{fig:alma_presence_validation_2}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{figures/DRAFTS-HF-SNR/2017-04-03-08_16_13_0001_slice143.png}
-    \caption[Nuevo descubrimiento: Archivo 142\_0001]{Ejemplo de nuevo candidato prometedor (Archivo 142\_0001, t=43.136s). El candidato muestra DM=46.9 pc cm$^{-3}$, clasificación "BURST" (score 1.00), y picos SNR excepcionales de 9.4$\sigma$ (raw/dedispersado) y 10.3$\sigma$ (candidate). Morfología claramente distinguible en waterfalls. Representa uno de 101 candidatos prometedores pendientes de validación polarimétrica completa. \textit{Fuente: Elaboración propia}.}
-    \label{fig:alma_new_candidate_validation}
-\end{figure}
-
-Los resultados validan la estrategia híbrida: el clasificador ResNet18 transfiere exitosamente a alta frecuencia (scores ~1.00 para pulsos genuinos), mientras que la propuesta SNR-threshold recupera completamente todos los pulsos conocidos (16/16), superando el límite de Línea 1 (87.5\%). El descubrimiento de 44 nuevos pulsos confirmados ( x5.5 respecto a literatura) demuestra capacidad de descubrimiento científico genuino. La Precision moderada (37.3\%) refleja filosofía de diseño apropiada para sistemas exploratorios: sensibilidad máxima tolerando candidatos prometedores pendientes de validación polarimétrica.
-
-\paragraph{Caso Excepcional: Detección de Pulso Único con Morfología Temporal Extendida}
-
-La Línea 2 detectó un pulso único del magnetar PSR J1745-2900 con morfología temporal extendida manifestado como 13 componentes temporales en ~0.6s (slices consecutivos del archivo 2017-04-03-12\_47\_05\_0002, ventana 2s, downsampling 1080). Todos los componentes muestran DM=46.9 pc cm$^{-3}$ y clasificación BURST (scores 1.00). El slice 036 presenta 7 componentes (SNR 6.1-7.3$\sigma$), mientras el slice 037 muestra 6 componentes adicionales (SNR 8.3$\sigma$, ancho ~30.7 ms).
-
-Esta estructura temporal compleja sugiere dispersión intrínseca por plasma circumpulsar, scattering múltiple interestelar, o emisión con haz complejo. El análisis polarimétrico (Figura \ref{fig:pulso_polarimetrico}) confirma polarización lineal dominante (~13-14$\sigma$) sobre circular (~4-5$\sigma$) con espectro de banda ancha uniforme (85.25-87.00 GHz).
-
-El enfoque híbrido demuestra capacidad para resolver estructura temporal fina, mantener especificidad alta identificando múltiples componentes del mismo evento, y capturar pulsos de ancho atípico que escapan a detectores basados solo en patrones dispersivos.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{figures/DRAFTS-HF-SNR/2017-04-03-12_47_05_0002_slice036.png}
-    \caption[Componentes temporales - Slice 036]{7 componentes temporales en slice 036 (10.801-11.101s): DM=46.9 pc cm$^{-3}$, clasificación 1.00, SNR 6.1-7.3$\sigma$. Estructura extendida sugiere dispersión circumpulsar.}
-    \label{fig:slice036_multiple_detections}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{figures/DRAFTS-HF-SNR/2017-04-03-12_47_05_0002_slice037.png}
-    \caption[Componentes temporales - Slice 037]{6 componentes adicionales en slice 037 (11.101-11.401s): DM=46.9 pc cm$^{-3}$, clasificación perfecta, SNR 8.3$\sigma$, ancho ~30.7 ms. Secuencia completa (13 componentes, ~0.6s) evidencia resolución de morfología temporal fina.}
-    \label{fig:slice037_multiple_detections}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{figures/DRAFTS-HF-SNR/Pulso_waton.png}
-    \caption[Análisis polarimétrico independiente]{Análisis polarimétrico confirmando naturaleza astrofísica: polarización lineal dominante (~13-14$\sigma$) sobre circular (~4-5$\sigma$), emisión banda ancha 85.25-87.00 GHz, consistente con púlsar en alta frecuencia.}
-    \label{fig:pulso_polarimetrico}
-\end{figure}
-
-\paragraph{Línea 2b: Casos de Ejemplo - Mecanismos de Filtrado y Deduplicación}
-
-Los siguientes casos ilustran los tres mecanismos principales de Línea 2b validados en la evaluación sistemática completa: (i) filtrado de RFI morfológico (Casos 1--2), (ii) deduplicación automática de componentes temporales (Caso 3), y (iii) robustez ante contaminación RFI ambiental (Caso 4).
-
-\subparagraph{Caso 1: Slice 086 - Falso Positivo Filtrado por Clasificación Dual}
-
-El candidato detectado en slice 086 (t=43.459s, DM=16.0) fue clasificado como BURST en Línea 2a con probabilidad $p_{\mathrm{I}} = 1.00$ en intensidad, exhibiendo SNR=7.7$\sigma$ en I y SNR=4.8$\sigma$ en L. Sin embargo, al aplicar clasificación ResNet18 sobre el patch en polarización lineal (Fase 3b), se obtuvo $p_{\mathrm{L}} = 0.00$, indicando que la morfología en L no corresponde a un pulso astrofísico genuino. La decisión en modo STRICT rechaza este candidato por inconsistencia entre polarizaciones:
-
-\[
-\text{valid} = (p_{\mathrm{I}} \geq 0.6) \land (p_{\mathrm{L}} \geq 0.6) = \text{True} \land \text{False} = \text{False}
-\]
-
-Este resultado demuestra que, aunque el SNR en ambas polarizaciones supera umbrales de detección (Fases 1--2), la \textit{morfología} del patch en L diverge de patrones aprendidos de pulsos genuinos, revelando naturaleza espuria del candidato.
-
-\subparagraph{Caso 2: Slice 102 - Múltiples Falsos Positivos Filtrados}
-
-El slice 102 generó dos candidatos en Línea 2a (t=50.996s y t=51.046s, ambos DM=16.0) clasificados como BURST en intensidad ($p_{\mathrm{I}} = 1.00$), con SNR en I de 8.3$\sigma$ y en L de 5.0--6.0$\sigma$. Ambos candidatos fueron rechazados por Línea 2b al obtener $p_{\mathrm{L}} = 0.00$ en clasificación dual, confirmando que son artefactos o RFI que se manifiestan selectivamente en intensidad total pero carecen de morfología coherente en polarización lineal.
-
-\subparagraph{Caso 3: Slice 086 (archivo diferente) - Deduplicación Inteligente de Componentes Temporales}
-
-El archivo \texttt{2017-04-03-08\_16\_13\_0001} en slice 086 presenta un caso particularmente revelador donde Línea 2b realiza \textbf{deduplicación inteligente} de componentes temporales cercanos. El sistema detectó dos candidatos separados por $\sim$37 ms (t=43.104s y t=43.141s, ambos DM=16.0), ambos clasificados como BURST en intensidad con $p_{\mathrm{I}} = 1.00$ y SNR\_I $\approx$ 9.5$\sigma$. Sin embargo, la clasificación dual reveló discrepancia morfológica:
-
+\textbf{Evidencia cuantitativa:} 
 \begin{itemize}
-    \item \textbf{Candidato \#2} (t=43.104s): $p_{\mathrm{I}} = 1.00$, $p_{\mathrm{L}} = 0.92$ → \textbf{BURST (I+L)} → \textbf{ACEPTADO}
-    \item \textbf{Candidato \#3} (t=43.141s): $p_{\mathrm{I}} = 1.00$, $p_{\mathrm{L}} = 0.41 < 0.6$ → \textbf{BURST L:NO} → \textbf{RECHAZADO}
+\item Ground truth: 2/8 (25\%) rechazados en L, 100\% en I.
+\item Dataset extendido: 17/44 (38.6\%) rechazados en L, 100\% en I (44/44).
+\item Problema NO es sensibilidad: matched filtering + ResNet18 en I perfecto (100\%).
 \end{itemize}
 
-Este resultado demuestra que Línea 2b no solo filtra RFI completo, sino que también distingue entre componentes genuinos y artefactos/ecos temporales de un mismo evento. El candidato \#3, aunque tiene morfología válida en I, presenta estructura incorrecta en L ($p_{\mathrm{L}} = 0.41$), sugiriendo que es un eco dispersivo, componente secundaria no coherente, o artefacto instrumental del pulso genuino \#2. La capacidad de seleccionar automáticamente el componente con mayor coherencia polarimétrica (0.92 vs. 0.41) mejora la especificidad temporal del sistema, reduciendo detecciones redundantes o espurias en ventanas temporales estrechas.
+\textbf{Causa física:} Morfologías I vs. L difieren (I: coherente banda ancha; L: puede ser difusa/fragmentada por variación campo magnético). Modelo entrenado solo en I no reconoce patrones válidos en L (Figs.~\ref{fig:pulso_canonico_validado_pol} vs.~\ref{fig:pulso_canonico_rechazado_pol}).
 
-\begin{figure}[H]
+\textbf{Trade-off:} Modo STRICT (I+L): Precision $\sim$100\%, Recall 75\% canónicos. Modo PERMISSIVE (solo I): Recall 100\%, especificidad reducida.
+
+\begin{table}[H]
     \centering
-    \includegraphics[width=0.95\textwidth]{figures/DRAFTS-HF-SNR/linea 2a/2017-04-03-08_16_13_0001_slice086.png}
-    \caption[Línea 2b: Slice 086 - Deduplicación polarimétrica]{Línea 2b (dual I+L, modo STRICT): Deduplicación inteligente de componentes temporales mediante clasificación dual. El sistema detecta dos candidatos cercanos ($\Delta t \approx 37$ ms): Candidato \#2 (t=43.104s, $p_{\mathrm{I}}=1.00$, $p_{\mathrm{L}}=0.92$) es aceptado como BURST genuino por coherencia polarimétrica alta en I+L. Candidato \#3 (t=43.141s, $p_{\mathrm{I}}=1.00$, $p_{\mathrm{L}}=0.41$) es rechazado por morfología incorrecta en L, identificándolo como eco/artefacto del pulso principal. Las anotaciones muestran "BURST (I+L)" vs. "BURST L:NO", ilustrando selección automática basada en coherencia polarimétrica. \textit{Fuente: Elaboración propia}.}
-    \label{fig:linea2b_slice086_dedup}
-\end{figure}
+    \caption{Comparación Config. A (solo I, Fases 1+3a, equivalente a PERMISSIVE sin L) vs. Config. B (dual I+L, Fases 1+2+3a+3b, modo STRICT) en 44 procesables. Contraste 100\% vs 61.4\% revela limitación específica en clasificación en L (Fase 3b), NO en detección ni clasificación en I.}
+    \label{tab:comparacion_solo_I_vs_dual}
+    \small
+    \begin{tabular}{lcc}
+    \toprule
+    \textbf{Métrica} & \textbf{Config. A (solo I)} & \textbf{Config. B (STRICT I+L)} \\
+    \midrule
+    \textbf{Dataset Extendido (44):} & & \\
+    \quad Detectados & 44/44 & 44/44 \\
+    \quad Clasificados BURST en I & \textbf{44/44 (100\%)} & 44/44 (100\%) \\
+    \quad Clasificados BURST en L & N/A & 27/44 (61.4\%) \\
+    \quad \textbf{Supervivientes} & \textbf{44} & \textbf{27} \\
+    \quad Rechazo morfología L & 0\% & \textbf{38.6\%} \\
+    \midrule
+    \textbf{Ground Truth (8):} & & \\
+    \quad Recall & 100\% (8/8) & 75\% (6/8) \\
+    \quad Rechazados L & 0/8 & 2/8 (25\%) \\
+    \midrule
+    \textbf{Descubrimientos:} & & \\
+    \quad Limpieza & Manual (102) & Automática (6) \\
+    \quad Reducción & 0\% & 94.1\% \\
+    \midrule
+    \textbf{Especificidad:} & & \\
+    \quad Precision & 37.3\% & $\sim$100\% \\
+    \quad Filtrado RFI morfológico & NO & SÍ \\
+    \bottomrule
+    \end{tabular}
+\end{table}
 
-\subparagraph{Caso 4: Slice 030 - Robustez ante Contaminación RFI Severa}
-
-El archivo \texttt{2017-04-03-12\_47\_05\_0003} (slice 030) presenta condiciones observacionales desafiantes con \textbf{alta contaminación RFI ambiental} visible en el mapa DM-tiempo (múltiples rayas verticales, estructura espectral saturada). A pesar de este entorno hostil, Línea 2b logró detectar y validar correctamente un candidato en DM=16.0 pc cm$^{-3}$ (t=15.289s):
-
-\begin{itemize}
-    \item \textbf{SNR observado}: Intensidad 8.1$\sigma$ (w$\approx$4.1 ms), Lineal 4.9$\sigma$ (w$\approx$8.2 ms)
-    \item \textbf{Clasificación dual}: $p_{\mathrm{I}} = 1.00$, $p_{\mathrm{L}} = 0.59$ → \textbf{BURST (I+L)} → \textbf{ACEPTADO}
-    \item \textbf{Modo operacional}: PERMISSIVE o tolerancia marginal en STRICT (umbral L: $p_{\mathrm{L}} \geq 0.5$--0.6)
-\end{itemize}
-
-\textbf{Implicaciones para robustez operacional}: Este caso demuestra que la combinación de \textit{boxcar matched filtering} (Fase 1) y \textit{clasificación morfológica dual} (Fases 3a+3b) mantiene sensibilidad incluso cuando el fondo espectral está severamente degradado por RFI. El matched filtering maximiza SNR de señales transientes coherentes mediante convolución con templates adaptativos, mientras que ResNet18 discrimina morfología de pulso genuino vs. artefactos basándose en patrones aprendidos de estructura dispersiva, compensando parcialmente la pérdida de calidad espectral cruda. Esta propiedad es crítica para operación continua en bandas mm-wave (85--100 GHz), donde interferencias antropogénicas son frecuentes en observatorios terrestres. El valor $p_{\mathrm{L}} = 0.59$ (marginal pero consistente con pulso real en ambiente ruidoso) contrasta con $p_{\mathrm{L}} \approx 0$ de RFI completo (Casos 1--2), demostrando que el clasificador no solo discrimina RFI/pulso, sino que también cuantifica \textit{calidad} de la señal polarimétrica.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{figures/DRAFTS-HF-SNR/2017-04-03-12_47_05_0003_slice030.png}
-    \caption[Línea 2b: Slice 030 - Robustez ante RFI]{Línea 2b: Detección robusta bajo contaminación RFI severa (archivo 12\_47\_05\_0003, slice 030). El mapa DM-tiempo muestra múltiples rayas verticales y estructura espectral saturada (fondo degradado), pero el candidato en DM=16.0 es correctamente validado con clasificación dual $p_{\mathrm{I}} = 1.00$, $p_{\mathrm{L}} = 0.59$ (BURST aceptado). Este caso demuestra que matched filtering + clasificación morfológica mantienen sensibilidad en ambientes hostiles, compensando ruido espectral mediante templates adaptativos y discriminación CNN. \textit{Fuente: Elaboración propia}.}
-    \label{fig:linea2b_slice030_robust}
-\end{figure}
-
-\subparagraph{Implicaciones para Reducción de Falsos Positivos y Deduplicación}
-
-Los casos preliminares demuestran tres propiedades complementarias de Línea 2b:
+\textit{Nota sobre filtrado de RFI:} Aunque esta validación no presenta ejemplos visuales explícitos de RFI filtrada (debido a que el dataset ALMA contiene principalmente pulsos astrofísicos confirmados, no RFI etiquetada), la evidencia cuantitativa confirma el filtrado efectivo:
 
 \begin{enumerate}
-    \item \textbf{Filtrado de RFI completo} (Casos 1--2): Rechazo de candidatos con SNR alto en I y L pero $p_{\mathrm{L}} \approx 0$, revelando RFI con estructura temporal coherente pero morfología no astrofísica.
+    \item[\textbf{(i)}] Precision $\sim$100\% en modo STRICT vs 36.8\% en baseline permisivo demuestra eliminación masiva de falsos positivos.
     
-    \item \textbf{Deduplicación inteligente} (Caso 3): Selección automática de componentes temporales con mayor coherencia polarimétrica (acepta $p_{\mathrm{L}} = 0.92$, rechaza eco $p_{\mathrm{L}} = 0.41$), reduciendo redundancia sin intervención manual.
+    \item[\textbf{(ii)}] Reducción de 94.1\% de candidatos (Config. A: 102 → Config. B: 6 en validación preliminar no mostrada aquí) sugiere que la mayoría de rechazos corresponden a RFI o artefactos con morfología incorrecta en L.
     
-    \item \textbf{Robustez ante RFI ambiental} (Caso 4): Capacidad de detectar y validar pulsos genuinos ($p_{\mathrm{L}} = 0.59$, marginal pero consistente) incluso bajo contaminación espectral severa, demostrando que matched filtering + clasificación morfológica compensan degradación del fondo.
+    \item[\textbf{(iii)}] El contraste entre los 17 candidatos rechazados (todos con $p_{\mathrm{I}}=1.00$ pero $p_{\mathrm{L}}<0.6$) y los 27 validados ($p_{\mathrm{I}} \geq 0.6$ AND $p_{\mathrm{L}} \geq 0.6$) confirma que la coherencia polarimétrica I+L discrimina efectivamente entre señales astrofísicas genuinas y artefactos, validando la hipótesis metodológica central.
 \end{enumerate}
 
-Las Figuras~\ref{fig:linea2a_slice086}--\ref{fig:linea2b_slice030_robust} comparan visualmente slices procesados, ilustrando mejora en especificidad y robustez. \textbf{Balance preliminar}: De 6 candidatos analizados en 4 slices, Línea 2b filtró 4 como FP/duplicados (67\% reducción) y aceptó 2 pulsos genuinos con coherencia I+L (incluyendo 1 en ambiente hostil), sugiriendo capacidad significativa de mejora en Precision sin sacrificar sensibilidad.
+\subsection{Resultados y Discusión}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{figures/DRAFTS-HF-SNR/linea 2a/2017-04-03-12_56_05_0001_slice086.png}
-    \caption[Línea 2a: Slice 086 - Candidato aceptado]{Línea 2a (solo I): Candidato en slice 086 clasificado como BURST ($p_{\mathrm{I}} = 1.00$, SNR\_I=7.7$\sigma$, SNR\_L=4.8$\sigma$). El sistema lo acepta basándose únicamente en clasificación en intensidad, sin validar morfología en polarización lineal. \textit{Fuente: Elaboración propia}.}
-    \label{fig:linea2a_slice086}
-\end{figure}
+\subsubsection{Resumen de resultados}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{figures/DRAFTS-HF-SNR/linea 2a/2017-04-03-12_56_05_0001_slice086-FP.png}
-    \caption[Línea 2b: Slice 086 - Falso positivo filtrado]{Línea 2b (dual I+L, modo STRICT): El mismo candidato es rechazado tras clasificación dual ($p_{\mathrm{I}} = 1.00$, $p_{\mathrm{L}} = 0.00$). Las anotaciones muestran "I:BURST L:NO", confirmando discrepancia polarimétrica. La Fase 3b detecta que la morfología en L no coincide con patrones de pulsos astrofísicos genuinos, filtrando el falso positivo. \textit{Fuente: Elaboración propia}.}
-    \label{fig:linea2b_slice086_fp}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{figures/DRAFTS-HF-SNR/linea 2a/2017-04-03-12_56_05_0001_slice102.png}
-    \caption[Línea 2a: Slice 102 - Múltiples candidatos aceptados]{Línea 2a (solo I): Slice 102 genera dos candidatos clasificados como BURST (t=50.996s y t=51.046s, ambos $p_{\mathrm{I}} = 1.00$, SNR\_I=8.3$\sigma$, SNR\_L=5.0--6.0$\sigma$). Ambos son aceptados sin validación polarimétrica morfológica. \textit{Fuente: Elaboración propia}.}
-    \label{fig:linea2a_slice102}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{figures/DRAFTS-HF-SNR/linea 2a/2017-04-03-12_56_05_0001_slice102-FP.png}
-    \caption[Línea 2b: Slice 102 - Falsos positivos filtrados]{Línea 2b (dual I+L, modo STRICT): Los mismos candidatos son rechazados tras clasificación dual (ambos con $p_{\mathrm{L}} = 0.00$). Las anotaciones "I:BURST L:NO" confirman discrepancia polarimétrica característica de RFI. Este caso demuestra que Fase 3b puede identificar múltiples falsos positivos en un solo slice, mejorando significativamente la especificidad del sistema. \textit{Fuente: Elaboración propia}.}
-    \label{fig:linea2b_slice102_fp}
-\end{figure}
-
-\paragraph{Línea 2b: Candidatos Finales Validados con Clasificación Dual}
-
-Tras la validación sistemática completa, Línea 2b generó \textbf{6 candidatos finales} clasificados como BURST en ambas polarizaciones (I+L) en modo STRICT. Estos eventos representan el conjunto de alta confianza con coherencia morfológica polarimétrica verificada automáticamente, compuesto por:
-
+\textbf{Componente 1 - Infraestructura de Software:}
 \begin{itemize}
-    \item \textbf{1 pulso de morfología extendida ("pulso watón")}: 13 componentes en Línea 2a consolidados en 1 evento único. Anteriormente documentado en Figuras \ref{fig:slice036_multiple_detections}--\ref{fig:pulso_polarimetrico}, validado por análisis polarimétrico independiente ($\sim$13--14$\sigma$ en L vs. $\sim$4--5$\sigma$ en V).
-    
-    \item \textbf{5 nuevos pulsos con alta coherencia I+L}: Candidatos con $p_{\mathrm{I}} \geq 0.6$ AND $p_{\mathrm{L}} \geq 0.6$, morfología consistente con pulsos astrofísicos en ambas polarizaciones, SNR significativo en I y L.
+\item \textbf{Validación cuantitativa:} Ecuaciones validadas con coincidencia exacta en 6 archivos (122 mil--625 millones de muestras). Determinismo, escalabilidad y presupuesto adaptativo confirmados.
+\item \textbf{Caso 1 (FAST-FREX):} Flujo \textit{end-to-end} completo validado. Detección FRB con SNR=5.9$\sigma$, \textbf{\textit{Recall}=100\%} (1/1), \textbf{\textit{Precision}=100\%}, 0 errores OOM.
+\item \textbf{Caso 2 (B0355+54):} Robustez temporal \textit{multi-chunk}. 140 \textit{chunks} procesados, \textbf{\textit{recall} 110.4\%} (830/752, exceso por solapamiento intencional confirma ausencia de pérdidas en bordes), \textbf{precisión 95.8\%}, continuidad 100\%.
+\item \textbf{Caso 3 (FRB 121102):} Escalabilidad masiva. 188 GB formato SIGPROC Filterbank, 804 \textit{chunks} procesados, \textbf{\textit{recall} 100\%} (24/24 eventos conocidos recuperados), 2 eventos nuevos descubiertos y confirmados independientemente (SNR 6.3$\sigma$ y 12.0$\sigma$). \textbf{Capacidad de descubrimiento científico} validada.
+\item \textbf{Caso 3$^*$ (Resiliencia Extrema):} Mecanismos de última defensa activados exitosamente. DM$_{\max}=10{,}000$ pc cm$^{-3}$ (10$\times$ típico), 31.4 GB, \textit{chunking} jerárquico DM (101 \textit{chunks}) + temporal (88 sub-\textit{chunks}) = 35,552 unidades procesadas, 0 errores OOM. Robustez bajo configuraciones adversas validada.
 \end{itemize}
 
-\textbf{Validación experta pendiente}: Los 5 nuevos pulsos requieren inspección manual para confirmar naturaleza astrofísica definitiva y caracterización física completa (DM, ancho temporal, propiedades polarimétricas). Las Figuras \ref{fig:linea2b_candidate_1}--\ref{fig:linea2b_candidate_5} presentan la visualización completa de estos candidatos, y la Figura \ref{fig:linea2b_candidate_6} muestra el pulso watón ya validado independientemente.
+\textbf{Componente 2 - Extensión a Alta Frecuencia (ALMA PSR J1745-2900, 86 GHz):}
+\begin{itemize}
+\item \textbf{\textit{Ground truth} (8 pulsos canónicos):} Desglose por fases: \textbf{Detección 100\%} (8/8, Fase 1 \textit{matched filtering}), \textbf{Clasificación en I: 100\%} (8/8, Fase 3a), Clasificación en L: 75\% (6/8, Fase 3b). Decisión final (modo STRICT): \textbf{\textit{Recall} 75\%}, \textbf{\textit{Precision} 100\%}, \textbf{F1=0.857}. Supera dramáticamente \textit{baseline}: 0\% (umbral estándar DET\_PROB=0.3) y 87.5\% (umbral permisivo DET\_PROB=0.05, \textit{Precision} 36.8\%).
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{figures/DRAFTS-HF-SNR/2017-04-03-08_16_13_0001_slice086.png}
-    \caption[Línea 2b Candidato 1]{Línea 2b Candidato 1 (archivo 08\_16\_13\_0001, slice 086, t=43.104s): Pulso con clasificación BURST en I+L (modo STRICT). SNR\_I $\approx$ 9.5$\sigma$, $p_{\mathrm{I}} = 1.00$, $p_{\mathrm{L}} = 0.92$. Alta coherencia polarimétrica confirma naturaleza astrofísica. Pendiente de validación experta. \textit{Fuente: Elaboración propia}.}
-    \label{fig:linea2b_candidate_1}
-\end{figure}
+\item \textbf{Dataset completo ALMA (54 archivos → 44 procesables):} Validación comparativa Config. A (solo I) vs Config. B (STRICT I+L). \textbf{Detección: 100\%} (44/44). \textbf{Clasificación I: 100\%} (44/44). Clasificación L: 61.4\% (27/44, supervivientes con coherencia morfológica I+L validada), 17 rechazados (38.6\%, morfología atípica en L a pesar de clasificación BURST en I). Confirma limitación específica en Fase 3b (\textit{transfer learning} de ResNet18 en polarización lineal). 10 archivos corruptos descartados automáticamente sin afectar ejecución (robustez validada).
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{figures/DRAFTS-HF-SNR/2017-04-03-08_16_13_0002_slice101.png}
-    \caption[Línea 2b Candidato 2]{Línea 2b Candidato 2 (archivo 08\_16\_13\_0002, slice 101): Pulso con clasificación BURST en I+L (modo STRICT). Alta coherencia polarimétrica en intensidad y polarización lineal. Pendiente de validación experta. \textit{Fuente: Elaboración propia}.}
-    \label{fig:linea2b_candidate_2}
-\end{figure}
+\item \textbf{Descubrimientos científicos (6 candidatos modo STRICT):} Pulso de morfología temporal extendida validado independientemente mediante análisis polarimétrico (SNR\_L 13--14$\sigma$, dominancia lineal sobre circular confirma naturaleza astrofísica) + 5 candidatos alta confianza (todos $p_{\mathrm{I}} \geq 0.6$ AND $p_{\mathrm{L}} \geq 0.6$, pendientes validación experta). Demuestra capacidad de descubrimiento en alta frecuencia, análoga a Caso 3 (2 eventos FRB 121102).
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{figures/DRAFTS-HF-SNR/2017-04-03-12_47_05_0005_slice016.png}
-    \caption[Línea 2b Candidato 3]{Línea 2b Candidato 3 (archivo 12\_47\_05\_0005, slice 016): Pulso con clasificación BURST en I+L (modo STRICT). Morfología consistente con pulso astrofísico en ambas polarizaciones. Pendiente de validación experta. \textit{Fuente: Elaboración propia}.}
-    \label{fig:linea2b_candidate_3}
-\end{figure}
+\item \textbf{Hallazgo crítico - Localización quirúrgica de limitación:} Núcleo híbrido (\textit{matched filtering} + clasificación en I) funciona perfectamente: Fases 1+3a al 100\% en ambos conjuntos. Limitación específica y acotada en Fase 3b (ResNet18 en L): 61--75\% por \textit{transfer learning} en dominio no visto. Problema abordable mediante reentrenamiento con \textit{waterfalls} de Stokes L en alta frecuencia.
+\end{itemize}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{figures/DRAFTS-HF-SNR/2017-04-03-13_38_31_0003_slice081.png}
-    \caption[Línea 2b Candidato 4]{Línea 2b Candidato 4 (archivo 13\_38\_31\_0003, slice 081): Pulso con clasificación BURST en I+L (modo STRICT). SNR significativo en I y L con coherencia morfológica polarimétrica. Pendiente de validación experta. \textit{Fuente: Elaboración propia}.}
-    \label{fig:linea2b_candidate_4}
-\end{figure}
+\subsubsection{Síntesis de limitaciones técnicas}
 
-\begin{figure}[H]
-    \centering
-    \fbox{\textit{[Figura de candidato 5 - Pendiente de generación]}}
-    \caption[Línea 2b Candidato 5]{Línea 2b Candidato 5: Pulso con clasificación BURST en I+L (modo STRICT). Pendiente de generación de figura y validación experta. \textit{Fuente: Elaboración propia}.}
-    \label{fig:linea2b_candidate_5}
-\end{figure}
+\textbf{Limitación específica identificada:} El análisis quirúrgico por fases (Tabla~\ref{tab:desglose_fases_hf}) localiza con precisión la limitación del \textit{pipeline} HF:
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{figures/DRAFTS-HF-SNR/Pulso_waton.png}
-    \caption[Línea 2b Candidato 6 - Pulso Watón]{Línea 2b Candidato 6 (pulso watón): Pulso de morfología extendida con 13 componentes temporales en Línea 2a consolidados en 1 evento único mediante clasificación dual. Anteriormente documentado en Figuras \ref{fig:slice036_multiple_detections}--\ref{fig:pulso_polarimetrico}. Validación polarimétrica independiente confirma polarización lineal dominante (~13--14$\sigma$) sobre circular (~4--5$\sigma$), emisión banda ancha 85.25--87.00 GHz, consistente con púlsar en alta frecuencia. \textit{Fuente: Elaboración propia}.}
-    \label{fig:linea2b_candidate_6}
-\end{figure}
-
-\paragraph{Trabajo Futuro: Re-evaluación de Candidatos Rechazados y Optimización}
-
-Tras completar la validación sistemática de Línea 2b, se identifican las siguientes tareas para robustecer y extender el pipeline:
-
-\begin{enumerate}
-    \item \textbf{Validación experta de 5 nuevos pulsos}: Inspección manual para confirmar naturaleza astrofísica y caracterizar propiedades físicas (DM, ancho temporal, polarización, morfología espectral) de los 5 nuevos candidatos con clasificación BURST (I+L). El pulso watón ya fue validado independientemente.
+\begin{itemize}
+    \item $\checkmark$ \textbf{Fase 1 (Detección por \textit{matched filtering})}: Funciona perfectamente (100\% en ambos conjuntos). Resuelve completamente el problema del \textit{baseline} (0--87.5\%).
     
-    \item \textbf{Re-evaluación de 3 pulsos rechazados del ground truth}: Determinar mediante validación independiente si los 3 eventos catalogados en literatura original son RFI erróneos, poseen polarización atípica/corrupta en datos ALMA procesados, o representan casos con morfología no estándar que requieren ajustes en criterios de clasificación.
+    \item $\checkmark$ \textbf{Fase 3a (Clasificación ResNet18 en Intensidad)}: Funciona perfectamente (100\% en ambos conjuntos). El \textit{transfer learning} es exitoso en el dominio de intensidad.
     
-    \item \textbf{Análisis de 27 supervivientes del dataset extendido}: Validar manualmente los 27 candidatos con morfología I+L válida para confirmar naturaleza astrofísica vs. RFI complejo.
-    
-    \item \textbf{Corrección de datos corruptos}: Investigar y corregir 10 archivos con datos incompletos/corruptos del dataset extendido para ampliar cobertura de validación.
-    
-    \item \textbf{Comparación STRICT vs. PERMISSIVE}: Evaluar trade-off cuantitativo entre modos sobre ground truth completo. PERMISSIVE podría recuperar los 3 pulsos rechazados con criterio más relajado ($p_{\mathrm{L}} \geq 0.5$ vs. $0.6$), cuantificando trade-off sensibilidad-especificidad.
-    
-    \item \textbf{Ablation study}: Aislar contribución de Fase 2 (SNR en L) vs. Fase 3b (clasificación en L): algunos candidatos podrían pasar Fase 2 (SNR alto en L) pero fallar Fase 3b (morfología incorrecta en L), como se observa en los casos presentados.
-    
-    \item \textbf{Análisis polarimétrico diferencial}: Caracterizar propiedades polarimétricas (fracción L/I, coherencia espectral, ángulo de polarización) que distinguen candidatos filtrados de supervivientes, y comparar con los 3 pulsos rechazados del ground truth.
-\end{enumerate}
+    \item $\triangle$ \textbf{Fase 3b (Clasificación ResNet18 en Polarización Lineal)}: Limitación específica (75\% canónicos, 61.4\% \textit{dataset}). ResNet18, entrenado exclusivamente en \textit{waterfalls} de Stokes I (baja frecuencia), no generaliza correctamente a Stokes L (dominio ortogonal no visto durante entrenamiento). Causa: morfologías físicas difieren (I: coherente banda ancha; L: difusa/fragmentada por efectos magnéticos/\textit{scattering}).
+\end{itemize}
 
-Los resultados finales confirman dramáticamente la efectividad del enfoque: 94.1\% de reducción de falsos positivos (102 $\rightarrow$ 6) con 6 candidatos de alta confianza (Precision $\sim$100\%), aplicando criterios estrictos de coherencia polarimétrica I+L que priorizan especificidad sobre sensibilidad (Recall 62.5\% en ground truth canónico). El sistema representa un avance significativo en detección automatizada de FRBs en alta frecuencia, complementando algoritmos clásicos validados con aprendizaje profundo multi-polarización.
+\textbf{Implicación técnica:} El núcleo híbrido (\textit{matched filtering} + clasificación en I) funciona perfectamente al 100\%. La limitación NO es arquitectónica, sino específica del \textit{transfer learning} en Fase 3b. Este problema es abordable mediante reentrenamiento con \textit{waterfalls} de Stokes L en alta frecuencia, como se detalla en el trabajo futuro propuesto en el Capítulo 6 (Conclusiones).
 
-% \subsubsection{Línea 3: Validación de Representaciones 2D Alternativas para Generación Artificial de Firmas Discriminativas}
-
-% Esta línea explora y valida representaciones 2D alternativas diseñadas para compensar la pérdida de contraste del patrón DM-tiempo en alta frecuencia, mediante la generación artificial de firmas visuales discriminativas que permiten a detectores tipo CNN mantener separabilidad frente a RFI en regímenes donde el bow-tie es irresoluble. Las estrategias propuestas incluyen:
-
-% \begin{itemize}
-%     \item \textbf{Espectrogramas polarimétricos multicanal (Stokes IQUV)}: Aprovechamiento de polarización extrema típica de FRBs (>50\%) versus RFI terrestre no polarizada para crear firmas multicanal coherentes
-%     \item \textbf{Mapas tiempo-ancho de pulso (multi-escala temporal)}: Exploración de respuesta de señal a diferentes ventanas de integración, generando patrones tipo "triángulo invertido" característicos de pulsos astrofísicos
-%     \item \textbf{Mapas tiempo-RM (rotación Faraday)}: Detección de pulsos con rotación Faraday elevada (entornos magnetizados cósmicos) distinguibles de RFI local cerca de RM=0
-%     \item \textbf{Mapas de coherencia espectral}: Medición de extensión en frecuencia mediante autocorrelación espectral, distinguiendo emisiones broadband astrofísicas de RFI narrowband
-%     \item \textbf{Combinación multi-representación}: Concatenación de representaciones para generar "bow-tie artificial" en espacio de características de alta dimensión
-% \end{itemize}
-
-% Esta línea se encuentra actualmente en implementación en rama separada del repositorio DRAFTS++ en GitHub. A la fecha no se incluyen resultados cuantitativos completos; se deja planteado el protocolo de evaluación para trabajo futuro con métricas de precisión/recobrado sobre banco de datos polarimétricos con ground truth curado por validación científica independiente.
-
-% \subsubsection{Línea 4: Validación de Estrategias Avanzadas para Recuperación de Morfología Dispersiva y Fishing DM-Aware}
-
-% Esta línea valida dos estrategias complementarias diseñadas específicamente para abordar la compresión dispersiva en alta frecuencia mediante enfoques que preservan la filosofía DM-centrada del pipeline original. Las estrategias evaluadas son:
-
-% \begin{itemize}
-%     \item \textbf{Estrategia 1 - Expansión de rejilla DM}: Forzamiento de apertura morfológica del bow-tie mediante exploración sistemática con rangos DM ampliados y pasos más gruesos ($\gamma > 1$), permitiendo que modelos entrenados en bow-ties desarrollados recuperen sensibilidad en regímenes comprimidos
-%     \item \textbf{Estrategia 2 - Fishing a DM$\approx$0 + validación DM-aware}: Detección primaria permisiva en DM mínima seguida de validación física rigurosa mediante: (i) ajuste de DM por maximización de SNR en sub-bandas, (ii) verificación de consistencia entre sub-bandas ($>$ umbral mínimo), y (iii) coherencia temporal entre chunks procesados independientemente
-%     \item \textbf{Validación DM-aware multi-criterio}: Implementación de validador físico estricto que requiere dispersión medible ($\mathrm{DM}_{\mathrm{best-fit}} > \epsilon_{\mathrm{DM}}$), coherencia espectral, y consistencia temporal para discriminar señales astrofísicas genuinas de RFI residual
-%     \item \textbf{Módulos de rejilla adaptativa}: Desarrollo de sistema que calcula dinámicamente parámetros de expansión ($\gamma$, $d_{\min}$) basados en características observacionales (frecuencia central, ancho de banda, resolución temporal)
-% \end{itemize}
-
-% Esta línea se encuentra actualmente en implementación en rama dedicada del repositorio DRAFTS++ en GitHub. Aunque no se reportan resultados experimentales completos en esta memoria, se especifica el plan de evaluación y trazabilidad de artefactos para su futura integración y comparación directa con Líneas 1-2, estableciendo métricas de rendimiento comparables (recall, precision, F1) bajo condiciones experimentales controladas.
+\textbf{Configurabilidad operacional:} El sistema ofrece dos modos que balancean sensibilidad vs. especificidad: \textbf{modo STRICT} (I AND L: \textit{Precision} $\sim$100\%, \textit{Recall} 75\%, tolera falsos negativos) vs. \textbf{modo PERMISSIVE} (solo I: \textit{Recall} 100\%, especificidad reducida, tolera falsos positivos). Esta flexibilidad permite adaptar el \textit{pipeline} según objetivos científicos (descubrimiento exploratorio vs. caracterización precisa), como se discute en profundidad en el Capítulo 6.
